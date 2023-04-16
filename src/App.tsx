@@ -18,9 +18,10 @@ const App: React.FC = () => {
           minHeight: "100vh",
         }}
       >
+        
         <MyAppBar
           sx={{ position: "fixed", top: 0, zIndex: 10, width: "100%" }}
-        />
+      />
         <Box
           sx={{
             display: "flex",

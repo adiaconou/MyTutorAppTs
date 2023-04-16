@@ -43,9 +43,9 @@ const MyChatForm: React.FC = () => {
           overflowY: "auto",
           backgroundColor: "transparent",
           width: "100%",
-          maxWidth: "sm",
-          margin: "0 auto",
-          paddingTop: "80px",
+          maxWidth: "md",
+          marginTop: "64px",
+          
           '&::-webkit-scrollbar': {
             width: '6px',
             backgroundColor: 'transparent',
@@ -57,7 +57,7 @@ const MyChatForm: React.FC = () => {
           '&::-webkit-scrollbar-track': {
             borderRadius: '3px',
             backgroundColor: 'transparent',
-          },
+          }, 
         }}
       >
         <MyChatWindow messages={messages} />
