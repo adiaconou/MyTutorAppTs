@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { Box, Slider, Typography, Divider } from "@mui/material";
 import MyDropDown from "../components/MyDropDown";
-// import { GoogleCloudDatastoreDataAccess } from "../dataAccess/googleCloudDatastoreDataAccess";
+import { SelectChangeEvent } from "@mui/material/Select";
+import { UserSettings } from "../models/settingsModel";
 
 const Settings: React.FC = () => {
-  // const dataAccess = new GoogleCloudDatastoreDataAccess('projectId');
   const fixedUserId = "adiaconou";
 
   // State to hold the current value of the slider
   const [languageProficiency, setLanguageProficiency] = useState<number>(5); // Default value
-  const [languageChoice, setLanguageChoice] = useState<string>("gr");
+  const [languageChoice, setLanguageChoice] = useState<string>("Greek");
 
   // Handle slider value change
   const handleLanguageProficiencyChange = (
@@ -18,7 +18,63 @@ const Settings: React.FC = () => {
     activeThumb: number
   ) => {
     setLanguageProficiency(newValue as number);
+
+    const userSettings: UserSettings = {
+      userId: 'adiaconou',
+      settings: {
+        languageChoice: languageChoice,
+        languageProficiency: newValue as number,
+      },
+    };
+
+    updateUserSettings(userSettings);
   };
+
+  const handleLanguageChoiceChange = (event: SelectChangeEvent<string>) => {
+    setLanguageChoice(event.target.value);
+  };
+
+  async function getUserSettings(userId: string): Promise<UserSettings | null> {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/user-settings/${userId}`
+      );
+
+      // Check if the response status code indicates success
+      if (!response.ok) {
+        throw new Error(`Server responded with status ${response.status}`);
+      }
+
+      const userSettings: UserSettings = await response.json();
+      console.log("userSettings: " + userSettings);
+      return userSettings;
+    } catch (error) {
+      console.error("Error fetching user settings:", error);
+      return null;
+    }
+  }
+
+  async function updateUserSettings(userSettings: UserSettings): Promise<UserSettings | null> {
+    try {
+      const response = await fetch(`http://localhost:3001/user-settings/${userSettings.userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userSettings),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error updating user settings');
+      }
+      const updatedUserSettings: UserSettings = await response.json();
+      return updatedUserSettings;
+
+    } catch (error) {
+      console.error(`Error attempting to update user settings: ${error}`);
+      return null;
+    }
+  }
 
   return (
     <Box
@@ -55,7 +111,10 @@ const Settings: React.FC = () => {
         />
 
         <Typography sx={{ fontSize: "14px" }}>Language</Typography>
-        <MyDropDown />
+        <MyDropDown
+          languageChoice={languageChoice}
+          handleLanguageChoiceChange={handleLanguageChoiceChange}
+        />
       </Box>
       <Box
         className="setting_languageProficiency"

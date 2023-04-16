@@ -22,5 +22,5 @@
   },
   "include": [
     "src"
-  ]
+, "server/interfaces", "server/src/dataAccess", "server/models", "server/interfaces", "server/src/models/settingsModel.ts", "server/src/interfaces/settingsDataAccess.ts"  ]
 }

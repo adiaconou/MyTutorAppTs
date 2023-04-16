@@ -1,6 +1,6 @@
 import React from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Box, Slider, Typography, Divider, MenuItem, Select } from '@mui/material';
+import { Box, Slider, Typography, Divider, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { blue } from '@mui/material/colors';
 
 const customTheme = createTheme({
@@ -31,10 +31,17 @@ const customTheme = createTheme({
   },
 });
 
-const MyDropDown: React.FC = () => {
+interface MyDropDownProps {
+  languageChoice: string;
+  handleLanguageChoiceChange: (event: SelectChangeEvent<string>) => void;
+}
+
+const MyDropDown: React.FC<MyDropDownProps> = ({ languageChoice, handleLanguageChoiceChange }) => {
   return (
     <ThemeProvider theme={customTheme}>
       <Select
+        value={languageChoice} // Use languageChoice prop to set the value of Select
+        onChange={handleLanguageChoiceChange} // Use handleLanguageChoiceChange prop to handle value changes
         sx={{
           marginTop: '10px',
           marginBottom: '10px',
