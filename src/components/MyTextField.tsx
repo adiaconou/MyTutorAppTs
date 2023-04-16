@@ -6,6 +6,9 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { blue } from "@mui/material/colors";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import { useMediaQuery } from "@mui/material";
+import { Theme } from "@mui/system";
+import { useTheme } from "@mui/system";
 
 const theme = createTheme({
   components: {
@@ -45,9 +48,13 @@ interface MyTextFieldProps {
   messages: Message[];
 }
 
+
 const MyTextField: React.FC<MyTextFieldProps> = ({ onSubmit, messages }) => {
   const [inputValue, setInputValue] = useState("");
 
+  // const theme = useTheme();
+  const isSmallScreen = true; // useMediaQuery(theme.breakpoints.down("sm"));
+  
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
@@ -81,7 +88,9 @@ const MyTextField: React.FC<MyTextFieldProps> = ({ onSubmit, messages }) => {
         paddingBottom: "15px",
       }}
     >
-      <Container maxWidth="md" sx={{ width: "800px" }}>
+      <Container maxWidth={false} sx={{ 
+        width: isSmallScreen ? "95%" : "800px",
+        maxWidth: isSmallScreen ? "95%" : "800px" }}>
         <form onSubmit={handleSubmit}>
           <ThemeProvider theme={theme}>
             <TextField

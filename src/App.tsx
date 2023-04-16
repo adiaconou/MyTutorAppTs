@@ -29,7 +29,7 @@ const App: React.FC = () => {
             paddingTop: "64px",
           }}
         >
-          <Container sx={{ flexGrow: 1, paddingTop: "16px" }}>
+          <Container maxWidth="md" sx={{ flexGrow: 1, paddingTop: "16px" }}>
             <Routes>
               <Route path="/" element={<MyChatForm />} />
               <Route path="/settings" element={<Settings />} />

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import MyTextField from './MyTextField';
-import MyChatWindow from './MyChatWindow';
-import { Box } from '@mui/material';
-import promptGPT from '../services/openaiService';
+import React, { useState } from "react";
+import MyTextField from "./MyTextField";
+import MyChatWindow from "./MyChatWindow";
+import { Box, Grid } from "@mui/material";
+import promptGPT from "../services/openaiService";
 
 interface Message {
   text: string;
@@ -30,21 +30,22 @@ const MyChatForm: React.FC = () => {
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        backgroundColor: 'transparent',
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh"
       }}
     >
       <Box
         sx={{
           flexGrow: 1,
-          overflowY: 'auto',
-          backgroundColor: 'transparent',
-          width: '500px',
-          marginTop: '64px',
+          overflowY: "auto",
+          backgroundColor: "transparent",
+          width: "100%",
+          maxWidth: "sm",
+          margin: "0 auto",
+          paddingTop: "80px",
           '&::-webkit-scrollbar': {
             width: '6px',
             backgroundColor: 'transparent',
@@ -63,14 +64,15 @@ const MyChatForm: React.FC = () => {
       </Box>
       <Box
         sx={{
-          position: 'sticky',
+          position: "sticky",
           bottom: 0,
           zIndex: 1,
-          backgroundColor: 'transparent',
-          paddingBottom: '15px',
-          paddingTop: '15px',
-          width: '100%',
-          maxWidth: '800px',
+          backgroundColor: "transparent",
+          paddingBottom: "15px",
+          paddingTop: "15px",
+          width: "100%",
+          maxWidth: "md",
+          margin: "0 auto",
         }}
       >
         <MyTextField messages={messages} onSubmit={handleTextSubmit} />

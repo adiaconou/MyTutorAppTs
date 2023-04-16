@@ -38,11 +38,11 @@ const MyChatWindow: React.FC<MyChatWindowProps> = ({ messages }) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ margin: 'auto' }}>
+      <Box sx={{ marginTop: 'auto' }}>
         <List
           id="chatBox"
           sx={{
-            maxWidth: 500,
+            width: '100%',
             paddingTop: '4px',
           }}
         >
