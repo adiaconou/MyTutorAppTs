@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Slider, Typography, Divider } from "@mui/material";
 import MyDropDown from "../components/MyDropDown";
 import { SelectChangeEvent } from "@mui/material/Select";
 import { UserSettings } from "../models/settingsModel";
+import CircularProgress from '@mui/material/CircularProgress';
 
 const Settings: React.FC = () => {
   const fixedUserId = "adiaconou";
@@ -10,6 +11,7 @@ const Settings: React.FC = () => {
   // State to hold the current value of the slider
   const [languageProficiency, setLanguageProficiency] = useState<number>(5); // Default value
   const [languageChoice, setLanguageChoice] = useState<string>("Greek");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Handle slider value change
   const handleLanguageProficiencyChange = (
@@ -32,7 +34,29 @@ const Settings: React.FC = () => {
 
   const handleLanguageChoiceChange = (event: SelectChangeEvent<string>) => {
     setLanguageChoice(event.target.value);
+
+
+    const userSettings: UserSettings = {
+      userId: 'adiaconou',
+      settings: {
+        languageChoice: event.target.value,
+        languageProficiency: languageProficiency,
+      },
+    };
+
+    updateUserSettings(userSettings);
   };
+
+  // Fetch user settings on component mount and update state values
+  useEffect(() => {
+    getUserSettings(fixedUserId).then((userSettings) => {
+      if (userSettings && userSettings.settings) {
+        setLanguageChoice(userSettings.settings.languageChoice);
+        setLanguageProficiency(userSettings.settings.languageProficiency);
+      }
+      setIsLoading(false);
+    });
+  }, []); // Empty dependency array ensures this effect only runs on component mount
 
   async function getUserSettings(userId: string): Promise<UserSettings | null> {
     try {
@@ -74,6 +98,21 @@ const Settings: React.FC = () => {
       console.error(`Error attempting to update user settings: ${error}`);
       return null;
     }
+  }
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (
