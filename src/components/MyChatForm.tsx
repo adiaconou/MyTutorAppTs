@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MyTextField from "./MyTextField";
 import MyChatWindow from "./MyChatWindow";
 import { Box, Grid } from "@mui/material";
@@ -11,6 +11,20 @@ interface Message {
 
 const MyChatForm: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
+  const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
+
+  const updateViewportSize = () => {
+    setViewportHeight(window.innerHeight);
+    // setViewportWidth(window.innerWidth);
+  };
+
+  useEffect(() => {
+    window.addEventListener('resize', updateViewportSize);
+    return () => {
+      window.removeEventListener('resize', updateViewportSize);
+    };
+  }, []);
 
   const handleTextSubmit = (text: string) => {
     const userMessage: Message = { text, isUser: true };
@@ -34,7 +48,7 @@ const MyChatForm: React.FC = () => {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        height: "100vh"
+        height: `${viewportHeight}px`,
       }}
     >
       <Box

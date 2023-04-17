@@ -2,10 +2,9 @@ import React from "react";
 import "./App.css";
 import MyChatForm from "./components/MyChatForm";
 import MyAppBar from "./components/MyAppBar";
-import MyNavMenu from "./components/MyNavMenu";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-import { BrowserRouter, Route, Link, Outlet, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Settings from "./nav/Settings";
 
 const App: React.FC = () => {
@@ -15,6 +14,7 @@ const App: React.FC = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
+          justifyContents: "center",
           minHeight: "100vh",
         }}
       >
@@ -28,6 +28,7 @@ const App: React.FC = () => {
             flexDirection: "column",
             flexGrow: 1,
             paddingTop: "64px",
+            alignItems: "center",
           }}
         >
           <Container maxWidth="md" sx={{ flexGrow: 1, paddingTop: "16px" }}>

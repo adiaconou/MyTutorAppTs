@@ -1,4 +1,4 @@
-import React, { useState, MouseEvent, FocusEvent } from "react";
+import React, { useState, useEffect, MouseEvent, FocusEvent } from "react";
 import TextField from "@mui/material/TextField";
 import { InputAdornment, Tooltip } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
@@ -52,9 +52,6 @@ interface MyTextFieldProps {
 const MyTextField: React.FC<MyTextFieldProps> = ({ onSubmit, messages }) => {
   const [inputValue, setInputValue] = useState("");
 
-  // const theme = useTheme();
-  const isSmallScreen = true; // useMediaQuery(theme.breakpoints.down("sm"));
-  
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
@@ -88,9 +85,7 @@ const MyTextField: React.FC<MyTextFieldProps> = ({ onSubmit, messages }) => {
         paddingBottom: "15px",
       }}
     >
-      <Container maxWidth={false} sx={{ 
-        width: isSmallScreen ? "95%" : "800px",
-        maxWidth: isSmallScreen ? "95%" : "800px" }}>
+      <Container maxWidth="md">
         <form onSubmit={handleSubmit}>
           <ThemeProvider theme={theme}>
             <TextField
@@ -114,13 +109,13 @@ const MyTextField: React.FC<MyTextFieldProps> = ({ onSubmit, messages }) => {
               InputLabelProps={{
                 style: {
                   fontFamily: "Noto Sans, monospace", // Set the font family
-                  fontSize: "13px", // Set the font size
+                  fontSize: "16px", // Set the font size
                 },
               }}
               InputProps={{
                 style: {
                   fontFamily: "Noto Sans, monospace", // Set the font family
-                  fontSize: "13px", // Set the font size
+                  fontSize: "16px", // Set the font size
                   textAlign: "left",
                 },
 
