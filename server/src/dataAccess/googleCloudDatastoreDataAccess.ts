@@ -27,18 +27,15 @@ export class GoogleCloudDatastoreDataAccess implements ISettingsDataAccess {
     async getUserSettings(userId: string): Promise<UserSettings | null> {
         const key = this.datastore.key([this.kind, userId]);
 
-        console.log("Key: " + key);
         try {
             const [userSettingsData] = await this.datastore.get(key);
 
             console.log("response!");
 
             if (!userSettingsData) {
-                console.log("null");
                 return null;
             }
 
-            console.log("not null!");
             return {
                 userId: userSettingsData[this.datastore.KEY].name,
                 settings: userSettingsData.settings,

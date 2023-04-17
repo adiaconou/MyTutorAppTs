@@ -58,6 +58,17 @@ const Settings: React.FC = () => {
     });
   }, []); // Empty dependency array ensures this effect only runs on component mount
 
+  async function sendLogToBackend(logMessage: string): Promise<void> {
+    const response = await fetch(`http://localhost:3001/log`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ message: logMessage })
+    });
+
+    const result = await response.json();
+    console.log("Result: " + result);
+  }
+
   async function getUserSettings(userId: string): Promise<UserSettings | null> {
     try {
       const response = await fetch(
@@ -71,8 +82,10 @@ const Settings: React.FC = () => {
 
       const userSettings: UserSettings = await response.json();
       console.log("userSettings: " + userSettings);
+      sendLogToBackend("User settings retrieved: " + JSON.stringify(userSettings));
       return userSettings;
     } catch (error) {
+      sendLogToBackend("Error fetching user settings: " + error);
       console.error("Error fetching user settings:", error);
       return null;
     }
