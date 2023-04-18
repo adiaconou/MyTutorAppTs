@@ -68,9 +68,11 @@ app.post("/log", async (req: Request, res: Response) => {
 
 app.get("/user-settings/:userId", async (req: Request, res: Response) => {
   try {
+    console.log("HI");
     const userId = req.params.userId;
+    console.log("userId: " + userId);
     const userSettings = await dataAccess.getUserSettings(userId);
-
+    console.log("user settings are: " + JSON.stringify(userSettings));
     res.json(userSettings);
   } catch (error) {
     res.status(500).json({ message: "Error fetching user settings" });
@@ -92,7 +94,7 @@ app.put("/user-settings/:userId", async (req: Request, res: Response) => {
       settings,
     };
 
-    const updatedUserSettings = await dataAccess.updateUserSettings(
+    const updatedUserSettings = await dataAccess.updateUserSettings(userId,
       userSettings
     );
     res.json(updatedUserSettings);

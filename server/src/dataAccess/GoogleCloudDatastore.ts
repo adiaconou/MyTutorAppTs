@@ -11,21 +11,25 @@ export class GoogleCloudDatastore<T> {
     this.entityKey = entityKey;
   }
 
-  async put(entity: T): Promise<void> {
-    const datastoreKey = this.datastore.key([this.entityType, this.entityKey]);
+  async put(key: string, entity: T): Promise<void> {
+    const datastoreKey = this.datastore.key([this.entityType, key]);
     const datastoreEntity = {
-      datastoreKey,
+      key: datastoreKey,
       data: entity,
     };
     await this.datastore.update(datastoreEntity);
   }
 
   async get(key: string): Promise<T | null> {
+    console.log("GoogleCLoudDataStore get: " + this.entityType + " " + key);
     const datastoreKey = this.datastore.key([this.entityType, key]);
+    console.log("A");
     const [datastoreEntity] = await this.datastore.get(datastoreKey);
     if (!datastoreEntity) {
+        console.log("IS NULL!");
       return null;
     }
-    return datastoreEntity.data as T;
+    console.log("B: " + JSON.stringify(datastoreEntity.data));
+    return  datastoreEntity as T;
   }
 }

@@ -1,7 +1,5 @@
 
-import { Datastore, Key } from '@google-cloud/datastore';
 import { UserSettings } from '../models/settingsModel';
-import { ISettingsDataAccess } from '../interfaces/settingsDataAccess';
 import { GoogleCloudDatastore } from './GoogleCloudDatastore';
 
 export class UserSettingsRepository {
@@ -12,11 +10,12 @@ export class UserSettingsRepository {
     }
 
     async getUserSettings(userId: string): Promise<UserSettings | null> {
+        console.log("getUserSettings");
         return this.cloudDatastore.get(userId);
 
     }
 
-    async updateUserSettings(userSettings: UserSettings): Promise<void> {
-        this.cloudDatastore.put(userSettings);
+    async updateUserSettings(userId: string, userSettings: UserSettings): Promise<void> {
+        this.cloudDatastore.put(userId, userSettings);
     }
 }
