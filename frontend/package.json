@@ -30,7 +30,7 @@
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "client": "react-scripts start",
     "build:server": "tsc --project server",
-    "server": "node server/dist/index.js",
+    "server": "node ../backend/dist/index.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
