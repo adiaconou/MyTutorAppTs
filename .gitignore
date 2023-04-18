@@ -6,8 +6,8 @@
 .pnp.js
 
 # Backend server
-/backend/node_modules/
-/backend/.env
+/server/node_modules/
+/server/.env
 
 # testing
 /coverage
