@@ -24,6 +24,6 @@ export class GoogleCloudDatastore<T> {
     if (!datastoreEntity) {
       return null;
     }
-    return  datastoreEntity as T;
+    return datastoreEntity as T;
   }
 }

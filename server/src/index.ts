@@ -3,12 +3,14 @@ import cors from "cors";
 import { UserSettings } from "./models/settingsModel";
 import { Logging } from "@google-cloud/logging";
 import { UserSettingsRepository } from "./dataAccess/UserSettingsRepository";
+import { SecretManager } from "./dataAccess/SecretManager";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 const dataAccess = new UserSettingsRepository('for-fun-153903');
+const secretManager = new SecretManager('for-fun-153903');
 
 /***** LOGGING  *********/
 interface LogRequestBody {
@@ -20,23 +22,18 @@ const fs = require("fs");
 
 app.post("/log", async (req: Request, res: Response) => {
   console.log("a");
-  if (serviceAccountKeyLoggingPath) {
-    // Read the contents of the JSON key file
-    const keyFileContents = fs.readFileSync(
-      serviceAccountKeyLoggingPath,
-      "utf8"
-    );
-
-    // Parse the contents as JSON
+  
+  try {
+    const secretName = 'gcloud-logging-api-key'; // Replace with the name of the secret containing the logging service account key
+    const keyFileContents = await secretManager.accessSecretVersion(secretName);
     const keyFileJson = JSON.parse(keyFileContents);
 
     // Initialize the Logging client with the parsed JSON credentials
     const logging = new Logging({
-      projectId: "for-fun-153903",
+      projectId: 'for-fun-153903',
       credentials: keyFileJson,
     });
 
-    console.log("I'm here");
     const logName = "my-log";
     const log = logging.log(logName);
     const metadata = { resource: { type: "global" } };
@@ -44,20 +41,12 @@ app.post("/log", async (req: Request, res: Response) => {
 
     const entry = log.entry(metadata, { message: logMessage });
 
-    try {
-      await log.write(entry);
-      res.status(200).send({ message: "Log entry created" });
-    } catch (error) {
-      res
-        .status(500)
-        .send({ message: "Error writing log entry", error: error });
-    }
+    await log.write(entry);
+    res.status(200).send({ message: "Log entry created" });
 
-    // Use the 'logging' instance as needed
-  } else {
-    console.error(
-      "The SERVICE_ACCOUNT_KEY_LOGGING environment variable is not defined or is empty."
-    );
+  } catch (error) {
+    console.error("Error accessing logging service account key from Secret Manager: ", error);
+    res.status(500).send({ message: "Error writing log entry", error: error });
   }
 });
 
