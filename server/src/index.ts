@@ -3,12 +3,15 @@ import cors from "cors";
 import { GoogleCloudDatastoreDataAccess } from "./dataAccess/googleCloudDatastoreDataAccess";
 import { UserSettings } from "./models/settingsModel";
 import { Logging } from "@google-cloud/logging";
+import { GoogleCloudDatastore } from "./dataAccess/GoogleCloudDatastore";
+import { UserSettingsRepository } from "./dataAccess/UserSettingsRepository";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const dataAccess = new GoogleCloudDatastoreDataAccess("for-fun-153903");
+// const dataAccess = new GoogleCloudDatastoreDataAccess("for-fun-153903");
+const dataAccess = new UserSettingsRepository('for-fun-153903');
 
 /***** LOGGING  *********/
 interface LogRequestBody {
