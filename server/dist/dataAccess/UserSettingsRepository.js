@@ -7,7 +7,6 @@ class UserSettingsRepository {
         this.cloudDatastore = new GoogleCloudDatastore_1.GoogleCloudDatastore(projectId, "UserSettings", "userId");
     }
     async getUserSettings(userId) {
-        console.log("getUserSettings");
         return this.cloudDatastore.get(userId);
     }
     async updateUserSettings(userId, userSettings) {

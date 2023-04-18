@@ -1,16 +1,13 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { GoogleCloudDatastoreDataAccess } from "./dataAccess/googleCloudDatastoreDataAccess";
 import { UserSettings } from "./models/settingsModel";
 import { Logging } from "@google-cloud/logging";
-import { GoogleCloudDatastore } from "./dataAccess/GoogleCloudDatastore";
 import { UserSettingsRepository } from "./dataAccess/UserSettingsRepository";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// const dataAccess = new GoogleCloudDatastoreDataAccess("for-fun-153903");
 const dataAccess = new UserSettingsRepository('for-fun-153903');
 
 /***** LOGGING  *********/
@@ -68,11 +65,8 @@ app.post("/log", async (req: Request, res: Response) => {
 
 app.get("/user-settings/:userId", async (req: Request, res: Response) => {
   try {
-    console.log("HI");
     const userId = req.params.userId;
-    console.log("userId: " + userId);
     const userSettings = await dataAccess.getUserSettings(userId);
-    console.log("user settings are: " + JSON.stringify(userSettings));
     res.json(userSettings);
   } catch (error) {
     res.status(500).json({ message: "Error fetching user settings" });
@@ -98,7 +92,6 @@ app.put("/user-settings/:userId", async (req: Request, res: Response) => {
       userSettings
     );
     res.json(updatedUserSettings);
-    console.log(updatedUserSettings);
   } catch (error) {
     res.status(500).json({ message: "Error updating user settings" });
   }

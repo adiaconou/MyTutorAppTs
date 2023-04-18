@@ -10,7 +10,6 @@ const UserSettingsRepository_1 = require("./dataAccess/UserSettingsRepository");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
-// const dataAccess = new GoogleCloudDatastoreDataAccess("for-fun-153903");
 const dataAccess = new UserSettingsRepository_1.UserSettingsRepository('for-fun-153903');
 const serviceAccountKeyLoggingPath = process.env.SERVICE_ACCOUNT_KEY_LOGGING;
 const fs = require("fs");
@@ -50,11 +49,8 @@ app.post("/log", async (req, res) => {
 /****************************************** */
 app.get("/user-settings/:userId", async (req, res) => {
     try {
-        console.log("HI");
         const userId = req.params.userId;
-        console.log("userId: " + userId);
         const userSettings = await dataAccess.getUserSettings(userId);
-        console.log("user settings are: " + JSON.stringify(userSettings));
         res.json(userSettings);
     }
     catch (error) {
@@ -75,7 +71,6 @@ app.put("/user-settings/:userId", async (req, res) => {
         };
         const updatedUserSettings = await dataAccess.updateUserSettings(userId, userSettings);
         res.json(updatedUserSettings);
-        console.log(updatedUserSettings);
     }
     catch (error) {
         res.status(500).json({ message: "Error updating user settings" });

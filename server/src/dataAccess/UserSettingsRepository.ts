@@ -10,7 +10,6 @@ export class UserSettingsRepository {
     }
 
     async getUserSettings(userId: string): Promise<UserSettings | null> {
-        console.log("getUserSettings");
         return this.cloudDatastore.get(userId);
 
     }
