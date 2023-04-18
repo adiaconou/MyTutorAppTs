@@ -3,10 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GoogleCloudDatastore = void 0;
 const datastore_1 = require("@google-cloud/datastore");
 class GoogleCloudDatastore {
-    constructor(projectId, entityType, entityKey) {
+    constructor(projectId, entityType) {
         this.datastore = new datastore_1.Datastore({ projectId });
         this.entityType = entityType;
-        this.entityKey = entityKey;
     }
     async put(key, entity) {
         const datastoreKey = this.datastore.key([this.entityType, key]);

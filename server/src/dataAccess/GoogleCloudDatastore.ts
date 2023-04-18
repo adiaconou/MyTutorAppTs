@@ -3,12 +3,10 @@ import { Datastore } from "@google-cloud/datastore";
 export class GoogleCloudDatastore<T> {
   private datastore: Datastore;
   private entityType: string;
-  private entityKey: string;
 
-  constructor(projectId: string, entityType: string, entityKey: string) {
+  constructor(projectId: string, entityType: string) {
     this.datastore = new Datastore({ projectId });
     this.entityType = entityType;
-    this.entityKey = entityKey;
   }
 
   async put(key: string, entity: T): Promise<void> {

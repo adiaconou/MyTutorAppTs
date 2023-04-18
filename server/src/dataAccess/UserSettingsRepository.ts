@@ -6,7 +6,7 @@ export class UserSettingsRepository {
     private cloudDatastore;
 
     constructor(projectId: string) {
-        this.cloudDatastore = new GoogleCloudDatastore<UserSettings>(projectId, "UserSettings", "userId");
+        this.cloudDatastore = new GoogleCloudDatastore<UserSettings>(projectId, "UserSettings");
     }
 
     async getUserSettings(userId: string): Promise<UserSettings | null> {
