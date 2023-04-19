@@ -12,6 +12,8 @@ app.use(express.json());
 const dataAccess = new UserSettingsRepository('for-fun-153903');
 const secretManager = new SecretManager('for-fun-153903');
 
+const PORT = process.env.PORT || 3001;
+
 /***** LOGGING  *********/
 interface LogRequestBody {
   message: string;
@@ -86,6 +88,6 @@ app.put("/user-settings/:userId", async (req: Request, res: Response) => {
   }
 });
 
-app.listen(3001, () => {
+app.listen(PORT, () => {
   console.log("Backend server listening on port 3001");
 });

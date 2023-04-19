@@ -13,6 +13,8 @@ const Settings: React.FC = () => {
   const [languageChoice, setLanguageChoice] = useState<string>("Greek");
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const apiUrl = process.env.APP_BACKEND_URL || "http://localhost:3001";
+
   // Handle slider value change
   const handleLanguageProficiencyChange = (
     event: Event,
@@ -59,7 +61,7 @@ const Settings: React.FC = () => {
   }, []); // Empty dependency array ensures this effect only runs on component mount
 
   async function sendLogToBackend(logMessage: string): Promise<void> {
-    const response = await fetch(`http://localhost:3001/log`, {
+    const response = await fetch(`${apiUrl}/log`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ message: logMessage })
@@ -72,7 +74,7 @@ const Settings: React.FC = () => {
   async function getUserSettings(userId: string): Promise<UserSettings | null> {
     try {
       const response = await fetch(
-        `http://localhost:3001/user-settings/${userId}`
+        `${apiUrl}/user-settings/${userId}`
       );
 
       // Check if the response status code indicates success
@@ -93,7 +95,7 @@ const Settings: React.FC = () => {
 
   async function updateUserSettings(userSettings: UserSettings): Promise<UserSettings | null> {
     try {
-      const response = await fetch(`http://localhost:3001/user-settings/${userSettings.userId}`, {
+      const response = await fetch(`${apiUrl}/user-settings/${userSettings.userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

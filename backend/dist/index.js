@@ -13,6 +13,7 @@ app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 const dataAccess = new UserSettingsRepository_1.UserSettingsRepository('for-fun-153903');
 const secretManager = new SecretManager_1.SecretManager('for-fun-153903');
+const PORT = process.env.PORT || 3001;
 const serviceAccountKeyLoggingPath = process.env.SERVICE_ACCOUNT_KEY_LOGGING;
 const fs = require("fs");
 app.post("/log", async (req, res) => {
@@ -69,6 +70,6 @@ app.put("/user-settings/:userId", async (req, res) => {
         res.status(500).json({ message: "Error updating user settings" });
     }
 });
-app.listen(3001, () => {
+app.listen(PORT, () => {
     console.log("Backend server listening on port 3001");
 });

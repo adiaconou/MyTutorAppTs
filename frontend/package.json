@@ -29,7 +29,7 @@
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "client": "react-scripts start",
-    "build:server": "tsc --project server",
+    "build:server": "tsc --project ../backend",
     "server": "node ../backend/dist/index.js",
     "build": "react-scripts build",
     "test": "react-scripts test",

@@ -1,0 +1,7 @@
+service: backend
+runtime: nodejs16
+entrypoint: node dist/index.js
+
+handlers:
+  - url: /.*
+    script: auto
