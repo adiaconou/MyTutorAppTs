@@ -2,15 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserSettingsRepository = void 0;
 const GoogleCloudDatastore_1 = require("./GoogleCloudDatastore");
-const kind = "UserSettings";
+const kind = "UserChatMessage";
 class UserSettingsRepository {
     constructor(projectId) {
         this.cloudDatastore = new GoogleCloudDatastore_1.GoogleCloudDatastore(projectId, kind);
     }
-    async getUserSettings(userId) {
+    async get(userId) {
         return this.cloudDatastore.get(userId);
     }
-    async updateUserSettings(userId, userSettings) {
+    async add({ userId, userSettings }) {
         this.cloudDatastore.put(userId, userSettings);
     }
 }

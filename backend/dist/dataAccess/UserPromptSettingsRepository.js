@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserSettingsRepository = void 0;
+exports.UserPromptSettingsRepository = void 0;
 const GoogleCloudDatastore_1 = require("./GoogleCloudDatastore");
-const kind = "UserSettings";
-class UserSettingsRepository {
+const kind = "UserPromptSettings";
+class UserPromptSettingsRepository {
     constructor(projectId) {
         this.cloudDatastore = new GoogleCloudDatastore_1.GoogleCloudDatastore(projectId, kind);
     }
@@ -14,4 +14,4 @@ class UserSettingsRepository {
         this.cloudDatastore.put(userId, userSettings);
     }
 }
-exports.UserSettingsRepository = UserSettingsRepository;
+exports.UserPromptSettingsRepository = UserPromptSettingsRepository;

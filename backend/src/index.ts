@@ -1,15 +1,19 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { UserSettings } from "./models/settingsModel";
+import { UserSettings } from "./models/UserSettings";
 import { Logging } from "@google-cloud/logging";
 import { UserSettingsRepository } from "./dataAccess/UserSettingsRepository";
+import { UserChatSessionRepository } from "./dataAccess/UserChatSessionRepository";
 import { SecretManager } from "./dataAccess/SecretManager";
+import { UserChatSession } from "./models/UserChatSession";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const dataAccess = new UserSettingsRepository('for-fun-153903');
+const userSettingsRepo = new UserSettingsRepository('for-fun-153903');
+const userChatSessionRepo = new UserChatSessionRepository('for-fun-153903');
+
 const secretManager = new SecretManager('for-fun-153903');
 
 const PORT = process.env.PORT || 3001;
@@ -54,17 +58,18 @@ app.post("/log", async (req: Request, res: Response) => {
 
 /****************************************** */
 
-app.get("/user-settings/:userId", async (req: Request, res: Response) => {
+app.get("/userSettings/:userId", async (req: Request, res: Response) => {
   try {
+    console.log("hi");
     const userId = req.params.userId;
-    const userSettings = await dataAccess.getUserSettings(userId);
+    const userSettings = await userSettingsRepo.getUserSettings(userId);
     res.json(userSettings);
   } catch (error) {
     res.status(500).json({ message: "Error fetching user settings" });
   }
 });
 
-app.put("/user-settings/:userId", async (req: Request, res: Response) => {
+app.put("/userSettings/:userId", async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
     const settings = req.body.settings;
@@ -79,12 +84,45 @@ app.put("/user-settings/:userId", async (req: Request, res: Response) => {
       settings,
     };
 
-    const updatedUserSettings = await dataAccess.updateUserSettings(userId,
+    const updatedUserSettings = await userSettingsRepo.updateUserSettings(userId,
       userSettings
     );
     res.json(updatedUserSettings);
   } catch (error) {
     res.status(500).json({ message: "Error updating user settings" });
+  }
+});
+
+app.get("/chatSessions/:id", async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const session = await userChatSessionRepo.get(id);
+    res.json(session);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching chat session" });
+  }
+});
+
+app.put("/chatSessions/:id", async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+    const id = req.params.id;
+    const createdAtUTC = new Date(req.params.createdAtUTC);
+    const lastUpdatedAtUTC = new Date(req.params.lastUpdatedAtUTC);
+    const summary = req.params.summary;
+
+    const session: UserChatSession = {
+      userId,
+      id,
+      createdAtUTC,
+      lastUpdatedAtUTC,
+      summary,
+    };
+
+    const createdSession = await userChatSessionRepo.create(id, session);
+    res.json(createdSession);
+  } catch (error) {
+    res.status(500).json({ message: "Error creating chat session" });
   }
 });
 

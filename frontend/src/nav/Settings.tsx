@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, Slider, Typography, Divider } from "@mui/material";
 import MyDropDown from "../components/MyDropDown";
 import { SelectChangeEvent } from "@mui/material/Select";
-import { UserSettings } from "../models/settingsModel";
+import { UserSettings } from "../models/UserSettings";
 import CircularProgress from '@mui/material/CircularProgress';
 
 const Settings: React.FC = () => {
@@ -13,7 +13,8 @@ const Settings: React.FC = () => {
   const [languageChoice, setLanguageChoice] = useState<string>("Greek");
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const apiUrl = process.env.APP_BACKEND_URL || "http://localhost:3001";
+  const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
+  // const apiUrl = "http://localhost:3001";
 
   // Handle slider value change
   const handleLanguageProficiencyChange = (
@@ -23,7 +24,7 @@ const Settings: React.FC = () => {
   ) => {
     setLanguageProficiency(newValue as number);
 
-    const userSettings: UserSettings = {
+    const userPromptSettings: UserSettings = {
       userId: 'adiaconou',
       settings: {
         languageChoice: languageChoice,
@@ -31,7 +32,7 @@ const Settings: React.FC = () => {
       },
     };
 
-    updateUserSettings(userSettings);
+    updateUserSettings(userPromptSettings);
   };
 
   const handleLanguageChoiceChange = (event: SelectChangeEvent<string>) => {
@@ -72,9 +73,10 @@ const Settings: React.FC = () => {
   }
 
   async function getUserSettings(userId: string): Promise<UserSettings | null> {
+    console.log("URL: " + apiUrl + "/userSettings/" + userId);
     try {
       const response = await fetch(
-        `${apiUrl}/user-settings/${userId}`
+        `${apiUrl}/userSettings/${userId}`
       );
 
       // Check if the response status code indicates success
@@ -95,7 +97,7 @@ const Settings: React.FC = () => {
 
   async function updateUserSettings(userSettings: UserSettings): Promise<UserSettings | null> {
     try {
-      const response = await fetch(`${apiUrl}/user-settings/${userSettings.userId}`, {
+      const response = await fetch(`${apiUrl}/userSettings/${userSettings.userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

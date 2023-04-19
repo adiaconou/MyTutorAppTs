@@ -23,5 +23,26 @@ class GoogleCloudDatastore {
         }
         return datastoreEntity;
     }
+    async getPage(limit, nextPageToken, indexName, indexValue, sortKey) {
+        const query = this.datastore
+            .createQuery(this.entityType)
+            .filter(indexName, '=', indexValue)
+            .order(sortKey, { descending: true })
+            .limit(limit);
+        if (nextPageToken) {
+            query.start(nextPageToken);
+        }
+        const [entities, info] = await this.datastore.runQuery(query);
+        const nextPageCursor = info.endCursor;
+        const moreResults = info.moreResults;
+        let nextNextPageToken = null;
+        if (moreResults !== datastore_1.Datastore.NO_MORE_RESULTS && nextPageCursor) {
+            nextNextPageToken = nextPageCursor;
+        }
+        return {
+            entities: entities,
+            nextPageToken: nextNextPageToken,
+        };
+    }
 }
 exports.GoogleCloudDatastore = GoogleCloudDatastore;
