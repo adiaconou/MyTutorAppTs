@@ -18,6 +18,9 @@ const MyChatForm: React.FC = () => {
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
   const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
 
+  // State to store retrieved chat sessions
+  const [chatSessions, setChatSessions] = useState<UserChatSession[]>([]);
+
   const updateViewportSize = () => {
     setViewportHeight(window.innerHeight);
     // setViewportWidth(window.innerWidth);
@@ -39,7 +42,7 @@ const MyChatForm: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(session),
-      });
+      }); 
 
       if (!response.ok) {
         throw new Error("Response not ok");

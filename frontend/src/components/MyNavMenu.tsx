@@ -15,6 +15,9 @@ import HistoryIcon from "@mui/icons-material/History";
 import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import { UserChatSession } from "../models/UserChatSession";
+import { useState, useEffect } from "react";
+import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 
 interface MenuItem {
   label: string;
@@ -34,17 +37,40 @@ export default function MyNavMenu({
   // Get access to the useHistory hook from react-router-dom
   const navigate = useNavigate();
 
-  const [historyExpanded, setHistoryExpanded] = React.useState(false);
+  // const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
+  const apiUrl = "http://localhost:3001";
 
+  const [historyExpanded, setHistoryExpanded] = React.useState(false);
+  const [historyItems, setHistoryItems] = useState<UserChatSession[]>([]);
+  const [isLoading, setIsLoading] = useState(true); // New state variable to track loading status
+
+
+  // Fetch chat sessions when the component is mounted
+  useEffect(() => {
+    const userId = "adiaconou"; // Replace with actual user ID
+    const limit = 10; // Number of chat sessions per page
+    getChatSessions(userId, limit);
+  }, []);
+    
   const toggleHistoryExpanded = () => {
     setHistoryExpanded(!historyExpanded);
   };
 
-  const historyItems = [
-    { label: "History Item 1" },
-    { label: "History Item 2" },
-    { label: "History Item 3" },
-  ];
+  // Function to get chat sessions
+  const getChatSessions = async (userId: string, limit: number) => {
+    try {
+      const response = await fetch(`${apiUrl}/chatSessions/?userId=${encodeURIComponent(userId)}&limit=${limit}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch chat sessions");
+      }
+      const sessions: UserChatSession[] = await response.json();
+      setHistoryItems(sessions);
+      setIsLoading(false); // Set loading status to false after data is fetched
+    } catch (error) {
+      console.error(`Error fetching chat sessions: ${error}`);
+      setIsLoading(false); // Set loading status to false even if an error occurs
+    }
+  };
 
   // Items for the navigation menu
   const menuItems: MenuItem[] = [
@@ -67,6 +93,15 @@ export default function MyNavMenu({
   ];
 
   const username = "Alex Diaconou";
+
+  if (isLoading) {
+    // Render a loading spinner or message while data is being fetched
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Drawer
@@ -108,9 +143,9 @@ export default function MyNavMenu({
         </ListItem>
         <Collapse in={historyExpanded} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            {historyItems.map((item) => (
-              <ListItem button key={item.label} sx={{ pl: 4 }}>
-                <ListItemText primary={item.label} />
+            {historyItems.map((session) => (
+              <ListItem button key={session.id} sx={{ pl: 4 }}>
+                <ListItemText primary={session.summary} />
               </ListItem>
             ))}
           </List>
