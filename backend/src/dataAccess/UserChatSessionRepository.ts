@@ -22,9 +22,9 @@ export class UserChatSessionRepository {
 }
 
   async getByUserId(
-    userId: string
+    userId: string,
+    limit: number
   ): Promise<UserChatSession[] | null> {
-    const limit = 10;
     let nextPageToken = null;
     const indexName = "userId";
     const indexValue = userId;

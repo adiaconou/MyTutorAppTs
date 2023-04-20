@@ -79,6 +79,28 @@ app.get("/chatSessions/:id", async (req, res) => {
         res.status(500).json({ message: "Error fetching chat session" });
     }
 });
+app.get("/chatSessions/", async (req, res) => {
+    try {
+        // Access query parameters using req.query
+        const userId = req.query.userId;
+        const limitStr = req.query.limit;
+        // Validate query parameters
+        if (!userId || !limitStr) {
+            return res.status(400).json({ message: "Missing userId or limit" });
+        }
+        // Convert limit to an integer
+        const limit = parseInt(limitStr, 10);
+        // Check if limit is a valid number
+        if (isNaN(limit)) {
+            return res.status(400).json({ message: "Invalid limit" });
+        }
+        const session = await userChatSessionRepo.getByUserId(userId, limit);
+        res.json(session);
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error fetching chat session list" });
+    }
+});
 app.put("/chatSessions/:id", async (req, res) => {
     try {
         const id = req.params.id;

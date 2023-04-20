@@ -9,8 +9,12 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import HomeIcon from "@mui/icons-material/Home";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
+import HistoryIcon from "@mui/icons-material/History";
+import Collapse from "@mui/material/Collapse";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
 
 interface MenuItem {
   label: string;
@@ -30,11 +34,23 @@ export default function MyNavMenu({
   // Get access to the useHistory hook from react-router-dom
   const navigate = useNavigate();
 
+  const [historyExpanded, setHistoryExpanded] = React.useState(false);
+
+  const toggleHistoryExpanded = () => {
+    setHistoryExpanded(!historyExpanded);
+  };
+
+  const historyItems = [
+    { label: "History Item 1" },
+    { label: "History Item 2" },
+    { label: "History Item 3" },
+  ];
+
   // Items for the navigation menu
   const menuItems: MenuItem[] = [
     {
-      label: "Chat",
-      icon: <HomeIcon />,
+      label: "New Chat",
+      icon: <ChatBubbleIcon />,
       onClick: () => {
         navigate("/");
         handleClose();
@@ -82,6 +98,23 @@ export default function MyNavMenu({
             <ListItemText primary={item.label} />
           </ListItem>
         ))}
+
+        <ListItem button onClick={toggleHistoryExpanded}>
+          <ListItemIcon>
+            <HistoryIcon />
+          </ListItemIcon>
+          <ListItemText primary="History" />
+          {historyExpanded ? <ExpandLess /> : <ExpandMore />}
+        </ListItem>
+        <Collapse in={historyExpanded} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {historyItems.map((item) => (
+              <ListItem button key={item.label} sx={{ pl: 4 }}>
+                <ListItemText primary={item.label} />
+              </ListItem>
+            ))}
+          </List>
+        </Collapse>
       </List>
     </Drawer>
   );

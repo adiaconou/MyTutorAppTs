@@ -13,8 +13,7 @@ class UserChatSessionRepository {
     async get(id) {
         return this.cloudDatastore.get(id);
     }
-    async getByUserId(userId) {
-        const limit = 10;
+    async getByUserId(userId, limit) {
         let nextPageToken = null;
         const indexName = "userId";
         const indexValue = userId;

@@ -27,29 +27,40 @@ export class GoogleCloudDatastore<T> {
     return datastoreEntity as T;
   }
 
-  async getPage(limit: number, nextPageToken: string | null, indexName: string, indexValue: string, sortKey: string): Promise<{ entities: T[], nextPageToken: string | null }> {
+  async getPage(
+    limit: number,
+    nextPageToken: string | null,
+    indexName: string,
+    indexValue: string,
+    sortKey: string
+  ): Promise<{ entities: T[]; nextPageToken: string | null }> {
     const query = this.datastore
       .createQuery(this.entityType)
-      .filter(indexName, '=', indexValue)
+      .filter(indexName, "=", indexValue)
       .order(sortKey, { descending: true })
       .limit(limit);
-  
+
     if (nextPageToken) {
       query.start(nextPageToken);
     }
-  
-    const [entities, info] = await this.datastore.runQuery(query);
-    const nextPageCursor = info.endCursor;
-    const moreResults = info.moreResults;
-  
-    let nextNextPageToken: string | null = null;
-    if (moreResults !== Datastore.NO_MORE_RESULTS && nextPageCursor) {
-      nextNextPageToken = nextPageCursor;
+
+    try {
+      const [entities, info] = await this.datastore.runQuery(query);
+      const nextPageCursor = info.endCursor;
+      const moreResults = info.moreResults;
+      let nextNextPageToken: string | null = null;
+      if (moreResults !== Datastore.NO_MORE_RESULTS && nextPageCursor) {
+        nextNextPageToken = nextPageCursor;
+      }
+      return {
+        entities: entities as T[],
+        nextPageToken: nextNextPageToken,
+      };
+    } catch (error) {
+      // Log the error details for debugging purposes
+      console.error("Error executing query:", error);
+      // Propagate the error to the caller (optional, based on your error handling strategy)
+      throw error;
     }
-  
-    return {
-      entities: entities as T[],
-      nextPageToken: nextNextPageToken,
-    };
   }
 }

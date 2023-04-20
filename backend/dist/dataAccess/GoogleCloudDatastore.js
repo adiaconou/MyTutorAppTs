@@ -26,23 +26,31 @@ class GoogleCloudDatastore {
     async getPage(limit, nextPageToken, indexName, indexValue, sortKey) {
         const query = this.datastore
             .createQuery(this.entityType)
-            .filter(indexName, '=', indexValue)
+            .filter(indexName, "=", indexValue)
             .order(sortKey, { descending: true })
             .limit(limit);
         if (nextPageToken) {
             query.start(nextPageToken);
         }
-        const [entities, info] = await this.datastore.runQuery(query);
-        const nextPageCursor = info.endCursor;
-        const moreResults = info.moreResults;
-        let nextNextPageToken = null;
-        if (moreResults !== datastore_1.Datastore.NO_MORE_RESULTS && nextPageCursor) {
-            nextNextPageToken = nextPageCursor;
+        try {
+            const [entities, info] = await this.datastore.runQuery(query);
+            const nextPageCursor = info.endCursor;
+            const moreResults = info.moreResults;
+            let nextNextPageToken = null;
+            if (moreResults !== datastore_1.Datastore.NO_MORE_RESULTS && nextPageCursor) {
+                nextNextPageToken = nextPageCursor;
+            }
+            return {
+                entities: entities,
+                nextPageToken: nextNextPageToken,
+            };
         }
-        return {
-            entities: entities,
-            nextPageToken: nextNextPageToken,
-        };
+        catch (error) {
+            // Log the error details for debugging purposes
+            console.error("Error executing query:", error);
+            // Propagate the error to the caller (optional, based on your error handling strategy)
+            throw error;
+        }
     }
 }
 exports.GoogleCloudDatastore = GoogleCloudDatastore;
