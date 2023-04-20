@@ -5,8 +5,8 @@ import { Box, Grid } from "@mui/material";
 import promptGPT from "../services/openaiService";
 import { UserChatSession } from "../models/UserChatSession";
 
-//const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
-const apiUrl = "http://localhost:3001";
+const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
+// const apiUrl = "http://localhost:3001";
 
 interface Message {
   text: string;
