@@ -3,7 +3,7 @@ import { GoogleCloudDatastore } from './GoogleCloudDatastore';
 
 const kind = "UserChatMessage";
 
-export class UserSettingsRepository {
+export class UserChatMessagesRepository {
     private cloudDatastore;
 
     constructor(projectId: string) {
@@ -15,7 +15,7 @@ export class UserSettingsRepository {
 
     }
 
-    async add({ userId, userSettings }: { userId: string; userSettings: UserChatMessage; }): Promise<void> {
-        this.cloudDatastore.put(userId, userSettings);
+    async add(id: string, message: UserChatMessage): Promise<void> {
+        this.cloudDatastore.put(id, message);
     }
 }

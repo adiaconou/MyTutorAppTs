@@ -8,12 +8,14 @@ const cors_1 = __importDefault(require("cors"));
 const logging_1 = require("@google-cloud/logging");
 const UserSettingsRepository_1 = require("./dataAccess/UserSettingsRepository");
 const UserChatSessionRepository_1 = require("./dataAccess/UserChatSessionRepository");
+const UserChatMessagesRepository_1 = require("./dataAccess/UserChatMessagesRepository");
 const SecretManager_1 = require("./dataAccess/SecretManager");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 const userSettingsRepo = new UserSettingsRepository_1.UserSettingsRepository("for-fun-153903");
 const userChatSessionRepo = new UserChatSessionRepository_1.UserChatSessionRepository("for-fun-153903");
+const userMessageRepo = new UserChatMessagesRepository_1.UserChatMessagesRepository("for-fun-153903");
 const secretManager = new SecretManager_1.SecretManager("for-fun-153903");
 const PORT = process.env.PORT || 3001;
 app.post("/log", async (req, res) => {
@@ -69,6 +71,27 @@ app.put("/userSettings/:userId", async (req, res) => {
         res.status(500).json({ message: "Error updating user settings" });
     }
 });
+app.put("/messages/:id", async (req, res) => {
+    try {
+        const id = req.body.id;
+        const chatSessionId = req.body.chatSessionId;
+        const text = req.body.text;
+        const timestamp = req.body.timestamp;
+        const sender = req.body.sender;
+        const newMessage = {
+            id,
+            chatSessionId,
+            text,
+            timestamp,
+            sender,
+        };
+        const updatedUserSettings = await userMessageRepo.add(id, newMessage);
+        res.json(updatedUserSettings);
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error adding new message" });
+    }
+});
 app.get("/chatSessions/:id", async (req, res) => {
     try {
         const id = req.params.id;
@@ -103,22 +126,41 @@ app.get("/chatSessions/", async (req, res) => {
 });
 app.put("/chatSessions/:id", async (req, res) => {
     try {
-        const id = req.params.id;
-        const userId = req.body.userId;
-        const createdAt = new Date(req.body.createdAt);
-        const lastUpdatedAt = new Date(req.body.lastUpdatedAt);
-        const summary = req.body.summary;
-        const session = {
+        // Extract 'session' and 'initialMessage' from the request body
+        const { session, initialMessage } = req.body;
+        // Validate and destructure the 'session' object
+        if (!session) {
+            return res.status(400).json({ message: "Missing session object in request body" });
+        }
+        const { userId, id, createdAt, lastUpdatedAt, summary } = session;
+        // Create the session object to be stored in the repository
+        const sessionToCreate = {
             userId,
             id,
-            createdAt: createdAt,
-            lastUpdatedAt: lastUpdatedAt,
+            createdAt: new Date(createdAt),
+            lastUpdatedAt: new Date(lastUpdatedAt),
             summary,
         };
-        await userChatSessionRepo.create(id, session);
+        // Validate and destructure the 'initialMessage' object (if needed)
+        if (initialMessage) {
+            const { id: messageId, chatSessionId, text, timestamp, sender } = initialMessage;
+            // Create the initialMessage object to be stored in the repository (if needed)
+            const messageToCreate = {
+                id: messageId,
+                chatSessionId,
+                text,
+                timestamp: new Date(timestamp),
+                sender,
+            };
+            await userChatSessionRepo.createNew(sessionToCreate.id, sessionToCreate, initialMessage.id, initialMessage);
+        }
+        else {
+            await userChatSessionRepo.create(id, session);
+        }
         res.status(204).send();
     }
     catch (error) {
+        console.log("Error creating chat session: " + error);
         res.status(500).json({ message: "Error creating chat session" });
     }
 });

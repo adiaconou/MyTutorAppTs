@@ -3,5 +3,5 @@ export interface UserChatMessage {
     chatSessionId: string;
     text: string;
     timestamp: Date;
-    sender: 'user' | 'bot';
+    sender: string;
 }

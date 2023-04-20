@@ -15,6 +15,38 @@ class GoogleCloudDatastore {
         };
         await this.datastore.upsert(datastoreEntity);
     }
+    async transactionalPut(kindA, keyA, entityA, kindB, keyB, entityB) {
+        // Define keys for both kinds
+        const datastoreKeyA = this.datastore.key([kindA, keyA]);
+        const datastoreKeyB = this.datastore.key([kindB, keyB]);
+        // Define datastore entities for both kinds
+        const datastoreEntityA = {
+            key: datastoreKeyA,
+            data: entityA,
+        };
+        const datastoreEntityB = {
+            key: datastoreKeyB,
+            data: entityB,
+        };
+        // Initialize a transaction
+        const transaction = this.datastore.transaction();
+        try {
+            // Start the transaction
+            await transaction.run();
+            // Perform update operations for both kinds within the transaction
+            transaction.save(datastoreEntityA);
+            transaction.save(datastoreEntityB);
+            // Commit the transaction (apply the changes)
+            await transaction.commit();
+        }
+        catch (error) {
+            // Handle errors (e.g., rollback the transaction)
+            await transaction.rollback();
+            console.error("Error performing transactional update:", error);
+            // Propagate the error to the caller (optional, based on your error handling strategy)
+            throw error;
+        }
+    }
     async get(key) {
         const datastoreKey = this.datastore.key([this.entityType, key]);
         const [datastoreEntity] = await this.datastore.get(datastoreKey);

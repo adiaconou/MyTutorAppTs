@@ -4,8 +4,10 @@ import { UserSettings } from "./models/UserSettings";
 import { Logging } from "@google-cloud/logging";
 import { UserSettingsRepository } from "./dataAccess/UserSettingsRepository";
 import { UserChatSessionRepository } from "./dataAccess/UserChatSessionRepository";
+import { UserChatMessagesRepository } from "./dataAccess/UserChatMessagesRepository";
 import { SecretManager } from "./dataAccess/SecretManager";
 import { UserChatSession } from "./models/UserChatSession";
+import { UserChatMessage } from "./models/UserChatMessage";
 
 const app = express();
 app.use(cors());
@@ -13,6 +15,7 @@ app.use(express.json());
 
 const userSettingsRepo = new UserSettingsRepository("for-fun-153903");
 const userChatSessionRepo = new UserChatSessionRepository("for-fun-153903");
+const userMessageRepo = new UserChatMessagesRepository("for-fun-153903");
 
 const secretManager = new SecretManager("for-fun-153903");
 
@@ -90,6 +93,32 @@ app.put("/userSettings/:userId", async (req: Request, res: Response) => {
   }
 });
 
+app.put("/messages/:id", async (req: Request, res: Response) => {
+  try {
+    const id = req.body.id;
+    const chatSessionId = req.body.chatSessionId;
+    const text = req.body.text;
+    const timestamp = req.body.timestamp;
+    const sender = req.body.sender;
+
+    const newMessage: UserChatMessage = {
+      id,
+      chatSessionId,
+      text,
+      timestamp,
+      sender,
+    };
+
+    const updatedUserSettings = await userMessageRepo.add(
+      id,
+      newMessage
+    );
+    res.json(updatedUserSettings);
+  } catch (error) {
+    res.status(500).json({ message: "Error adding new message" });
+  }
+});
+
 app.get("/chatSessions/:id", async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
@@ -128,23 +157,45 @@ app.get("/chatSessions/", async (req: Request, res: Response) => {
 
 app.put("/chatSessions/:id", async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
-    const userId = req.body.userId;
-    const createdAt = new Date(req.body.createdAt);
-    const lastUpdatedAt = new Date(req.body.lastUpdatedAt);
-    const summary = req.body.summary;
+    // Extract 'session' and 'initialMessage' from the request body
+    const { session, initialMessage } = req.body;
 
-    const session: UserChatSession = {
+    // Validate and destructure the 'session' object
+    if (!session) {
+      return res.status(400).json({ message: "Missing session object in request body" });
+    }
+    const { userId, id, createdAt, lastUpdatedAt, summary } = session as UserChatSession;
+
+    // Create the session object to be stored in the repository
+    const sessionToCreate: UserChatSession = {
       userId,
       id,
-      createdAt: createdAt,
-      lastUpdatedAt: lastUpdatedAt,
+      createdAt: new Date(createdAt),
+      lastUpdatedAt: new Date(lastUpdatedAt),
       summary,
     };
 
-    await userChatSessionRepo.create(id, session);
+    // Validate and destructure the 'initialMessage' object (if needed)
+    if (initialMessage) {
+      const { id: messageId, chatSessionId, text, timestamp, sender } = initialMessage as UserChatMessage;
+
+      // Create the initialMessage object to be stored in the repository (if needed)
+      const messageToCreate: UserChatMessage = {
+        id: messageId,
+        chatSessionId,
+        text,
+        timestamp: new Date(timestamp),
+        sender,
+      };
+
+      await userChatSessionRepo.createNew(sessionToCreate.id, sessionToCreate, initialMessage.id, initialMessage);
+    } else {
+      await userChatSessionRepo.create(id, session);
+    }
+
     res.status(204).send();
   } catch (error) {
+    console.log("Error creating chat session: " + error);
     res.status(500).json({ message: "Error creating chat session" });
   }
 });

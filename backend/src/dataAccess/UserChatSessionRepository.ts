@@ -1,3 +1,4 @@
+import { UserChatMessage } from "../models/UserChatMessage";
 import { UserChatSession } from "../models/UserChatSession";
 import { GoogleCloudDatastore } from "./GoogleCloudDatastore";
 
@@ -17,9 +18,24 @@ export class UserChatSessionRepository {
     this.cloudDatastore.put(id, session);
   }
 
+  async createNew(
+    newSessionId: string,
+    newSession: UserChatSession,
+    initialMessageId: string,
+    initialMessage: UserChatMessage): Promise<void> {
+    this.cloudDatastore.transactionalPut(
+      "UserChatSession",
+      newSessionId,
+      newSession,
+      "UserChatMessage",
+      initialMessageId,
+      initialMessage
+    );
+  }
+
   async get(id: string): Promise<UserChatSession | null> {
     return this.cloudDatastore.get(id);
-}
+  }
 
   async getByUserId(
     userId: string,
@@ -33,13 +49,14 @@ export class UserChatSessionRepository {
     let chatSessions: UserChatSession[] = [];
 
     do {
-      const page: { entities: unknown[]; nextPageToken: string | null } = await this.cloudDatastore.getPage(
-        limit,
-        nextPageToken,
-        indexName,
-        indexValue,
-        sortKey
-      );
+      const page: { entities: unknown[]; nextPageToken: string | null } =
+        await this.cloudDatastore.getPage(
+          limit,
+          nextPageToken,
+          indexName,
+          indexValue,
+          sortKey
+        );
       const entities = page.entities;
       nextPageToken = page.nextPageToken;
 
@@ -49,9 +66,7 @@ export class UserChatSessionRepository {
     } while (nextPageToken !== null);
 
     // sort chat sessions by createdAt in ascending order
-    chatSessions.sort(
-      (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
-    );
+    chatSessions.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
     return chatSessions;
   }

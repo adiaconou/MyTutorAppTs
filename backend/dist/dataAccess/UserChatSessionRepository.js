@@ -10,6 +10,9 @@ class UserChatSessionRepository {
     async create(id, session) {
         this.cloudDatastore.put(id, session);
     }
+    async createNew(newSessionId, newSession, initialMessageId, initialMessage) {
+        this.cloudDatastore.transactionalPut("UserChatSession", newSessionId, newSession, "UserChatMessage", initialMessageId, initialMessage);
+    }
     async get(id) {
         return this.cloudDatastore.get(id);
     }
