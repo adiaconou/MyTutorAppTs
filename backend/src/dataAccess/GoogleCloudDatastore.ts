@@ -15,7 +15,7 @@ export class GoogleCloudDatastore<T> {
       key: datastoreKey,
       data: entity,
     };
-    await this.datastore.update(datastoreEntity);
+    await this.datastore.upsert(datastoreEntity);
   }
 
   async get(key: string): Promise<T | null> {

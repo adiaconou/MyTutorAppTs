@@ -28,7 +28,7 @@ export class UserChatSessionRepository {
     let nextPageToken = null;
     const indexName = "userId";
     const indexValue = userId;
-    const sortKey = "createdAtUTC";
+    const sortKey = "createdAt";
 
     let chatSessions: UserChatSession[] = [];
 
@@ -48,9 +48,9 @@ export class UserChatSessionRepository {
       }
     } while (nextPageToken !== null);
 
-    // sort chat sessions by createdAtUTC in ascending order
+    // sort chat sessions by createdAt in ascending order
     chatSessions.sort(
-      (a, b) => a.createdAtUTC.getTime() - b.createdAtUTC.getTime()
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
     );
 
     return chatSessions;

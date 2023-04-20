@@ -11,10 +11,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const userSettingsRepo = new UserSettingsRepository('for-fun-153903');
-const userChatSessionRepo = new UserChatSessionRepository('for-fun-153903');
+const userSettingsRepo = new UserSettingsRepository("for-fun-153903");
+const userChatSessionRepo = new UserChatSessionRepository("for-fun-153903");
 
-const secretManager = new SecretManager('for-fun-153903');
+const secretManager = new SecretManager("for-fun-153903");
 
 const PORT = process.env.PORT || 3001;
 
@@ -23,20 +23,15 @@ interface LogRequestBody {
   message: string;
 }
 
-const serviceAccountKeyLoggingPath = process.env.SERVICE_ACCOUNT_KEY_LOGGING;
-const fs = require("fs");
-
 app.post("/log", async (req: Request, res: Response) => {
-  console.log("a");
-  
   try {
-    const secretName = 'gcloud-logging-api-key'; // Replace with the name of the secret containing the logging service account key
+    const secretName = "gcloud-logging-api-key"; // Replace with the name of the secret containing the logging service account key
     const keyFileContents = await secretManager.accessSecretVersion(secretName);
     const keyFileJson = JSON.parse(keyFileContents);
 
     // Initialize the Logging client with the parsed JSON credentials
     const logging = new Logging({
-      projectId: 'for-fun-153903',
+      projectId: "for-fun-153903",
       credentials: keyFileJson,
     });
 
@@ -49,9 +44,11 @@ app.post("/log", async (req: Request, res: Response) => {
 
     await log.write(entry);
     res.status(200).send({ message: "Log entry created" });
-
   } catch (error) {
-    console.error("Error accessing logging service account key from Secret Manager: ", error);
+    console.error(
+      "Error accessing logging service account key from Secret Manager: ",
+      error
+    );
     res.status(500).send({ message: "Error writing log entry", error: error });
   }
 });
@@ -60,7 +57,6 @@ app.post("/log", async (req: Request, res: Response) => {
 
 app.get("/userSettings/:userId", async (req: Request, res: Response) => {
   try {
-    console.log("hi");
     const userId = req.params.userId;
     const userSettings = await userSettingsRepo.getUserSettings(userId);
     res.json(userSettings);
@@ -84,7 +80,8 @@ app.put("/userSettings/:userId", async (req: Request, res: Response) => {
       settings,
     };
 
-    const updatedUserSettings = await userSettingsRepo.updateUserSettings(userId,
+    const updatedUserSettings = await userSettingsRepo.updateUserSettings(
+      userId,
       userSettings
     );
     res.json(updatedUserSettings);
@@ -105,22 +102,22 @@ app.get("/chatSessions/:id", async (req: Request, res: Response) => {
 
 app.put("/chatSessions/:id", async (req: Request, res: Response) => {
   try {
-    const userId = req.params.userId;
     const id = req.params.id;
-    const createdAtUTC = new Date(req.params.createdAtUTC);
-    const lastUpdatedAtUTC = new Date(req.params.lastUpdatedAtUTC);
-    const summary = req.params.summary;
+    const userId = req.body.userId;
+    const createdAt = new Date(req.body.createdAt);
+    const lastUpdatedAt = new Date(req.body.lastUpdatedAt);
+    const summary = req.body.summary;
 
     const session: UserChatSession = {
       userId,
       id,
-      createdAtUTC,
-      lastUpdatedAtUTC,
+      createdAt: createdAt,
+      lastUpdatedAt: lastUpdatedAt,
       summary,
     };
 
-    const createdSession = await userChatSessionRepo.create(id, session);
-    res.json(createdSession);
+    await userChatSessionRepo.create(id, session);
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: "Error creating chat session" });
   }

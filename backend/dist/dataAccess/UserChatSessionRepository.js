@@ -18,7 +18,7 @@ class UserChatSessionRepository {
         let nextPageToken = null;
         const indexName = "userId";
         const indexValue = userId;
-        const sortKey = "createdAtUTC";
+        const sortKey = "createdAt";
         let chatSessions = [];
         do {
             const page = await this.cloudDatastore.getPage(limit, nextPageToken, indexName, indexValue, sortKey);
@@ -28,8 +28,8 @@ class UserChatSessionRepository {
                 chatSessions = chatSessions.concat(entities);
             }
         } while (nextPageToken !== null);
-        // sort chat sessions by createdAtUTC in ascending order
-        chatSessions.sort((a, b) => a.createdAtUTC.getTime() - b.createdAtUTC.getTime());
+        // sort chat sessions by createdAt in ascending order
+        chatSessions.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
         return chatSessions;
     }
 }

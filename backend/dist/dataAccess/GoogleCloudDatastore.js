@@ -13,7 +13,7 @@ class GoogleCloudDatastore {
             key: datastoreKey,
             data: entity,
         };
-        await this.datastore.update(datastoreEntity);
+        await this.datastore.upsert(datastoreEntity);
     }
     async get(key) {
         const datastoreKey = this.datastore.key([this.entityType, key]);

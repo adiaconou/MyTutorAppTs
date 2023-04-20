@@ -1,7 +1,7 @@
 export interface UserChatSession {
     userId: string;
     id: string;
-    createdAtUTC: Date;
-    lastUpdatedAtUTC: Date;
+    createdAt: Date;
+    lastUpdatedAt: Date;
     summary: string;
 }

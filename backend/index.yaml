@@ -2,5 +2,5 @@ indexes:
 - kind: UserChatSession
   properties:
   - name: userId
-  - name: createdAtUTC
+  - name: createdAt
     direction: desc
