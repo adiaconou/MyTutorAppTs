@@ -3,6 +3,10 @@ import MyTextField from "./MyTextField";
 import MyChatWindow from "./MyChatWindow";
 import { Box, Grid } from "@mui/material";
 import promptGPT from "../services/openaiService";
+import { UserChatSession } from "../models/UserChatSession";
+
+//const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
+const apiUrl = "http://localhost:3001";
 
 interface Message {
   text: string;
@@ -19,10 +23,36 @@ const MyChatForm: React.FC = () => {
     // setViewportWidth(window.innerWidth);
   };
 
+  async function createChatSession() {
+    try {
+      const session: UserChatSession = {
+        id: "chatSession1",
+        userId: "adiaconou",
+        createdAt: new Date(),
+        lastUpdatedAt: new Date(),
+        summary: "A New Chat Session",
+      };
+
+      const response = await fetch(`${apiUrl}/chatSessions/${session.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(session),
+      });
+
+      if (!response.ok) {
+        throw new Error("Response not ok");
+      }
+    } catch (error) {
+      console.error(`Error attempting to update user chat: ${error}`);
+    }
+  }
+
   useEffect(() => {
-    window.addEventListener('resize', updateViewportSize);
+    window.addEventListener("resize", updateViewportSize);
     return () => {
-      window.removeEventListener('resize', updateViewportSize);
+      window.removeEventListener("resize", updateViewportSize);
     };
   }, []);
 
@@ -39,6 +69,7 @@ const MyChatForm: React.FC = () => {
     };
 
     fetchResponse();
+    createChatSession();
   };
 
   return (
@@ -59,19 +90,19 @@ const MyChatForm: React.FC = () => {
           width: "100%",
           maxWidth: "md",
           marginTop: "64px",
-          
-          '&::-webkit-scrollbar': {
-            width: '6px',
-            backgroundColor: 'transparent',
+
+          "&::-webkit-scrollbar": {
+            width: "6px",
+            backgroundColor: "transparent",
           },
-          '&::-webkit-scrollbar-thumb': {
-            borderRadius: '3px',
-            backgroundColor: '#aaa',
+          "&::-webkit-scrollbar-thumb": {
+            borderRadius: "3px",
+            backgroundColor: "#aaa",
           },
-          '&::-webkit-scrollbar-track': {
-            borderRadius: '3px',
-            backgroundColor: 'transparent',
-          }, 
+          "&::-webkit-scrollbar-track": {
+            borderRadius: "3px",
+            backgroundColor: "transparent",
+          },
         }}
       >
         <MyChatWindow messages={messages} />

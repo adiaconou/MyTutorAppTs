@@ -1,4 +1,4 @@
-import React, { useState, useEffect, MouseEvent, FocusEvent } from "react";
+import React, { useState, MouseEvent, FocusEvent } from "react";
 import TextField from "@mui/material/TextField";
 import { InputAdornment, Tooltip } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
@@ -6,9 +6,6 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { blue } from "@mui/material/colors";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import { useMediaQuery } from "@mui/material";
-import { Theme } from "@mui/system";
-import { useTheme } from "@mui/system";
 
 const theme = createTheme({
   components: {
