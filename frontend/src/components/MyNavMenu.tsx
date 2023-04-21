@@ -37,8 +37,8 @@ export default function MyNavMenu({
   // Get access to the useHistory hook from react-router-dom
   const navigate = useNavigate();
 
-   const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
-  // const apiUrl = "http://localhost:3001";
+  // const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
+   const apiUrl = "http://localhost:3001";
 
   const [historyExpanded, setHistoryExpanded] = React.useState(false);
   const [historyItems, setHistoryItems] = useState<UserChatSession[]>([]);

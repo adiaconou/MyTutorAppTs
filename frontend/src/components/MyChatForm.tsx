@@ -7,8 +7,8 @@ import { UserChatSession } from "../models/UserChatSession";
 import { v4 as uuidv4} from 'uuid';
 import { UserChatMessage } from "../models/UserChatMessage";
 
-// const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
-const apiUrl = "http://localhost:3001";
+ const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
+// const apiUrl = "http://localhost:3001";
 
 interface Message {
   text: string;
@@ -48,8 +48,15 @@ const MyChatForm: React.FC = () => {
       };
 
       const requestBody = {
-        session: session,
-        initialMessage: initialMessage
+        session: {
+          ...session,
+          createdAt: session.createdAt.toISOString(),
+          lastUpdatedAt: session.lastUpdatedAt.toISOString(),
+        },
+        initialMessage: {
+          ...initialMessage,
+          timestamp: initialMessage.timestamp.toISOString(),
+        },
       };
 
       console.log("TRANSACTIONS BABY");
