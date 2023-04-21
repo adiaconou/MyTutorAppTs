@@ -15,6 +15,40 @@ export class UserChatMessagesRepository {
 
     }
 
+    async getById (
+        id: string,
+        limit: number
+      ): Promise<UserChatMessage[] | null> {
+        let nextPageToken = null;
+        const indexName = "chatSessionId";
+        const indexValue = id;
+        const sortKey = "timestamp";
+    
+        let chatMessages: UserChatMessage[] = [];
+    
+        do {
+          const page: { entities: unknown[]; nextPageToken: string | null } =
+            await this.cloudDatastore.getPage(
+              limit,
+              nextPageToken,
+              indexName,
+              indexValue,
+              sortKey
+            );
+          const entities = page.entities;
+          nextPageToken = page.nextPageToken;
+    
+          if (entities.length > 0) {
+            chatMessages = chatMessages.concat(entities as UserChatMessage[]);
+          }
+        } while (nextPageToken !== null);
+    
+        // sort chat sessions by timestamp in ascending order
+       // chatMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    
+        return chatMessages;
+      }
+
     async add(id: string, message: UserChatMessage): Promise<void> {
         this.cloudDatastore.put(id, message);
     }

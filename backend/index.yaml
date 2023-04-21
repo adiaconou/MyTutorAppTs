@@ -4,3 +4,9 @@ indexes:
   - name: userId
   - name: createdAt
     direction: desc
+
+- kind: UserChatMessage
+  properties:
+  - name: chatSessionId
+  - name: timestamp
+    direction: desc

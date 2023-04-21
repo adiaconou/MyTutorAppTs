@@ -4,10 +4,13 @@ import MyChatWindow from "./MyChatWindow";
 import { Box, Grid } from "@mui/material";
 import promptGPT from "../services/openaiService";
 import { UserChatSession } from "../models/UserChatSession";
-import { v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { UserChatMessage } from "../models/UserChatMessage";
+import { useParams } from "react-router-dom";
 
- const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
+const apiUrl =
+  process.env.APP_BACKEND_URL ||
+  "https://backend-dot-for-fun-153903.uc.r.appspot.com";
 // const apiUrl = "http://localhost:3001";
 
 interface Message {
@@ -20,6 +23,10 @@ const MyChatForm: React.FC = () => {
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
   const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
 
+  const { id } = useParams<{ id: string }>();
+  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState<any>(null);
+  
   // State to store retrieved chat sessions
   const [chatSessions, setChatSessions] = useState<UserChatSession[]>([]);
 
@@ -28,6 +35,30 @@ const MyChatForm: React.FC = () => {
     // setViewportWidth(window.innerWidth);
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (id) {
+          const response = await fetch(`${apiUrl}/your-endpoint/${id}`);
+          if (!response.ok) {
+            throw new Error("Failed to fetch data");
+          }
+          const fetchedData = await response.json();
+          setData(fetchedData);
+          setIsLoading(false);
+        } else {
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error(`Error fetching data: ${error}`);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  
   async function createChatSession(messageText: string) {
     try {
       let chatSessionId = uuidv4();
@@ -44,7 +75,7 @@ const MyChatForm: React.FC = () => {
         chatSessionId: chatSessionId,
         text: messageText,
         timestamp: new Date(),
-        sender: 'user',
+        sender: "user",
       };
 
       const requestBody = {
@@ -61,19 +92,18 @@ const MyChatForm: React.FC = () => {
 
       console.log("TRANSACTIONS BABY");
       const response = await fetch(`${apiUrl}/chatSessions/${session.id}`, {
-        
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
-      }); 
+      });
 
       if (!response.ok) {
         throw new Error("Response not ok");
       }
 
-      sessionStorage.setItem('chatSessionId', session.id);
+      sessionStorage.setItem("chatSessionId", session.id);
     } catch (error) {
       console.error(`Error attempting to update user chat: ${error}`);
     }
@@ -81,34 +111,31 @@ const MyChatForm: React.FC = () => {
 
   async function putNewMessage(text: string, sender: string) {
     try {
-    const chatSessionId = sessionStorage.getItem('chatSessionId');
-    console.log("Chat session id: " + chatSessionId);
-    if (chatSessionId == null) {
-      return;
-    }
+      const chatSessionId = sessionStorage.getItem("chatSessionId");
+      console.log("Chat session id: " + chatSessionId);
+      if (chatSessionId == null) {
+        return;
+      }
 
-    const initialMessage: UserChatMessage = {
-      id: uuidv4(),
-      chatSessionId: chatSessionId,
-      text: text,
-      timestamp: new Date(),
-      sender: sender,
-    };
+      const initialMessage: UserChatMessage = {
+        id: uuidv4(),
+        chatSessionId: chatSessionId,
+        text: text,
+        timestamp: new Date(),
+        sender: sender,
+      };
 
-    console.log("TRANSACTIONS BABY");
       const response = await fetch(`${apiUrl}/messages/${initialMessage.id}`, {
-        
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(initialMessage),
-      }); 
+      });
 
       if (!response.ok) {
         throw new Error("Response not ok");
       }
-
     } catch (error) {
       console.error(`Error attempting to update user chat: ${error}`);
     }
@@ -122,12 +149,10 @@ const MyChatForm: React.FC = () => {
   }, []);
 
   const handleTextSubmit = async (text: string) => {
-
     if (messages.length == 0) {
       await createChatSession(text);
-      
     } else {
-      await putNewMessage(text, 'user');
+      await putNewMessage(text, "user");
     }
 
     const userMessage: Message = { text, isUser: true };
@@ -139,13 +164,16 @@ const MyChatForm: React.FC = () => {
         const aiMessage: Message = { text: response, isUser: false };
         setMessages((prevMessages) => [...prevMessages, aiMessage]);
 
-        await putNewMessage(response, 'bot');
+        await putNewMessage(response, "bot");
       }
     };
 
     fetchResponse();
-    
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Box

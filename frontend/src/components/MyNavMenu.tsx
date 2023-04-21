@@ -38,12 +38,11 @@ export default function MyNavMenu({
   const navigate = useNavigate();
 
   // const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
-   const apiUrl = "http://localhost:3001";
+  const apiUrl = "http://localhost:3001";
 
   const [historyExpanded, setHistoryExpanded] = React.useState(false);
   const [historyItems, setHistoryItems] = useState<UserChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(true); // New state variable to track loading status
-
 
   // Fetch chat sessions when the component is mounted
   useEffect(() => {
@@ -51,7 +50,7 @@ export default function MyNavMenu({
     const limit = 10; // Number of chat sessions per page
     getChatSessions(userId, limit);
   }, []);
-    
+
   const toggleHistoryExpanded = () => {
     setHistoryExpanded(!historyExpanded);
   };
@@ -59,7 +58,11 @@ export default function MyNavMenu({
   // Function to get chat sessions
   const getChatSessions = async (userId: string, limit: number) => {
     try {
-      const response = await fetch(`${apiUrl}/chatSessions/?userId=${encodeURIComponent(userId)}&limit=${limit}`);
+      const response = await fetch(
+        `${apiUrl}/chatSessions/?userId=${encodeURIComponent(
+          userId
+        )}&limit=${limit}`
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch chat sessions");
       }
@@ -97,7 +100,14 @@ export default function MyNavMenu({
   if (isLoading) {
     // Render a loading spinner or message while data is being fetched
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
         <CircularProgress />
       </Box>
     );
@@ -144,7 +154,15 @@ export default function MyNavMenu({
         <Collapse in={historyExpanded} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
             {historyItems.map((session) => (
-              <ListItem button key={session.id} sx={{ pl: 4 }}>
+              <ListItem
+                button
+                key={session.id}
+                sx={{ pl: 4 }}
+                onClick={() => {
+                  navigate(`/c/${session.id}`);
+                  handleClose();
+                }}
+              >
                 <ListItemText primary={session.summary} />
               </ListItem>
             ))}

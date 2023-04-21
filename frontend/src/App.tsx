@@ -35,6 +35,7 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/" element={<MyChatForm />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/c/:id" element={<MyChatForm />} />
             </Routes>
           </Container>
         </Box>
