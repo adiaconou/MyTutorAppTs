@@ -65,9 +65,6 @@ export class UserChatSessionRepository {
       }
     } while (nextPageToken !== null);
 
-    // sort chat sessions by createdAt in ascending order
-    chatSessions.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-
     return chatSessions;
   }
 }

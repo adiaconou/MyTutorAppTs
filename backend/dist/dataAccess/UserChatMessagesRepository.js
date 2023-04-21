@@ -24,8 +24,14 @@ class UserChatMessagesRepository {
                 chatMessages = chatMessages.concat(entities);
             }
         } while (nextPageToken !== null);
-        // sort chat sessions by timestamp in ascending order
-        // chatMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+        // Sort chat messages by timestamp in ascending order
+        chatMessages.sort((a, b) => {
+            // Convert string timestamps to Date objects
+            const dateA = new Date(a.timestamp);
+            const dateB = new Date(b.timestamp);
+            // Compare timestamps and sort in ascending order
+            return dateA.getTime() - dateB.getTime();
+        });
         return chatMessages;
     }
     async add(id, message) {

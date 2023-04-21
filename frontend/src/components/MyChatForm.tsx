@@ -8,9 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import { UserChatMessage } from "../models/UserChatMessage";
 import { useParams } from "react-router-dom";
 
-const apiUrl =
-  process.env.APP_BACKEND_URL ||
-  "https://backend-dot-for-fun-153903.uc.r.appspot.com";
+ const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
 // const apiUrl = "http://localhost:3001";
 
 interface Message {
@@ -26,7 +24,13 @@ const MyChatForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<any>(null);
-  
+
+  const [sessionData, setSessionData] = useState<string>(() => {
+    // Retrieve data from sessionStorage if available
+    const chatSessionId = sessionStorage.getItem('chatSessionId');
+    return chatSessionId ?? '';
+  });
+
   // State to store retrieved chat sessions
   const [chatSessions, setChatSessions] = useState<UserChatSession[]>([]);
 
@@ -35,18 +39,50 @@ const MyChatForm: React.FC = () => {
     // setViewportWidth(window.innerWidth);
   };
 
+  const clearMessages = () => {
+    setMessages([]);
+    sessionStorage.setItem('chatSessionId', '');
+  };
+
+  // Function to get chat sessions
+  const getMessages = async (chatSessionId: string, limit: number) => {
+    try {
+      const response = await fetch(
+        `${apiUrl}/messages/?chatSessionId=${encodeURIComponent(
+          chatSessionId
+        )}&limit=${limit}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch messages");
+      }
+      const messageList: UserChatMessage[] = await response.json();
+
+      // Convert UserChatMessage[] to Message[]
+      const mappedMessages: Message[] = messageList.map((message) => ({
+        text: message.text,
+        isUser: message.sender === "user",
+      }));
+
+      setMessages(mappedMessages);
+      setIsLoading(false); // Set loading status to false after data is fetched
+    } catch (error) {
+      console.error(`Error fetching chat sessions: ${error}`);
+      setIsLoading(false); // Set loading status to false even if an error occurs
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (id) {
-          const response = await fetch(`${apiUrl}/your-endpoint/${id}`);
-          if (!response.ok) {
-            throw new Error("Failed to fetch data");
-          }
-          const fetchedData = await response.json();
-          setData(fetchedData);
+          sessionStorage.setItem("chatSessionId", id);
+          getMessages(id, 500);
+   
           setIsLoading(false);
         } else {
+          sessionStorage.setItem("chatSessionId", '');
+          clearMessages();
           setIsLoading(false);
         }
       } catch (error) {
@@ -58,7 +94,6 @@ const MyChatForm: React.FC = () => {
     fetchData();
   }, [id]);
 
-  
   async function createChatSession(messageText: string) {
     try {
       let chatSessionId = uuidv4();
@@ -90,7 +125,6 @@ const MyChatForm: React.FC = () => {
         },
       };
 
-      console.log("TRANSACTIONS BABY");
       const response = await fetch(`${apiUrl}/chatSessions/${session.id}`, {
         method: "PUT",
         headers: {

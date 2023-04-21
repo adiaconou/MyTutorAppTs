@@ -75,6 +75,16 @@ export default function MyNavMenu({
     }
   };
 
+  // Function to handle the "New Chat" action
+  const handleNewChat = () => {
+    // Set sessionData to an empty string in sessionStorage
+    sessionStorage.setItem('chatSessionId', '');
+    
+    // Navigate to the home page
+    navigate("/");
+    handleClose();
+  };
+
   // Items for the navigation menu
   const menuItems: MenuItem[] = [
     {
@@ -83,6 +93,7 @@ export default function MyNavMenu({
       onClick: () => {
         navigate("/");
         handleClose();
+        handleNewChat();
       },
     },
     {
