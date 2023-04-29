@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import MyTextField from "./MyTextField";
 import MyChatWindow from "./MyChatWindow";
 import { Box, Grid } from "@mui/material";
-import promptGPT from "../services/openaiService";
 import { UserChatSession } from "../models/UserChatSession";
 import { v4 as uuidv4 } from "uuid";
 import { UserChatMessage } from "../models/UserChatMessage";
 import { useParams } from "react-router-dom";
+import promptGPT from "../services/OpenaiService";
 
- const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
+ const apiUrl = process.env.REACT_APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
 // const apiUrl = "http://localhost:3001";
 
 interface Message {
@@ -19,11 +19,9 @@ interface Message {
 const MyChatForm: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
-  const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
 
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState<any>(null);
 
   const [sessionData, setSessionData] = useState<string>(() => {
     // Retrieve data from sessionStorage if available
@@ -227,6 +225,8 @@ const MyChatForm: React.FC = () => {
           width: "100%",
           maxWidth: "md",
           marginTop: "64px",
+          // bgcolor: '#444654',
+          borderRadius: 2,
 
           "&::-webkit-scrollbar": {
             width: "6px",
@@ -254,7 +254,7 @@ const MyChatForm: React.FC = () => {
           paddingTop: "15px",
           width: "100%",
           maxWidth: "md",
-          margin: "0 auto",
+          margin: "0 auto"
         }}
       >
         <MyTextField messages={messages} onSubmit={handleTextSubmit} />

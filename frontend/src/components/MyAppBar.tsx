@@ -30,7 +30,7 @@ const MyAppBar: React.FC<MyAppBarProps> = ({ sx }) => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed" sx={sx}>
+      <AppBar position="fixed" sx={{ ...sx, minHeight: '64px' }}>
         <Toolbar sx={{ justifyContent: 'flex-start' }}>
           <IconButton
             size="large"

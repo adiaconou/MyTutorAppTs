@@ -18,6 +18,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import { UserChatSession } from "../models/UserChatSession";
 import { useState, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
+import { BackendService } from "../services/BackendService";
 
 interface MenuItem {
   label: string;
@@ -30,6 +31,8 @@ interface MyNavMenuProps {
   handleClose: () => void;
 }
 
+const backend = new BackendService();
+
 export default function MyNavMenu({
   drawerOpen,
   handleClose,
@@ -37,18 +40,13 @@ export default function MyNavMenu({
   // Get access to the useHistory hook from react-router-dom
   const navigate = useNavigate();
 
-  // const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
-  const apiUrl = "http://localhost:3001";
-
   const [historyExpanded, setHistoryExpanded] = React.useState(false);
   const [historyItems, setHistoryItems] = useState<UserChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(true); // New state variable to track loading status
 
   // Fetch chat sessions when the component is mounted
   useEffect(() => {
-    const userId = "adiaconou"; // Replace with actual user ID
-    const limit = 10; // Number of chat sessions per page
-    getChatSessions(userId, limit);
+    getChatSessions("adiaconou", 10);
   }, []);
 
   const toggleHistoryExpanded = () => {
@@ -57,29 +55,19 @@ export default function MyNavMenu({
 
   // Function to get chat sessions
   const getChatSessions = async (userId: string, limit: number) => {
-    try {
-      const response = await fetch(
-        `${apiUrl}/chatSessions/?userId=${encodeURIComponent(
-          userId
-        )}&limit=${limit}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch chat sessions");
-      }
-      const sessions: UserChatSession[] = await response.json();
-      setHistoryItems(sessions);
-      setIsLoading(false); // Set loading status to false after data is fetched
-    } catch (error) {
-      console.error(`Error fetching chat sessions: ${error}`);
-      setIsLoading(false); // Set loading status to false even if an error occurs
-    }
+    const sessions: UserChatSession[] = await backend.getChatSessions(
+      userId,
+      limit
+    );
+    setHistoryItems(sessions);
+    setIsLoading(false);
   };
 
   // Function to handle the "New Chat" action
   const handleNewChat = () => {
     // Set sessionData to an empty string in sessionStorage
-    sessionStorage.setItem('chatSessionId', '');
-    
+    sessionStorage.setItem("chatSessionId", "");
+
     // Navigate to the home page
     navigate("/");
     handleClose();

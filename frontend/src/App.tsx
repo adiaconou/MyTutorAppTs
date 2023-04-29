@@ -14,24 +14,22 @@ const App: React.FC = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          justifyContents: "center",
           minHeight: "100vh",
         }}
       >
-        
-        <MyAppBar
-          sx={{ position: "fixed", top: 0, zIndex: 10, width: "100%" }}
-      />
+        <Box sx={{ position: "fixed", top: 0, zIndex: 10, width: "100%" }}>
+          <MyAppBar />
+        </Box>
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             flexGrow: 1,
-            paddingTop: "64px",
             alignItems: "center",
+            bgcolor: "purple"
           }}
         >
-          <Container maxWidth="md" sx={{ flexGrow: 1, paddingTop: "16px" }}>
+          <Container maxWidth="md" sx={{ flexGrow: 1 }}>
             <Routes>
               <Route path="/" element={<MyChatForm />} />
               <Route path="/settings" element={<Settings />} />
@@ -40,7 +38,7 @@ const App: React.FC = () => {
           </Container>
         </Box>
       </Box>
-    </BrowserRouter>
+    </BrowserRouter>  
   );
 }
 

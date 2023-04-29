@@ -121,6 +121,7 @@ app.put("/messages/:id", async (req: Request, res: Response) => {
 
 app.get("/chatSessions/:id", async (req: Request, res: Response) => {
   try {
+    console.log("I'm here");
     const id = req.params.id;
     const session = await userChatSessionRepo.get(id);
     res.json(session);

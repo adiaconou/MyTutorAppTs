@@ -25,7 +25,6 @@ const promptGPT = async (prompt: string, maxTokens: number = 50): Promise<string
   };
 
   try {
-    console.log("TEST");
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: headers,

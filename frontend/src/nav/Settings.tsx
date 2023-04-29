@@ -13,7 +13,7 @@ const Settings: React.FC = () => {
   const [languageChoice, setLanguageChoice] = useState<string>("Greek");
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const apiUrl = process.env.APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
+  const apiUrl = process.env.REACT_APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
   // const apiUrl = "http://localhost:3001";
 
   // Handle slider value change
