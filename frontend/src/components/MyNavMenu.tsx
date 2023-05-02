@@ -162,7 +162,11 @@ export default function MyNavMenu({
                   handleClose();
                 }}
               >
-                <ListItemText primary={session.summary} />
+                <ListItemText
+                  primary=<Typography sx={{ fontSize: "14px" }}>
+                    {session.createdAt.toString()}
+                  </Typography>
+                />
               </ListItem>
             ))}
           </List>

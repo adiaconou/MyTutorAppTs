@@ -22,7 +22,8 @@ export class UserChatSessionRepository {
     newSessionId: string,
     newSession: UserChatSession,
     initialMessageId: string,
-    initialMessage: UserChatMessage): Promise<void> {
+    initialMessage: UserChatMessage
+  ): Promise<void> {
     this.cloudDatastore.transactionalPut(
       "UserChatSession",
       newSessionId,
@@ -39,7 +40,8 @@ export class UserChatSessionRepository {
 
   async getByUserId(
     userId: string,
-    limit: number
+    limit: number,
+    maxPages?: number
   ): Promise<UserChatSession[] | null> {
     let nextPageToken = null;
     const indexName = "userId";
@@ -47,6 +49,7 @@ export class UserChatSessionRepository {
     const sortKey = "createdAt";
 
     let chatSessions: UserChatSession[] = [];
+    let currentPage = 0;
 
     do {
       const page: { entities: unknown[]; nextPageToken: string | null } =
@@ -63,7 +66,9 @@ export class UserChatSessionRepository {
       if (entities.length > 0) {
         chatSessions = chatSessions.concat(entities as UserChatSession[]);
       }
-    } while (nextPageToken !== null);
+
+      currentPage++;
+    } while (nextPageToken !== null && (!maxPages || currentPage < maxPages));
 
     return chatSessions;
   }

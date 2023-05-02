@@ -16,12 +16,13 @@ class UserChatSessionRepository {
     async get(id) {
         return this.cloudDatastore.get(id);
     }
-    async getByUserId(userId, limit) {
+    async getByUserId(userId, limit, maxPages) {
         let nextPageToken = null;
         const indexName = "userId";
         const indexValue = userId;
         const sortKey = "createdAt";
         let chatSessions = [];
+        let currentPage = 0;
         do {
             const page = await this.cloudDatastore.getPage(limit, nextPageToken, indexName, indexValue, sortKey);
             const entities = page.entities;
@@ -29,7 +30,8 @@ class UserChatSessionRepository {
             if (entities.length > 0) {
                 chatSessions = chatSessions.concat(entities);
             }
-        } while (nextPageToken !== null);
+            currentPage++;
+        } while (nextPageToken !== null && (!maxPages || currentPage < maxPages));
         return chatSessions;
     }
 }

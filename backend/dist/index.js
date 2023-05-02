@@ -94,7 +94,6 @@ app.put("/messages/:id", async (req, res) => {
 });
 app.get("/chatSessions/:id", async (req, res) => {
     try {
-        console.log("I'm here");
         const id = req.params.id;
         const session = await userChatSessionRepo.get(id);
         res.json(session);
@@ -140,7 +139,8 @@ app.get("/chatSessions/", async (req, res) => {
         if (isNaN(limit)) {
             return res.status(400).json({ message: "Invalid limit" });
         }
-        const session = await userChatSessionRepo.getByUserId(userId, limit);
+        console.log("LIMIT: " + limit);
+        const session = await userChatSessionRepo.getByUserId(userId, limit, 1);
         res.json(session);
     }
     catch (error) {
