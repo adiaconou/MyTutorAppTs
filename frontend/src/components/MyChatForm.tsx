@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from "react";
 import MyTextField from "./MyTextField";
 import MyChatWindow from "./MyChatWindow";
-import { Box, Grid } from "@mui/material";
-import { UserChatSession } from "../models/UserChatSession";
-import { v4 as uuidv4 } from "uuid";
+import { Box } from "@mui/material";
 import { UserChatMessage } from "../models/UserChatMessage";
 import { useParams } from "react-router-dom";
 import promptGPT from "../services/OpenaiService";
-
-const apiUrl =
-  process.env.REACT_APP_BACKEND_URL ||
-  "https://backend-dot-for-fun-153903.uc.r.appspot.com";
-// const apiUrl = "http://localhost:3001";
+import { BackendService } from "../services/BackendService";
 
 interface Message {
   text: string;
@@ -29,74 +23,42 @@ const MyChatForm: React.FC<MyChatFormProps> = ({ systemPrompt }) => {
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(true);
 
-  const [sessionData, setSessionData] = useState<string>(() => {
-    // Retrieve data from sessionStorage if available
-    const chatSessionId = sessionStorage.getItem("chatSessionId");
-    return chatSessionId ?? "";
-  });
+  const backend = new BackendService();
 
-  // State to store retrieved chat sessions
-  const [chatSessions, setChatSessions] = useState<UserChatSession[]>([]);
+  useEffect(() => {
+    window.addEventListener("resize", updateViewportSize);
+    return () => {
+      window.removeEventListener("resize", updateViewportSize);
+    };
+  }, []);
 
-  const updateViewportSize = () => {
-    setViewportHeight(window.innerHeight);
-    // setViewportWidth(window.innerWidth);
-  };
-
-  const clearMessages = () => {
-    setMessages([]);
-    sessionStorage.setItem("chatSessionId", "");
-  };
-
-  // Function to get chat sessions
-  const getMessages = async (chatSessionId: string, limit: number) => {
-    try {
-      const response = await fetch(
-        `${apiUrl}/messages/?chatSessionId=${encodeURIComponent(
-          chatSessionId
-        )}&limit=${limit}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch messages");
-      }
-      const messageList: UserChatMessage[] = await response.json();
-
-      // Convert UserChatMessage[] to Message[]
-      const mappedMessages: Message[] = messageList.map((message) => ({
-        text: message.text,
-        isUser: message.sender === "user",
-      }));
-
-      setMessages(mappedMessages);
-      setIsLoading(false); // Set loading status to false after data is fetched
-    } catch (error) {
-      console.error(`Error fetching chat sessions: ${error}`);
-      setIsLoading(false); // Set loading status to false even if an error occurs
-    }
-  };
-
+  /*** When the component loads, we check if there is a chat session id
+   * in the session data. If it exists, we will load the chat history
+   * for that chat session. If it doesn't exist, we will clear the messages
+   * from the chat form because it should be a fresh chat session.
+   ***/
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (id) {
           sessionStorage.setItem("chatSessionId", id);
           getMessages(id, 500);
-
           setIsLoading(false);
         } else {
           sessionStorage.setItem("chatSessionId", "");
           clearMessages();
           setIsLoading(false);
 
+          // systemPrompt is an optional prop for the component which
+          // is only passed in if this is a new chat session. This will
+          // trigger the initial gpt system prompt to kick off the chat
+          // session.
           if (systemPrompt) {
             const fetchResponse = async () => {
-              console.log("ITSA MEEE: " + systemPrompt);
               const response = await promptGPT(systemPrompt, "system");
               if (response !== null) {
                 const aiMessage: Message = { text: response, isUser: false };
                 setMessages((prevMessages) => [...prevMessages, aiMessage]);
-
                 await putNewMessage(response, "bot");
               }
             };
@@ -113,94 +75,45 @@ const MyChatForm: React.FC<MyChatFormProps> = ({ systemPrompt }) => {
     fetchData();
   }, [id]);
 
+  /***  Update viewport height ***/
+  const updateViewportSize = () => {
+    setViewportHeight(window.innerHeight);
+  };
+
+  /*** Clear chat messages and session data from the chat component ***/
+  const clearMessages = () => {
+    setMessages([]);
+    sessionStorage.setItem("chatSessionId", "");
+  };
+
+  /*** Get message history for the chat session ***/
+  const getMessages = async (chatSessionId: string, limit: number) => {
+    const messageList: UserChatMessage[] = await backend.getMessages(
+      chatSessionId,
+      limit
+    );
+
+    // Convert UserChatMessage[] to Message[]
+    const mappedMessages: Message[] = messageList.map((message) => ({
+      text: message.text,
+      isUser: message.sender === "user",
+    }));
+
+    setMessages(mappedMessages);
+    setIsLoading(false);
+  };
+
+  /*** Store the new chat session record in the database ***/
   async function createChatSession(messageText: string) {
-    try {
-      let chatSessionId = uuidv4();
-      const session: UserChatSession = {
-        id: chatSessionId,
-        userId: "adiaconou",
-        createdAt: new Date(),
-        lastUpdatedAt: new Date(),
-        summary: chatSessionId,
-      };
-
-      const initialMessage: UserChatMessage = {
-        id: uuidv4(),
-        chatSessionId: chatSessionId,
-        text: messageText,
-        timestamp: new Date(),
-        sender: "user",
-      };
-
-      const requestBody = {
-        session: {
-          ...session,
-          createdAt: session.createdAt.toISOString(),
-          lastUpdatedAt: session.lastUpdatedAt.toISOString(),
-        },
-        initialMessage: {
-          ...initialMessage,
-          timestamp: initialMessage.timestamp.toISOString(),
-        },
-      };
-
-      const response = await fetch(`${apiUrl}/chatSessions/${session.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        throw new Error("Response not ok");
-      }
-
-      sessionStorage.setItem("chatSessionId", session.id);
-    } catch (error) {
-      console.error(`Error attempting to update user chat: ${error}`);
-    }
+    backend.createChatSession(messageText);
   }
 
+  /*** Store the last message in the database ***/
   async function putNewMessage(text: string, sender: string) {
-    try {
-      const chatSessionId = sessionStorage.getItem("chatSessionId");
-      console.log("Chat session id: " + chatSessionId);
-      if (chatSessionId == null) {
-        return;
-      }
-
-      const initialMessage: UserChatMessage = {
-        id: uuidv4(),
-        chatSessionId: chatSessionId,
-        text: text,
-        timestamp: new Date(),
-        sender: sender,
-      };
-
-      const response = await fetch(`${apiUrl}/messages/${initialMessage.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(initialMessage),
-      });
-
-      if (!response.ok) {
-        throw new Error("Response not ok");
-      }
-    } catch (error) {
-      console.error(`Error attempting to update user chat: ${error}`);
-    }
+    backend.putNewMessage(text, sender);
   }
 
-  useEffect(() => {
-    window.addEventListener("resize", updateViewportSize);
-    return () => {
-      window.removeEventListener("resize", updateViewportSize);
-    };
-  }, []);
-
+  /*** Handle new messages submitted by the user through chat ***/
   const handleTextSubmit = async (text: string) => {
     if (messages.length == 0) {
       await createChatSession(text);

@@ -5,7 +5,7 @@ import MyAppBar from "./components/MyAppBar";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Settings from "./nav/Settings";
+import Settings from "./components/navigation/SettingsView";
 import Gpt4Prompt from "./prompt/Gpt4Prompt";
 import { UserSettings } from "./models/UserSettings";
 import { BackendService } from "./services/BackendService";

@@ -45,7 +45,6 @@ interface MyTextFieldProps {
   messages: Message[];
 }
 
-
 const MyTextField: React.FC<MyTextFieldProps> = ({ onSubmit, messages }) => {
   const [inputValue, setInputValue] = useState("");
 
