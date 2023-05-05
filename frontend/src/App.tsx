@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 import MyChatForm from "./components/MyChatForm";
 import MyAppBar from "./components/MyAppBar";
@@ -6,8 +6,33 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Settings from "./nav/Settings";
+import Gpt4Prompt from "./prompt/Gpt4Prompt";
+import { UserSettings } from "./models/UserSettings";
+import { BackendService } from "./services/BackendService";
 
 const App: React.FC = () => {
+  const [systemPrompt, setSystemPrompt] = useState("");
+  const backend = new BackendService();
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      // Get UserSettings object from the backend
+      const userSettings: UserSettings | null = await backend.getUserSettings(
+        "adiaconou"
+      );
+
+      // If userSettings is not null, get the system prompt using the Gpt4Prompt static method
+      if (userSettings) {
+        const prompt = Gpt4Prompt.getSystemPrompt(userSettings);
+
+        // Set the system prompt in the state
+        setSystemPrompt(prompt);
+      }
+    };
+
+    // Call the async function
+    fetchUserSettings();
+  }, []);
+
   return (
     <BrowserRouter>
       <Box
@@ -26,20 +51,20 @@ const App: React.FC = () => {
             flexDirection: "column",
             flexGrow: 1,
             alignItems: "center",
-            bgcolor: "purple"
+            bgcolor: "purple",
           }}
         >
           <Container maxWidth="md" sx={{ flexGrow: 1 }}>
             <Routes>
-              <Route path="/" element={<MyChatForm />} />
+              <Route path="/" element={<MyChatForm systemPrompt={systemPrompt} />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/c/:id" element={<MyChatForm />} />
             </Routes>
           </Container>
         </Box>
       </Box>
-    </BrowserRouter>  
+    </BrowserRouter>
   );
-}
+};
 
 export default App;

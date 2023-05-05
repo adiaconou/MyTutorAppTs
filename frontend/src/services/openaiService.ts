@@ -18,10 +18,10 @@ interface CompletionResponse {
   }[];
 }
 
-const promptGPT = async (prompt: string, maxTokens: number = 50): Promise<string | null> => {
+const promptGPT = async (prompt: string, role: string, maxTokens: number = 50): Promise<string | null> => {
   const data = {
     model: "gpt-3.5-turbo",
-    messages: [{ role: "user", content: JSON.stringify(prompt) }] as Message[],
+    messages: [{ role: role, content: JSON.stringify(prompt) }] as Message[],
   };
 
   try {

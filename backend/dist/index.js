@@ -65,10 +65,12 @@ app.put("/userSettings/:userId", async (req, res) => {
             settings,
         };
         const updatedUserSettings = await userSettingsRepo.updateUserSettings(userId, userSettings);
+        console.log("success");
         res.json(updatedUserSettings);
     }
     catch (error) {
         res.status(500).json({ message: "Error updating user settings" });
+        console.log("Server error: " + error);
     }
 });
 app.put("/messages/:id", async (req, res) => {

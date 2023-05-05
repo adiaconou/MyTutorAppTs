@@ -3,52 +3,20 @@ import { Box, Slider, Typography, Divider } from "@mui/material";
 import MyDropDown from "../components/MyDropDown";
 import { SelectChangeEvent } from "@mui/material/Select";
 import { UserSettings } from "../models/UserSettings";
-import CircularProgress from '@mui/material/CircularProgress';
+import CircularProgress from "@mui/material/CircularProgress";
+import { BackendService } from "../services/BackendService";
 
 const Settings: React.FC = () => {
   const fixedUserId = "adiaconou";
+  const backend = new BackendService();
 
-  // State to hold the current value of the slider
   const [languageProficiency, setLanguageProficiency] = useState<number>(5); // Default value
   const [languageChoice, setLanguageChoice] = useState<string>("Greek");
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const apiUrl = process.env.REACT_APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
-  // const apiUrl = "http://localhost:3001";
-
-  // Handle slider value change
-  const handleLanguageProficiencyChange = (
-    event: Event,
-    newValue: number | number[],
-    activeThumb: number
-  ) => {
-    setLanguageProficiency(newValue as number);
-
-    const userPromptSettings: UserSettings = {
-      userId: 'adiaconou',
-      settings: {
-        languageChoice: languageChoice,
-        languageProficiency: newValue as number,
-      },
-    };
-
-    updateUserSettings(userPromptSettings);
-  };
-
-  const handleLanguageChoiceChange = (event: SelectChangeEvent<string>) => {
-    setLanguageChoice(event.target.value);
-
-
-    const userSettings: UserSettings = {
-      userId: 'adiaconou',
-      settings: {
-        languageChoice: event.target.value,
-        languageProficiency: languageProficiency,
-      },
-    };
-
-    updateUserSettings(userSettings);
-  };
+  const apiUrl =
+    process.env.REACT_APP_BACKEND_URL ||
+    "https://backend-dot-for-fun-153903.uc.r.appspot.com";
 
   // Fetch user settings on component mount and update state values
   useEffect(() => {
@@ -61,11 +29,47 @@ const Settings: React.FC = () => {
     });
   }, []); // Empty dependency array ensures this effect only runs on component mount
 
+  // Handle slider value change
+  const handleLanguageProficiencyChange = (
+    event: Event,
+    newValue: number | number[],
+    activeThumb: number
+  ) => {
+    setLanguageProficiency(newValue as number);
+
+    const userPromptSettings: UserSettings = {
+      userId: "adiaconou",
+      settings: {
+        languageChoice: languageChoice,
+        languageProficiency: newValue as number,
+        sourceLanguage: "English",
+      },
+    };
+
+    updateUserSettings(userPromptSettings);
+  };
+
+  // Handle language choice change
+  const handleLanguageChoiceChange = (event: SelectChangeEvent<string>) => {
+    setLanguageChoice(event.target.value);
+
+    const userSettings: UserSettings = {
+      userId: "adiaconou",
+      settings: {
+        languageChoice: event.target.value,
+        languageProficiency: languageProficiency,
+        sourceLanguage: "English",
+      },
+    };
+
+    updateUserSettings(userSettings);
+  };
+
   async function sendLogToBackend(logMessage: string): Promise<void> {
     const response = await fetch(`${apiUrl}/log`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ message: logMessage })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: logMessage }),
     });
 
     const result = await response.json();
@@ -73,58 +77,21 @@ const Settings: React.FC = () => {
   }
 
   async function getUserSettings(userId: string): Promise<UserSettings | null> {
-    console.log("URL: " + apiUrl + "/userSettings/" + userId);
-    try {
-      const response = await fetch(
-        `${apiUrl}/userSettings/${userId}`
-      );
-
-      // Check if the response status code indicates success
-      if (!response.ok) {
-        throw new Error(`Server responded with status ${response.status}`);
-      }
-
-      const userSettings: UserSettings = await response.json();
-      console.log("userSettings: " + userSettings);
-      sendLogToBackend("User settings retrieved: " + JSON.stringify(userSettings));
-      return userSettings;
-    } catch (error) {
-      sendLogToBackend("Error fetching user settings: " + error);
-      console.error("Error fetching user settings:", error);
-      return null;
-    }
+    return backend.getUserSettings(userId);
   }
 
-  async function updateUserSettings(userSettings: UserSettings): Promise<UserSettings | null> {
-    try {
-      const response = await fetch(`${apiUrl}/userSettings/${userSettings.userId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userSettings),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error updating user settings');
-      }
-      const updatedUserSettings: UserSettings = await response.json();
-      return updatedUserSettings;
-
-    } catch (error) {
-      console.error(`Error attempting to update user settings: ${error}`);
-      return null;
-    }
+  async function updateUserSettings(userSettings: UserSettings): Promise<void> {
+    backend.updateUserSettings(userSettings);
   }
 
   if (isLoading) {
     return (
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
         }}
       >
         <CircularProgress />

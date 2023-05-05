@@ -3,5 +3,6 @@ export interface UserSettings {
     settings: {
       languageChoice: string;
       languageProficiency: number;
+      sourceLanguage: string;
     };
   }

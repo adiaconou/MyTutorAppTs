@@ -89,7 +89,7 @@ app.put("/userSettings/:userId", async (req: Request, res: Response) => {
     );
     res.json(updatedUserSettings);
   } catch (error) {
-    res.status(500).json({ message: "Error updating user settings" });
+    res.status(500).json({ message: `Error updating user settings ${error}` });
   }
 });
 

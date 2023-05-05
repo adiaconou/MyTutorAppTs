@@ -8,7 +8,9 @@ import { UserChatMessage } from "../models/UserChatMessage";
 import { useParams } from "react-router-dom";
 import promptGPT from "../services/OpenaiService";
 
- const apiUrl = process.env.REACT_APP_BACKEND_URL || "https://backend-dot-for-fun-153903.uc.r.appspot.com";
+const apiUrl =
+  process.env.REACT_APP_BACKEND_URL ||
+  "https://backend-dot-for-fun-153903.uc.r.appspot.com";
 // const apiUrl = "http://localhost:3001";
 
 interface Message {
@@ -16,7 +18,11 @@ interface Message {
   isUser: boolean;
 }
 
-const MyChatForm: React.FC = () => {
+interface MyChatFormProps {
+  systemPrompt?: string;
+}
+
+const MyChatForm: React.FC<MyChatFormProps> = ({ systemPrompt }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
 
@@ -25,8 +31,8 @@ const MyChatForm: React.FC = () => {
 
   const [sessionData, setSessionData] = useState<string>(() => {
     // Retrieve data from sessionStorage if available
-    const chatSessionId = sessionStorage.getItem('chatSessionId');
-    return chatSessionId ?? '';
+    const chatSessionId = sessionStorage.getItem("chatSessionId");
+    return chatSessionId ?? "";
   });
 
   // State to store retrieved chat sessions
@@ -39,7 +45,7 @@ const MyChatForm: React.FC = () => {
 
   const clearMessages = () => {
     setMessages([]);
-    sessionStorage.setItem('chatSessionId', '');
+    sessionStorage.setItem("chatSessionId", "");
   };
 
   // Function to get chat sessions
@@ -76,12 +82,27 @@ const MyChatForm: React.FC = () => {
         if (id) {
           sessionStorage.setItem("chatSessionId", id);
           getMessages(id, 500);
-   
+
           setIsLoading(false);
         } else {
-          sessionStorage.setItem("chatSessionId", '');
+          sessionStorage.setItem("chatSessionId", "");
           clearMessages();
           setIsLoading(false);
+
+          if (systemPrompt) {
+            const fetchResponse = async () => {
+              console.log("ITSA MEEE: " + systemPrompt);
+              const response = await promptGPT(systemPrompt, "system");
+              if (response !== null) {
+                const aiMessage: Message = { text: response, isUser: false };
+                setMessages((prevMessages) => [...prevMessages, aiMessage]);
+
+                await putNewMessage(response, "bot");
+              }
+            };
+
+            fetchResponse();
+          }
         }
       } catch (error) {
         console.error(`Error fetching data: ${error}`);
@@ -191,7 +212,7 @@ const MyChatForm: React.FC = () => {
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     const fetchResponse = async () => {
-      const response = await promptGPT(text);
+      const response = await promptGPT(text, "user");
       if (response !== null) {
         const aiMessage: Message = { text: response, isUser: false };
         setMessages((prevMessages) => [...prevMessages, aiMessage]);
@@ -254,7 +275,7 @@ const MyChatForm: React.FC = () => {
           paddingTop: "15px",
           width: "100%",
           maxWidth: "md",
-          margin: "0 auto"
+          margin: "0 auto",
         }}
       >
         <MyTextField messages={messages} onSubmit={handleTextSubmit} />
