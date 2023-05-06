@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import TextFieldView from "./TextFieldView";
-import ChatView from "./ChatView";
+import ChatMessageListView from "./ChatMessageListView";
 import { Box } from "@mui/material";
 import useViewModel from "./ChatFormViewModel";
 
@@ -8,11 +8,32 @@ interface ChatFormViewProps {
   systemPrompt?: string;
 }
 
+function useWindowDimensions() {
+  const [windowDimensions, setWindowDimensions] = useState({
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowDimensions({
+        height: window.innerHeight,
+      });
+    }
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  console.log("Window dimensions: " + windowDimensions.height);
+  return windowDimensions;
+}
+
+
 const ChatFormView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
 
   const {
     messages,
-    viewportHeight,
+   // viewportHeight,
     id,
     isLoading,
     loadChatSession,
@@ -20,13 +41,16 @@ const ChatFormView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
     handleTextSubmit
   } = useViewModel();
 
+  const { height: viewportHeight } = useWindowDimensions();
+
+  /*
   useEffect(() => {
     window.addEventListener("resize", updateViewportSize);
     return () => {
       window.removeEventListener("resize", updateViewportSize);
     };
   }, []);
-
+*/
   useEffect(() => {
     if (systemPrompt) {
       loadChatSession(systemPrompt);
@@ -41,6 +65,7 @@ const ChatFormView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
 
   return (
     <Box
+      className="ChatFormView_parent"
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -50,18 +75,18 @@ const ChatFormView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
       }}
     >
       <Box
+        className="ChatMessageListView_parent"
         sx={{
           flexGrow: 1,
           overflowY: "auto",
-          backgroundColor: "transparent",
           width: "100%",
           maxWidth: "md",
-          marginTop: "64px",
+          marginTop: '64px',
           // bgcolor: '#444654',
-          borderRadius: 2,
+          borderRadius: 1,
 
           "&::-webkit-scrollbar": {
-            width: "6px",
+            width: "2px",
             backgroundColor: "transparent",
           },
           "&::-webkit-scrollbar-thumb": {
@@ -74,9 +99,10 @@ const ChatFormView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
           },
         }}
       >
-        <ChatView messages={messages} />
+        <ChatMessageListView messages={messages} />
       </Box>
       <Box
+        className="TextFieldView_parent"
         sx={{
           position: "sticky",
           bottom: 0,

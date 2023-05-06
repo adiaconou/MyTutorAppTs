@@ -88,7 +88,8 @@ export default function ChatFormViewModel() {
   /*** Handle new messages submitted by the user through chat ***/
   const handleTextSubmit = async (text: string) => {
     if (messages.length == 0) {
-      await createChatSession(text);
+      const newChatSessionId: string = await createChatSession(text);
+      sessionStorage.setItem("chatSessionId", newChatSessionId);
     } else {
       await putNewMessage(text, "user");
     }
@@ -111,7 +112,7 @@ export default function ChatFormViewModel() {
 
   /*** Store the new chat session record in the database ***/
   async function createChatSession(messageText: string) {
-    backend.createChatSession(messageText);
+    return backend.createChatSession(messageText);
   }
 
   /*** Store the last message in the database ***/

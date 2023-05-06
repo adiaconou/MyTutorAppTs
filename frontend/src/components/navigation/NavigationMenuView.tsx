@@ -49,7 +49,7 @@ export default function NavigationMenuView({
 
   // Fetch chat sessions when the component is mounted
   useEffect(() => {
-    getChatSessions("adiaconou", 10);
+    getChatSessions("adiaconou", 15);
   }, []);
 
   // Items for the navigation menu

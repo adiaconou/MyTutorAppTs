@@ -51,7 +51,7 @@ const SettingsView: React.FC = () => {
     >
       <Box
         className="setting_pageTitle"
-        sx={{ marginBottom: "30px", marginTop: "64px", width: "75%" }}
+        sx={{ marginBottom: "30px", marginTop: "64px", width: "75%", }}
       >
         <Typography sx={{ fontWeight: "bold", fontSize: "24px" }}>
           Prompt Settings

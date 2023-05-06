@@ -55,7 +55,6 @@ const TextFieldView: React.FC<TextFieldViewProps> = ({
       style={{
         display: "flex",
         justifyContent: "center",
-        paddingBottom: "15px",
       }}
     >
       <Container maxWidth="md">

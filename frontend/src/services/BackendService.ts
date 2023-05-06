@@ -8,7 +8,7 @@ const apiUrl = process.env.REACT_APP_BACKEND_URL;
 export class BackendService {
 
   // Create a new UserChatSession
-  async createChatSession(messageText: string): Promise<void> {
+  async createChatSession(messageText: string): Promise<string> {
     try {
       let chatSessionId = uuidv4();
 
@@ -57,8 +57,10 @@ export class BackendService {
       if (!response.ok) {
         throw new Error("Response not ok");
       }
+      return chatSessionId;
     } catch (error) {
       console.error(`Error attempting to update user chat: ${error}`);
+      return "";
     }
   }
 
@@ -134,6 +136,8 @@ export class BackendService {
         )}&limit=${limit}`
       );
 
+      console.log("Getting messages: " + chatSessionId);
+
       if (!response.ok) {
         throw new Error("Failed to fetch messages");
       }
@@ -150,6 +154,8 @@ export class BackendService {
   async putNewMessage(text: string, sender: string): Promise<void> {
     try {
       const chatSessionId = sessionStorage.getItem("chatSessionId");
+
+      console.log("Chat Session ID: " + chatSessionId);
 
       if (chatSessionId == null) {
         return;

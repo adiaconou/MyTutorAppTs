@@ -39,10 +39,9 @@ const App: React.FC = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
         }}
       >
-        <Box sx={{ position: "fixed", top: 0, zIndex: 10, width: "100%" }}>
+        <Box className="AppBarView_parent" sx={{ position: "fixed", top: 0, zIndex: 10, width: "100%" }}>
           <AppBarView />
         </Box>
         <Box
@@ -51,12 +50,15 @@ const App: React.FC = () => {
             flexDirection: "column",
             flexGrow: 1,
             alignItems: "center",
-            bgcolor: "purple",
+            // bgcolor: "purple",
           }}
         >
-          <Container maxWidth="md" sx={{ flexGrow: 1 }}>
+          <Container
+            maxWidth="md"
+            sx={{ flexGrow: 1, paddingLeft: "0px", paddingRight: "0px" }}
+          >
             <Routes>
-              <Route path="/" element={<ChatFormView systemPrompt={systemPrompt} />} />
+              <Route path="/" element={<ChatFormView />} />
               <Route path="/settings" element={<SettingsView />} />
               <Route path="/c/:id" element={<ChatFormView />} />
             </Routes>
