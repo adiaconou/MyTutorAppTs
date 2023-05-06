@@ -4,9 +4,10 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import NavigationMenuView from './navigation/NavigationMenuView';
+import NavigationMenuView from './NavigationMenuView';
+import useViewModel from "./AppBarViewModel";
 
-interface MyAppBarProps {
+interface AppBarViewProps {
   sx?: {
     position?: string;
     top?: number;
@@ -15,16 +16,13 @@ interface MyAppBarProps {
   };
 }
 
-const MyAppBar: React.FC<MyAppBarProps> = ({ sx }) => {
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
+const AppBarView: React.FC<AppBarViewProps> = ({ sx }) => {
 
-  const handleMenuClick = () => {
-    setDrawerOpen(true);
-  };
-
-  const handleClose = () => {
-    setDrawerOpen(false);
-  };
+  const {
+    handleMenuClick,
+    handleClose,
+    getDrawerOpen
+  } = useViewModel();
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -42,9 +40,9 @@ const MyAppBar: React.FC<MyAppBarProps> = ({ sx }) => {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <NavigationMenuView drawerOpen={drawerOpen} handleClose={handleClose} />
+      <NavigationMenuView drawerOpen={getDrawerOpen()} handleClose={handleClose} />
     </Box>
   );
 };
 
-export default MyAppBar;
+export default AppBarView;

@@ -12,12 +12,6 @@ interface MyChatWindowProps {
 
 const theme = createTheme({});
 
-declare namespace JSX {
-  interface IntrinsicElements {
-    div: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
-  }
-}
-
 const MyChatWindow: React.FC<MyChatWindowProps> = ({ messages }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 

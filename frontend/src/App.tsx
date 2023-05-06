@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import ChatFormView from "./components/chat/ChatFormView";
-import MyAppBar from "./components/MyAppBar";
+import AppBarView from "./components/navigation/AppBarView";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -43,7 +43,7 @@ const App: React.FC = () => {
         }}
       >
         <Box sx={{ position: "fixed", top: 0, zIndex: 10, width: "100%" }}>
-          <MyAppBar />
+          <AppBarView />
         </Box>
         <Box
           sx={{
