@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Box, Slider, Typography, Divider } from "@mui/material";
-import MyDropDown from "../MyDropDown";
+import MyDropDown from "./LanguageChoiceDropDownView";
 import CircularProgress from "@mui/material/CircularProgress";
 import useViewModel from "./SettingsViewModel";
 

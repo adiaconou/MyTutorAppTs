@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import MyChatForm from "./components/MyChatForm";
+import ChatFormView from "./components/chat/ChatFormView";
 import MyAppBar from "./components/MyAppBar";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import SettingsView from "./components/navigation/SettingsView";
+import SettingsView from "./components/settings/SettingsView";
 import Gpt4Prompt from "./prompt/Gpt4Prompt";
 import { UserSettings } from "./models/UserSettings";
 import { BackendService } from "./services/BackendService";
@@ -56,9 +56,9 @@ const App: React.FC = () => {
         >
           <Container maxWidth="md" sx={{ flexGrow: 1 }}>
             <Routes>
-              <Route path="/" element={<MyChatForm systemPrompt={systemPrompt} />} />
+              <Route path="/" element={<ChatFormView systemPrompt={systemPrompt} />} />
               <Route path="/settings" element={<SettingsView />} />
-              <Route path="/c/:id" element={<MyChatForm />} />
+              <Route path="/c/:id" element={<ChatFormView />} />
             </Routes>
           </Container>
         </Box>
