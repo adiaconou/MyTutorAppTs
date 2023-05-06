@@ -6,13 +6,13 @@ import ListItem from '@mui/material/ListItem';
 import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 
-interface MyChatWindowProps {
+interface ChatViewProps {
   messages: { text: string; isUser: boolean }[];
 }
 
 const theme = createTheme({});
 
-const MyChatWindow: React.FC<MyChatWindowProps> = ({ messages }) => {
+const ChatView: React.FC<ChatViewProps> = ({ messages }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,4 +69,4 @@ const MyChatWindow: React.FC<MyChatWindowProps> = ({ messages }) => {
   );
 };
 
-export default MyChatWindow;
+export default ChatView;

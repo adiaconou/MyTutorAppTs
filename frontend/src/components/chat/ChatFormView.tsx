@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import MyTextField from "./MyTextField";
-import MyChatWindow from "./MyChatWindow";
+import TextFieldView from "./TextFieldView";
+import ChatView from "./ChatView";
 import { Box } from "@mui/material";
 import useViewModel from "./ChatFormViewModel";
 
@@ -74,7 +74,7 @@ const ChatFormView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
           },
         }}
       >
-        <MyChatWindow messages={messages} />
+        <ChatView messages={messages} />
       </Box>
       <Box
         sx={{
@@ -89,7 +89,7 @@ const ChatFormView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
           margin: "0 auto",
         }}
       >
-        <MyTextField messages={messages} onSubmit={handleTextSubmit} />
+        <TextFieldView onSubmit={handleTextSubmit} />
       </Box>
     </Box>
   );

@@ -1,4 +1,3 @@
-import React, { useState, MouseEvent, FocusEvent } from "react";
 import TextField from "@mui/material/TextField";
 import { InputAdornment, Tooltip } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
@@ -6,6 +5,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { blue } from "@mui/material/colors";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import { useTextFieldViewModel } from "./TextFieldViewModel";
 
 const theme = createTheme({
   components: {
@@ -35,43 +35,20 @@ const theme = createTheme({
   },
 });
 
-interface Message {
-  text: string;
-  isUser: boolean;
-}
-
-interface MyTextFieldProps {
+interface TextFieldViewProps {
   onSubmit: (inputValue: string) => void;
-  messages: Message[];
 }
 
-const MyTextField: React.FC<MyTextFieldProps> = ({ onSubmit, messages }) => {
-  const [inputValue, setInputValue] = useState("");
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
-  };
-
-  const handleSubmit = async (
-    event?: MouseEvent<SVGSVGElement> | React.FormEvent<HTMLFormElement>
-  ) => {
-    event?.preventDefault();
-    onSubmit(inputValue);
-    setInputValue("");
-  };
-
-  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      handleSubmit();
-    }
-  };
-
-  const handleBlur = (
-    event: FocusEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    event.preventDefault();
-  };
+const TextFieldView: React.FC<TextFieldViewProps> = ({
+  onSubmit,
+}) => {
+  const {
+    inputValue,
+    handleInputChange,
+    handleSubmit,
+    handleKeyPress,
+    handleBlur,
+  } = useTextFieldViewModel({ onSubmit });
 
   return (
     <Box
@@ -140,4 +117,4 @@ const MyTextField: React.FC<MyTextFieldProps> = ({ onSubmit, messages }) => {
   );
 };
 
-export default MyTextField;
+export default TextFieldView;

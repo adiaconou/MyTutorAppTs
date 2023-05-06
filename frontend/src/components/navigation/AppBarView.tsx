@@ -1,10 +1,10 @@
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import NavigationMenuView from './NavigationMenuView';
+import * as React from "react";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
+import NavigationMenuView from "./NavigationMenuView";
 import useViewModel from "./AppBarViewModel";
 
 interface AppBarViewProps {
@@ -17,17 +17,12 @@ interface AppBarViewProps {
 }
 
 const AppBarView: React.FC<AppBarViewProps> = ({ sx }) => {
-
-  const {
-    handleMenuClick,
-    handleClose,
-    getDrawerOpen
-  } = useViewModel();
+  const { handleMenuClick, handleClose, getDrawerOpen } = useViewModel();
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed" sx={{ ...sx, minHeight: '64px' }}>
-        <Toolbar sx={{ justifyContent: 'flex-start' }}>
+      <AppBar position="fixed" sx={{ ...sx, minHeight: "64px" }}>
+        <Toolbar sx={{ justifyContent: "flex-start" }}>
           <IconButton
             size="large"
             edge="start"
@@ -40,7 +35,10 @@ const AppBarView: React.FC<AppBarViewProps> = ({ sx }) => {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <NavigationMenuView drawerOpen={getDrawerOpen()} handleClose={handleClose} />
+      <NavigationMenuView
+        drawerOpen={getDrawerOpen()}
+        handleClose={handleClose}
+      />
     </Box>
   );
 };
