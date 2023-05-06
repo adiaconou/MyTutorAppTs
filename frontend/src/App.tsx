@@ -5,7 +5,7 @@ import MyAppBar from "./components/MyAppBar";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Settings from "./components/navigation/SettingsView";
+import SettingsView from "./components/navigation/SettingsView";
 import Gpt4Prompt from "./prompt/Gpt4Prompt";
 import { UserSettings } from "./models/UserSettings";
 import { BackendService } from "./services/BackendService";
@@ -57,7 +57,7 @@ const App: React.FC = () => {
           <Container maxWidth="md" sx={{ flexGrow: 1 }}>
             <Routes>
               <Route path="/" element={<MyChatForm systemPrompt={systemPrompt} />} />
-              <Route path="/settings" element={<Settings />} />
+              <Route path="/settings" element={<SettingsView />} />
               <Route path="/c/:id" element={<MyChatForm />} />
             </Routes>
           </Container>

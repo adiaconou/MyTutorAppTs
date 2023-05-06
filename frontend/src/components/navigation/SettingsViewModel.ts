@@ -6,10 +6,12 @@ import { SelectChangeEvent } from "@mui/material";
 export default function SettingsViewModel() {
   const backend = new BackendService();
 
-  const [languageProficiency, setLanguageProficiency] = useState<number>(5); // Default value
-  const [languageChoice, setLanguageChoice] = useState<string>("Greek");
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [languageProficiency, setLanguageProficiency] = useState<number>(5);
+  const [languageChoice, setLanguageChoice] = useState<string>("Greek"); 
 
+  // controls the spinner when the settings are being loaded
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+   
   /*** Retrieve the stored user settings when the SettingsView is first loaded ***/
   const getUserSettings = (userId: string): void => {
     backend

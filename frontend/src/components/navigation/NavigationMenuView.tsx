@@ -1,4 +1,3 @@
-import React from "react";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -15,10 +14,9 @@ import HistoryIcon from "@mui/icons-material/History";
 import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import { UserChatSession } from "../models/UserChatSession";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
-import { BackendService } from "../services/BackendService";
+import useViewModel from "./NavigationMenuViewModel";
 
 interface MenuItem {
   label: string;
@@ -26,52 +24,33 @@ interface MenuItem {
   onClick: () => void;
 }
 
-interface MyNavMenuProps {
+interface NavigationMenuViewProps {
   drawerOpen: boolean;
   handleClose: () => void;
 }
 
-const backend = new BackendService();
-
-export default function MyNavMenu({
+export default function NavigationMenuView({
   drawerOpen,
   handleClose,
-}: MyNavMenuProps): JSX.Element {
+}: NavigationMenuViewProps): JSX.Element {
+
+  const {
+    historyExpanded,
+    historyItems,
+    isLoading,
+    getChatSessions,
+    handleNewChat,
+    toggleHistoryExpanded,
+    userName
+  } = useViewModel();
+
   // Get access to the useHistory hook from react-router-dom
   const navigate = useNavigate();
-
-  const [historyExpanded, setHistoryExpanded] = React.useState(false);
-  const [historyItems, setHistoryItems] = useState<UserChatSession[]>([]);
-  const [isLoading, setIsLoading] = useState(true); // New state variable to track loading status
 
   // Fetch chat sessions when the component is mounted
   useEffect(() => {
     getChatSessions("adiaconou", 10);
   }, []);
-
-  const toggleHistoryExpanded = () => {
-    setHistoryExpanded(!historyExpanded);
-  };
-
-  // Function to get chat sessions
-  const getChatSessions = async (userId: string, limit: number) => {
-    const sessions: UserChatSession[] = await backend.getChatSessions(
-      userId,
-      limit
-    );
-    setHistoryItems(sessions);
-    setIsLoading(false);
-  };
-
-  // Function to handle the "New Chat" action
-  const handleNewChat = () => {
-    // Set sessionData to an empty string in sessionStorage
-    sessionStorage.setItem("chatSessionId", "");
-
-    // Navigate to the home page
-    navigate("/");
-    handleClose();
-  };
 
   // Items for the navigation menu
   const menuItems: MenuItem[] = [
@@ -93,8 +72,6 @@ export default function MyNavMenu({
       },
     },
   ];
-
-  const username = "Alex Diaconou";
 
   if (isLoading) {
     // Render a loading spinner or message while data is being fetched
@@ -132,7 +109,7 @@ export default function MyNavMenu({
         <Avatar sx={{ marginRight: "8px" }}>
           <AccountCircleIcon />
         </Avatar>
-        <Typography variant="h6">{username}</Typography>
+        <Typography variant="h6">{userName}</Typography>
       </Box>
 
       <List>
@@ -175,3 +152,4 @@ export default function MyNavMenu({
     </Drawer>
   );
 }
+

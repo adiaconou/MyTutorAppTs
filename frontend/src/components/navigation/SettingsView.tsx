@@ -4,7 +4,7 @@ import MyDropDown from "../MyDropDown";
 import CircularProgress from "@mui/material/CircularProgress";
 import useViewModel from "./SettingsViewModel";
 
-const Settings: React.FC = () => {
+const SettingsView: React.FC = () => {
   const {
     languageProficiency,
     languageChoice,
@@ -104,4 +104,4 @@ const Settings: React.FC = () => {
   );
 };
 
-export default Settings;
+export default SettingsView;

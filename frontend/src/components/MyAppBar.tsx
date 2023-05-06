@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import MyNavMenu from './MyNavMenu';
+import NavigationMenuView from './navigation/NavigationMenuView';
 
 interface MyAppBarProps {
   sx?: {
@@ -42,7 +42,7 @@ const MyAppBar: React.FC<MyAppBarProps> = ({ sx }) => {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <MyNavMenu drawerOpen={drawerOpen} handleClose={handleClose} />
+      <NavigationMenuView drawerOpen={drawerOpen} handleClose={handleClose} />
     </Box>
   );
 };
