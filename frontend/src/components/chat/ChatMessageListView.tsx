@@ -3,10 +3,11 @@ import Box from '@mui/material/Box';
 import ChatBubbleView from './ChatBubbleView';
 
 interface ChatMessageListViewProps {
-  messages: { text: string; isUser: boolean }[];
+  messages: { text: string; isUser: boolean; }[];
+  waitingForMessageFromAI: boolean;
 }
 
-const ChatMessageListView: React.FC<ChatMessageListViewProps> = ({ messages }) => {
+const ChatMessageListView: React.FC<ChatMessageListViewProps> = ({ messages, waitingForMessageFromAI }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,8 +29,16 @@ const ChatMessageListView: React.FC<ChatMessageListViewProps> = ({ messages }) =
       }}
     >
       {messages.map((message, index) => (
-        <ChatBubbleView key={index} message={message} sx={{ marginBottom: "8px" }} />
+        <ChatBubbleView key={index} message={message} sx={{ marginBottom: "8px" }} waitingForMessageFromAI={false} />
       ))}
+      {waitingForMessageFromAI && (
+        <ChatBubbleView
+          key={messages.length}
+          message={{ text: '...', isUser: false }}
+          sx={{ marginBottom: "8px" }}
+          waitingForMessageFromAI={true}
+        />
+      )}
       <div ref={bottomRef} />
     </Box>
   );

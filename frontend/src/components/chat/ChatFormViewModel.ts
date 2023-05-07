@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BackendService } from "../../services/BackendService";
 import promptGPT from "../../services/OpenaiService";
@@ -11,17 +11,32 @@ interface Message {
 
 export default function ChatFormViewModel() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [viewportHeight, setViewportHeight] = useState(window.innerHeight);
-
+  const { height: viewportHeight } = useWindowDimensions();
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(true);
-
+  const [waitingForMessageFromAI, setWaitingForMessageFromAI] = useState(false);
   const backend = new BackendService();
 
-  /***  Update viewport height ***/
-  const updateViewportSize = () => {
-    setViewportHeight(window.innerHeight);
-  };
+  /***  Update window dimensions ***/
+  function useWindowDimensions() {
+    const [windowDimensions, setWindowDimensions] = useState({
+      height: window.innerHeight,
+    });
+
+    useEffect(() => {
+      function handleResize() {
+        setWindowDimensions({
+          height: window.innerHeight,
+        });
+      }
+
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    console.log("Window dimensions: " + windowDimensions.height);
+    return windowDimensions;
+  }
 
   /*** Clear chat messages and session data from the chat component ***/
   const clearMessages = () => {
@@ -87,6 +102,7 @@ export default function ChatFormViewModel() {
 
   /*** Handle new messages submitted by the user through chat ***/
   const handleTextSubmit = async (text: string) => {
+
     if (messages.length == 0) {
       const newChatSessionId: string = await createChatSession(text);
       sessionStorage.setItem("chatSessionId", newChatSessionId);
@@ -97,6 +113,8 @@ export default function ChatFormViewModel() {
     const userMessage: Message = { text, isUser: true };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
+    setWaitingForMessageFromAI(true);
+    
     const fetchResponse = async () => {
       const response = await promptGPT(text, "user");
       if (response !== null) {
@@ -105,6 +123,8 @@ export default function ChatFormViewModel() {
 
         await putNewMessage(response, "bot");
       }
+
+      setWaitingForMessageFromAI(false);
     };
 
     fetchResponse();
@@ -125,8 +145,9 @@ export default function ChatFormViewModel() {
     viewportHeight,
     id,
     isLoading,
+    waitingForMessageFromAI,
     loadChatSession,
-    updateViewportSize,
     handleTextSubmit,
+    useWindowDimensions,
   };
 }

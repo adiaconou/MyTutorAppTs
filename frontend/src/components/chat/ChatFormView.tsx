@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import TextFieldView from "./TextFieldView";
 import ChatMessageListView from "./ChatMessageListView";
 import { Box } from "@mui/material";
@@ -8,49 +8,18 @@ interface ChatFormViewProps {
   systemPrompt?: string;
 }
 
-function useWindowDimensions() {
-  const [windowDimensions, setWindowDimensions] = useState({
-    height: window.innerHeight,
-  });
-
-  useEffect(() => {
-    function handleResize() {
-      setWindowDimensions({
-        height: window.innerHeight,
-      });
-    }
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  console.log("Window dimensions: " + windowDimensions.height);
-  return windowDimensions;
-}
-
-
 const ChatFormView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
 
   const {
     messages,
-   // viewportHeight,
+    viewportHeight,
     id,
     isLoading,
+    waitingForMessageFromAI,
     loadChatSession,
-    updateViewportSize,
-    handleTextSubmit
+    handleTextSubmit,
   } = useViewModel();
 
-  const { height: viewportHeight } = useWindowDimensions();
-
-  /*
-  useEffect(() => {
-    window.addEventListener("resize", updateViewportSize);
-    return () => {
-      window.removeEventListener("resize", updateViewportSize);
-    };
-  }, []);
-*/
   useEffect(() => {
     if (systemPrompt) {
       loadChatSession(systemPrompt);
@@ -99,7 +68,7 @@ const ChatFormView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
           },
         }}
       >
-        <ChatMessageListView messages={messages} />
+        <ChatMessageListView messages={messages} waitingForMessageFromAI={waitingForMessageFromAI} />
       </Box>
       <Box
         className="TextFieldView_parent"
@@ -115,7 +84,7 @@ const ChatFormView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
           margin: "0 auto",
         }}
       >
-        <TextFieldView onSubmit={handleTextSubmit} />
+        <TextFieldView onSubmit={handleTextSubmit} disabled={waitingForMessageFromAI} />
       </Box>
     </Box>
   );

@@ -4,13 +4,15 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import { SxProps, Theme } from "@mui/system";
 import SmartToy from "@mui/icons-material/SmartToy";
+import TypingIndicator from "./TypingIndicatorView";
 
 interface ChatBubbleViewProps {
-  message: { text: string; isUser: boolean };
+  message: { text: string; isUser: boolean; };
   sx?: SxProps<Theme>;
+  waitingForMessageFromAI: boolean;
 }
 
-const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx }) => {
+const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingForMessageFromAI }) => {
   const textColor = "#ffffff";
 
   return (
@@ -44,13 +46,16 @@ const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx }) => {
           elevation={3}
           sx={{
             padding: "8px 12px",
-            borderRadius: "12px",
+            borderRadius: message.isUser ? "12px 12px 12px 12px" : "12px 12px 0px 12px",
             backgroundColor: message.isUser
               ? (theme) => theme.palette.primary.main
               : (theme) => theme.palette.grey[800],
           }}
         >
-          <Typography
+          {waitingForMessageFromAI && !message.isUser ? (
+            <TypingIndicator /> // Render TypingIndicator when waitingForMessageFromAI is true and message is not from the user
+          ) : (
+            <Typography
             variant="body1"
             style={{
               fontFamily: "Noto Sans, monospace",
@@ -59,7 +64,7 @@ const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx }) => {
             }}
           >
             {message.text}
-          </Typography>
+          </Typography> )}
         </Paper>
       </Box>
     </Box>

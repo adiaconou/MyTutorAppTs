@@ -37,10 +37,11 @@ const theme = createTheme({
 
 interface TextFieldViewProps {
   onSubmit: (inputValue: string) => void;
+  disabled?: boolean;
 }
 
 const TextFieldView: React.FC<TextFieldViewProps> = ({
-  onSubmit,
+  onSubmit, disabled
 }) => {
   const {
     inputValue,
@@ -72,6 +73,7 @@ const TextFieldView: React.FC<TextFieldViewProps> = ({
               fullWidth
               autoFocus={true}
               onBlur={handleBlur}
+              disabled={disabled}
               sx={{
                 "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
                   {
@@ -92,7 +94,10 @@ const TextFieldView: React.FC<TextFieldViewProps> = ({
                 },
 
                 endAdornment: (
-                  <InputAdornment position="end">
+                  <InputAdornment position="end"  style={{
+                     pointerEvents: inputValue.trim().length === 0 || disabled ? 'none' : 'auto',
+                     opacity: inputValue.trim().length === 0 || disabled ? 0.3 : 1, 
+                  }}>
                     <Tooltip title="Send it!">
                       <SendIcon
                         sx={{
