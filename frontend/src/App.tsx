@@ -9,26 +9,33 @@ import SettingsView from "./components/settings/SettingsView";
 import Gpt4Prompt from "./prompt/Gpt4Prompt";
 import { UserSettings } from "./models/UserSettings";
 import { BackendService } from "./services/BackendService";
+import { withAuthentication } from "./auth/withAuthentication";
 
 const App: React.FC = () => {
   const [systemPrompt, setSystemPrompt] = useState("");
   const backend = new BackendService();
+
+  const ProtectedChatFormView = withAuthentication(ChatFormView);
+  const ProtectedSettingsView = withAuthentication(SettingsView);
+  const ProtectedAppBarView = withAuthentication(AppBarView);
+
   useEffect(() => {
     const fetchUserSettings = async () => {
-      // Get UserSettings object from the backend
-      const userSettings: UserSettings | null = await backend.getUserSettings(
-        "adiaconou"
-      );
-
-      // If userSettings is not null, get the system prompt using the Gpt4Prompt static method
-      if (userSettings) {
-        const prompt = Gpt4Prompt.getSystemPrompt(userSettings);
-
-        // Set the system prompt in the state
-        setSystemPrompt(prompt);
+      const email = sessionStorage.getItem("email");
+      if (email) {
+        // Get UserSettings object from the backend
+        const userSettings: UserSettings | null = await backend.getUserSettings(email);
+  
+        // If userSettings is not null, get the system prompt using the Gpt4Prompt static method
+        if (userSettings) {
+          const prompt = Gpt4Prompt.getSystemPrompt(userSettings);
+  
+          // Set the system prompt in the state
+          setSystemPrompt(prompt);
+        }
       }
     };
-
+  
     // Call the async function
     fetchUserSettings();
   }, []);
@@ -42,7 +49,7 @@ const App: React.FC = () => {
         }}
       >
         <Box className="AppBarView_parent" sx={{ position: "fixed", top: 0, zIndex: 10, width: "100%" }}>
-          <AppBarView />
+          <ProtectedAppBarView />
         </Box>
         <Box
           sx={{
@@ -58,9 +65,9 @@ const App: React.FC = () => {
             sx={{ flexGrow: 1, paddingLeft: "0px", paddingRight: "0px" }}
           >
             <Routes>
-              <Route path="/" element={<ChatFormView />} />
-              <Route path="/settings" element={<SettingsView />} />
-              <Route path="/c/:id" element={<ChatFormView />} />
+              <Route path="/" element={<ProtectedChatFormView />} />
+              <Route path="/settings" element={<ProtectedSettingsView />} />
+              <Route path="/c/:id" element={<ProtectedChatFormView />} />
             </Routes>
           </Container>
         </Box>

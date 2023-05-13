@@ -12,6 +12,8 @@ export default function SettingsViewModel() {
   // controls the spinner when the settings are being loaded
   const [isLoading, setIsLoading] = useState<boolean>(true);
    
+  const email = sessionStorage.getItem("email");
+
   /*** Retrieve the stored user settings when the SettingsView is first loaded ***/
   const getUserSettings = (userId: string): void => {
     backend
@@ -35,10 +37,15 @@ export default function SettingsViewModel() {
     newValue: number | number[],
     activeThumb: number
   ) => void = (event, newValue, activeThumb) => {
+
+    if (!email) {
+      throw Error("Email address is unavailable. User settings cannot be updated.");
+    }
+
     setLanguageProficiency(newValue as number);
 
     const userPromptSettings: UserSettings = {
-      userId: "adiaconou",
+      userId: email,
       settings: {
         languageChoice: languageChoice,
         languageProficiency: newValue as number,
@@ -51,10 +58,15 @@ export default function SettingsViewModel() {
 
   /*** Store the language choice update when a new selection is made from the drop down ***/
   const handleLanguageChoiceChange = (event: SelectChangeEvent<string>) => {
+
+    if (!email) {
+      throw Error("Email address is unavailable. User settings cannot be updated.");
+    }
+
     setLanguageChoice(event.target.value);
 
     const userSettings: UserSettings = {
-      userId: "adiaconou",
+      userId: email,
       settings: {
         languageChoice: event.target.value,
         languageProficiency: languageProficiency,

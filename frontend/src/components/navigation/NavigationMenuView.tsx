@@ -17,6 +17,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import { useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import useViewModel from "./NavigationMenuViewModel";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 interface MenuItem {
   label: string;
@@ -47,9 +48,35 @@ export default function NavigationMenuView({
   // Get access to the useHistory hook from react-router-dom
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    fetch(process.env.REACT_APP_BACKEND_URL + "/auth/logout", {
+      method: 'POST',
+      credentials: 'include',
+    })
+    .then(response => {
+      if (response.ok) {
+        // If the response is ok, clear the user data from session storage
+        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        sessionStorage.removeItem('displayName');
+        sessionStorage.removeItem('email');
+        sessionStorage.removeItem('token');
+      } else {
+        console.error('Logout failed');
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  
+    navigate("/login");
+    handleClose();
+  };
+
   // Fetch chat sessions when the component is mounted
   useEffect(() => {
-    getChatSessions("adiaconou", 15);
+    const email = sessionStorage.getItem("email");
+    if (!email) {
+      throw Error("Cannot get chat sessions because email address is unavailable");
+    }
+    getChatSessions(email, 15);
   }, []);
 
   // Items for the navigation menu
@@ -70,6 +97,11 @@ export default function NavigationMenuView({
         navigate("/settings");
         handleClose();
       },
+    },
+    {
+      label: "Logout",
+      icon: <LogoutIcon />, // replace this with your actual logout icon
+      onClick: handleLogout,
     },
   ];
 

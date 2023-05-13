@@ -14,11 +14,16 @@ const SettingsView: React.FC = () => {
     getUserSettings,
   } = useViewModel();
 
-  const fixedUserId = "adiaconou";
+  const email = sessionStorage.getItem("email");
 
   // Fetch user settings on component mount and update state values
   useEffect(() => {
-    getUserSettings(fixedUserId);
+    if (email) {
+      getUserSettings(email);
+    } else {
+      throw Error("User settings cannot be looked up because the user's email address is not available in the session data.");
+    }
+    
   }, []); // Empty dependency array ensures this effect only runs on component mount
 
   if (isLoading) {

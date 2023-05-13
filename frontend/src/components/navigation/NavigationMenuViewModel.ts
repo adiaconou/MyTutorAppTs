@@ -9,7 +9,7 @@ export default function NavigationMenuViewModel() {
 
   const backend = new BackendService();
 
-  const userName = "Alex Diaconou";
+  const userName = sessionStorage.getItem("displayName");
 
   const toggleHistoryExpanded = () => {
     setHistoryExpanded(!historyExpanded);

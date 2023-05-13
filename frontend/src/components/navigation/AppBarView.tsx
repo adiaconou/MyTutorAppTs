@@ -21,7 +21,7 @@ const AppBarView: React.FC<AppBarViewProps> = ({ sx }) => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed" sx={{ ...sx, minHeight: "64px" }}>
+      <AppBar position="fixed" sx={{ ...sx, minHeight: "50px" }}>
         <Toolbar sx={{ justifyContent: "flex-start" }}>
           <IconButton
             size="large"
@@ -31,7 +31,7 @@ const AppBarView: React.FC<AppBarViewProps> = ({ sx }) => {
             sx={{ mr: 2 }}
             onClick={handleMenuClick}
           >
-            <MenuIcon />
+            <MenuIcon sx={{ fontSize: "2rem"}} />
           </IconButton>
         </Toolbar>
       </AppBar>
