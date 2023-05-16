@@ -63,6 +63,7 @@ export class BackendService {
       if (!response.ok) {
         throw new Error("Response not ok");
       }
+      console.log(`Created new ChatSession {chatSessionId: ${chatSessionId}}`);
       return chatSessionId;
     } catch (error) {
       console.error(`Error attempting to update user chat: ${error}`);

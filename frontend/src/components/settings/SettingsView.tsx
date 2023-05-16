@@ -3,8 +3,11 @@ import { Box, Slider, Typography, Divider } from "@mui/material";
 import MyDropDown from "./LanguageChoiceDropDownView";
 import CircularProgress from "@mui/material/CircularProgress";
 import useViewModel from "./SettingsViewModel";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const SettingsView: React.FC = () => {
+  const { user, isAuthenticated } = useAuth0();
+  
   const {
     languageProficiency,
     languageChoice,
@@ -18,8 +21,8 @@ const SettingsView: React.FC = () => {
 
   // Fetch user settings on component mount and update state values
   useEffect(() => {
-    if (email) {
-      getUserSettings(email);
+    if (user?.email) {
+      getUserSettings(user.email);
     } else {
       throw Error("User settings cannot be looked up because the user's email address is not available in the session data.");
     }

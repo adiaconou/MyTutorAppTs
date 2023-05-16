@@ -18,7 +18,7 @@ interface AppBarViewProps {
 
 const AppBarView: React.FC<AppBarViewProps> = ({ sx }) => {
   const { handleMenuClick, handleClose, getDrawerOpen } = useViewModel();
-
+  
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" sx={{ ...sx, minHeight: "50px" }}>

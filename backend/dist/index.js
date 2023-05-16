@@ -50,7 +50,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 app.get("/auth/google", passport_1.default.authenticate("google", {
     scope: ["profile", "email"],
     successRedirect: "/auth/google/callback",
-    failureRedirect: "/login",
+    failureRedirect: FRONTEND_URL + "/login",
     prompt: "consent"
 }));
 app.get("/auth/google/callback", passport_1.default.authenticate("google"), (req, res) => {
@@ -76,26 +76,26 @@ app.get('/auth/status', (req, res) => {
     const token = req.cookies.token;
     // If the token exists
     if (token) {
+        console.log("Token retrieved: " + token);
         // Verify the token
-        console.log("WE have a token!");
         jsonwebtoken_1.default.verify(token, JWT_SECRET, (err, decodedToken) => {
             if (err) {
                 // Token verification failed
-                console.log("Token verification failed");
+                console.log("Token verification failed: " + err);
                 res.json({ authenticated: false });
             }
             else {
                 // Token is valid, user is authenticated
                 // You can also send back any other user data stored in the token
-                console.log("LET'S GOOO AUTH");
                 const { userID, displayName, email } = decodedToken;
+                console.log(email + " is authenticated.");
                 res.json({ authenticated: true, userID, displayName, email });
             }
         });
     }
     else {
         // No token, user is not authenticated
-        console.log("FALSE BITCHES");
+        console.log("Token not found.");
         res.json({ authenticated: false });
     }
 });

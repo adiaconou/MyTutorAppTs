@@ -14,10 +14,11 @@ import HistoryIcon from "@mui/icons-material/History";
 import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import useViewModel from "./NavigationMenuViewModel";
-import LogoutIcon from '@mui/icons-material/Logout';
+import LogoutIcon from "@mui/icons-material/Logout";
+import { useAuth0 } from "@auth0/auth0-react";
 
 interface MenuItem {
   label: string;
@@ -34,50 +35,34 @@ export default function NavigationMenuView({
   drawerOpen,
   handleClose,
 }: NavigationMenuViewProps): JSX.Element {
+  const { logout, user, isAuthenticated, isLoading } = useAuth0();
 
   const {
     historyExpanded,
     historyItems,
-    isLoading,
+    // isLoading,
     getChatSessions,
     handleNewChat,
     toggleHistoryExpanded,
-    userName
+    userName,
   } = useViewModel();
 
   // Get access to the useHistory hook from react-router-dom
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    fetch(process.env.REACT_APP_BACKEND_URL + "/auth/logout", {
-      method: 'POST',
-      credentials: 'include',
-    })
-    .then(response => {
-      if (response.ok) {
-        // If the response is ok, clear the user data from session storage
-        document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        sessionStorage.removeItem('displayName');
-        sessionStorage.removeItem('email');
-        sessionStorage.removeItem('token');
-      } else {
-        console.error('Logout failed');
-      }
-    })
-    .catch(error => console.error('Error:', error));
-  
-    navigate("/login");
-    handleClose();
-  };
-
-  // Fetch chat sessions when the component is mounted
-  useEffect(() => {
-    const email = sessionStorage.getItem("email");
-    if (!email) {
-      throw Error("Cannot get chat sessions because email address is unavailable");
+  useLayoutEffect(() => {
+    console.log("User object: " + user);
+    if (user?.email) {
+      // getChatSessions(15, sessionStorage.getItem("email"));
+      getChatSessions(15, user.email);
     }
-    getChatSessions(email, 15);
-  }, []);
+    console.log(
+      "Mounting nav menu: " +
+        user?.email + " name: " + user?.name +
+        " isAuthenticated: " +
+        isAuthenticated 
+    );
+  }, [user, isAuthenticated]);
 
   // Items for the navigation menu
   const menuItems: MenuItem[] = [
@@ -101,7 +86,7 @@ export default function NavigationMenuView({
     {
       label: "Logout",
       icon: <LogoutIcon />, // replace this with your actual logout icon
-      onClick: handleLogout,
+      onClick: () => logout(),
     },
   ];
 
@@ -184,4 +169,3 @@ export default function NavigationMenuView({
     </Drawer>
   );
 }
-

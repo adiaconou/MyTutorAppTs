@@ -16,12 +16,15 @@ export default function NavigationMenuViewModel() {
   };
 
   // Function to get chat sessions
-  const getChatSessions = async (userId: string, limit: number) => {
-    const sessions: UserChatSession[] = await backend.getChatSessions(
-      userId,
-      limit
-    );
-    setHistoryItems(sessions);
+  const getChatSessions = async (limit: number, userId: string | null) => {
+    if (userId !== undefined && userId !== null) {
+      const sessions: UserChatSession[] = await backend.getChatSessions(userId, limit);
+      setHistoryItems(sessions);
+    } else {
+      console.log("Cannot get chat sessions because email address (userId) is not set");
+      setHistoryItems([]);
+    }
+
     setIsLoading(false);
   };
 
@@ -38,6 +41,6 @@ export default function NavigationMenuViewModel() {
     getChatSessions,
     handleNewChat,
     toggleHistoryExpanded,
-    userName
+    userName,
   };
 }

@@ -3,24 +3,26 @@ import TextFieldView from "./TextFieldView";
 import ChatMessageListView from "./ChatMessageListView";
 import { Box } from "@mui/material";
 import useViewModel from "./ChatFormViewModel";
+import { useAuth0 } from "@auth0/auth0-react";
 
 interface ChatFormViewProps {
   systemPrompt?: string;
 }
 
-const ChatFormView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
+const ChatPageView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
+  const { logout, user, isAuthenticated, isLoading } = useAuth0();
 
   const {
     messages,
     viewportHeight,
     id,
-    isLoading,
     waitingForMessageFromAI,
     loadChatSession,
     handleTextSubmit,
   } = useViewModel();
 
   useEffect(() => {
+    console.log("ChatPageView mounting: " + user?.email);
     if (systemPrompt) {
       loadChatSession(systemPrompt);
     } else {
@@ -90,4 +92,4 @@ const ChatFormView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
   );
 };
 
-export default ChatFormView;
+export default ChatPageView;

@@ -92,7 +92,7 @@ app.get(
   passport.authenticate("google", {
     scope: ["profile", "email"],
     successRedirect: "/auth/google/callback",
-    failureRedirect: "/login", // Replace with your failure redirect URL
+    failureRedirect: FRONTEND_URL + "/login", // Replace with your failure redirect URL
     prompt: "consent"
   })
 );
@@ -134,24 +134,25 @@ app.get('/auth/status', (req: Request, res: Response) => {
 
   // If the token exists
   if (token) {
+    console.log("Token retrieved: " + token);
+
     // Verify the token
-    console.log("WE have a token!");
     jwt.verify(token, JWT_SECRET, (err: jwt.JsonWebTokenError | null, decodedToken: any) => {
       if (err) {
         // Token verification failed
-        console.log("Token verification failed");
+        console.log("Token verification failed: " + err);
         res.json({ authenticated: false });
       } else {
         // Token is valid, user is authenticated
         // You can also send back any other user data stored in the token
-        console.log("LET'S GOOO AUTH");
         const { userID, displayName, email } = decodedToken as { userID: string, displayName: string, email: string };
+        console.log(email + " is authenticated.");
         res.json({ authenticated: true, userID, displayName, email });
       }
     });
   } else {
     // No token, user is not authenticated
-    console.log("FALSE BITCHES");
+    console.log("Token not found.");
     res.json({ authenticated: false });
   }
 });

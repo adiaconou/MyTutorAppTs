@@ -16,6 +16,7 @@ export default function SettingsViewModel() {
 
   /*** Retrieve the stored user settings when the SettingsView is first loaded ***/
   const getUserSettings = (userId: string): void => {
+    console.log("Getting user settings for " + userId);
     backend
       .getUserSettings(userId)
       .then((userSettings) => {
