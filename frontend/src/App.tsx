@@ -4,21 +4,24 @@ import ChatPageView from "./components/chat/ChatPageView";
 import AppBarView from "./components/navigation/AppBarView";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import SettingsView from "./components/settings/SettingsView";
 import Gpt4Prompt from "./prompt/Gpt4Prompt";
 import { UserSettings } from "./models/UserSettings";
 import { BackendService } from "./services/BackendService";
 import LoginPageView from "./auth/LoginPageView";
 import CallbackPageView from "./auth/CallbackPageView";
+import { useAuth0 } from "@auth0/auth0-react";
+import { AuthenticationGuard } from "./auth/authentication-guard";
 
 const App: React.FC = () => {
+  const {  user } = useAuth0();
   const [systemPrompt, setSystemPrompt] = useState("");
   const backend = new BackendService();
 
   useEffect(() => {
     const fetchUserSettings = async () => {
-      const email = sessionStorage.getItem("email");
+      const email = user?.email;
       if (email) {
         // Get UserSettings object from the backend
         const userSettings: UserSettings | null = await backend.getUserSettings(
@@ -65,9 +68,9 @@ const App: React.FC = () => {
             sx={{ flexGrow: 1, paddingLeft: "0px", paddingRight: "0px" }}
           >
             <Routes>
-              <Route path="/" element={<ChatPageView />} />
-              <Route path="/settings" element={<SettingsView />} />
-              <Route path="/c/:id" element={<ChatPageView />} />
+              <Route path="/" element={<AuthenticationGuard component={ChatPageView} />} />
+              <Route path="/settings" element={<AuthenticationGuard component={SettingsView} />} />
+              <Route path="/c/:id" element={<AuthenticationGuard component={ChatPageView} />} />
               <Route path="/login" element={<LoginPageView />} />
               <Route path="/callback" element={<CallbackPageView />} />
             </Routes>

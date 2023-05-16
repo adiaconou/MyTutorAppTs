@@ -2,9 +2,11 @@ import { useState } from "react";
 import { UserSettings } from "../../models/UserSettings";
 import { BackendService } from "../../services/BackendService";
 import { SelectChangeEvent } from "@mui/material";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function SettingsViewModel() {
   const backend = new BackendService();
+  const {  user  } = useAuth0(); 
 
   const [languageProficiency, setLanguageProficiency] = useState<number>(5);
   const [languageChoice, setLanguageChoice] = useState<string>("Greek"); 
@@ -12,7 +14,7 @@ export default function SettingsViewModel() {
   // controls the spinner when the settings are being loaded
   const [isLoading, setIsLoading] = useState<boolean>(true);
    
-  const email = sessionStorage.getItem("email");
+  const email = user?.email;
 
   /*** Retrieve the stored user settings when the SettingsView is first loaded ***/
   const getUserSettings = (userId: string): void => {

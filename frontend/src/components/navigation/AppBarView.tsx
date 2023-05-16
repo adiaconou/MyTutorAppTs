@@ -6,6 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import NavigationMenuView from "./NavigationMenuView";
 import useViewModel from "./AppBarViewModel";
+import { useAuth0 } from "@auth0/auth0-react";
 
 interface AppBarViewProps {
   sx?: {
@@ -18,6 +19,11 @@ interface AppBarViewProps {
 
 const AppBarView: React.FC<AppBarViewProps> = ({ sx }) => {
   const { handleMenuClick, handleClose, getDrawerOpen } = useViewModel();
+  const { isAuthenticated } = useAuth0();
+
+  if (!isAuthenticated) {
+    return null;
+  }
   
   return (
     <Box sx={{ flexGrow: 1 }}>

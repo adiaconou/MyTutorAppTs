@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { UserChatSession } from "../../models/UserChatSession";
 import { BackendService } from "../../services/BackendService";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function NavigationMenuViewModel() {
+  const { user } = useAuth0();
   const [historyExpanded, setHistoryExpanded] = React.useState(false);
   const [historyItems, setHistoryItems] = useState<UserChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(true); // New state variable to track loading status
 
   const backend = new BackendService();
 
-  const userName = sessionStorage.getItem("displayName");
+  const userName = user?.name;
 
   const toggleHistoryExpanded = () => {
     setHistoryExpanded(!historyExpanded);

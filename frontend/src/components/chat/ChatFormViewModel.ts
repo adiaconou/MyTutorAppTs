@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { BackendService } from "../../services/BackendService";
 import promptGPT from "../../services/OpenaiService";
 import { UserChatMessage } from "../../models/UserChatMessage";
+import { useAuth0 } from "@auth0/auth0-react";
 
 interface Message {
   text: string;
@@ -10,6 +11,7 @@ interface Message {
 }
 
 export default function ChatFormViewModel() {
+  const { user } = useAuth0();
   const [messages, setMessages] = useState<Message[]>([]);
   const { height: viewportHeight } = useWindowDimensions();
   const { id } = useParams<{ id: string }>();
@@ -132,7 +134,12 @@ export default function ChatFormViewModel() {
 
   /*** Store the new chat session record in the database ***/
   async function createChatSession(messageText: string) {
-    return backend.createChatSession(messageText);
+    if (user && user.email) {
+      return backend.createChatSession(messageText, user.email);
+    }
+
+    throw Error("Cannot create chat session because user email is not available.");
+    
   }
 
   /*** Store the last message in the database ***/

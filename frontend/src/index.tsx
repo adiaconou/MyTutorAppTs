@@ -1,9 +1,7 @@
-import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Auth0Provider } from "@auth0/auth0-react";
 import { BrowserRouter } from "react-router-dom";
 
@@ -13,7 +11,7 @@ ReactDOM.render(
       domain="dev-qprsmox8bpmaln3b.us.auth0.com"
       clientId="dlijXHwUF79ccHBqB9cRv0nMZux9irbj"
       authorizationParams={{
-        redirect_uri: "http://localhost:3000/callback",
+        redirect_uri: window.location.origin + "/callback",
       }}
     >
       <App />

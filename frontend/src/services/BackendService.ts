@@ -4,12 +4,11 @@ import { UserSettings } from "../models/UserSettings";
 import { v4 as uuidv4 } from "uuid";
 
 const apiUrl = process.env.REACT_APP_BACKEND_URL;
-const email = sessionStorage.getItem("email");
 
 export class BackendService {
 
   // Create a new UserChatSession
-  async createChatSession(messageText: string): Promise<string> {
+  async createChatSession(messageText: string, email: string): Promise<string> {
     try {
 
       if (!email) {

@@ -17,8 +17,6 @@ const SettingsView: React.FC = () => {
     getUserSettings,
   } = useViewModel();
 
-  const email = sessionStorage.getItem("email");
-
   // Fetch user settings on component mount and update state values
   useEffect(() => {
     if (user?.email) {

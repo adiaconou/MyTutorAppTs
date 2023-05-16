@@ -86,7 +86,9 @@ export default function NavigationMenuView({
     {
       label: "Logout",
       icon: <LogoutIcon />, // replace this with your actual logout icon
-      onClick: () => logout(),
+      onClick: () => logout({logoutParams: {
+        returnTo: window.location.origin + "/login",
+      }}),
     },
   ];
 
