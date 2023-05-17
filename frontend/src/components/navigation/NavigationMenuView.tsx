@@ -14,11 +14,14 @@ import HistoryIcon from "@mui/icons-material/History";
 import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import useViewModel from "./NavigationMenuViewModel";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth0 } from "@auth0/auth0-react";
+import { format } from "date-fns";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { BackendService } from "../../services/BackendService";
 
 interface MenuItem {
   label: string;
@@ -36,6 +39,7 @@ export default function NavigationMenuView({
   handleClose,
 }: NavigationMenuViewProps): JSX.Element {
   const { logout, user, isAuthenticated, isLoading } = useAuth0();
+  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
 
   const {
     historyExpanded,
@@ -46,6 +50,8 @@ export default function NavigationMenuView({
     toggleHistoryExpanded,
     userName,
   } = useViewModel();
+
+  const backendService = new BackendService();
 
   // Get access to the useHistory hook from react-router-dom
   const navigate = useNavigate();
@@ -58,9 +64,11 @@ export default function NavigationMenuView({
     }
     console.log(
       "Mounting nav menu: " +
-        user?.email + " name: " + user?.name +
+        user?.email +
+        " name: " +
+        user?.name +
         " isAuthenticated: " +
-        isAuthenticated 
+        isAuthenticated
     );
   }, [user, isAuthenticated]);
 
@@ -86,9 +94,12 @@ export default function NavigationMenuView({
     {
       label: "Logout",
       icon: <LogoutIcon />, // replace this with your actual logout icon
-      onClick: () => logout({logoutParams: {
-        returnTo: window.location.origin + "/login",
-      }}),
+      onClick: () =>
+        logout({
+          logoutParams: {
+            returnTo: window.location.origin + "/login",
+          },
+        }),
     },
   ];
 
@@ -125,7 +136,7 @@ export default function NavigationMenuView({
     >
       {/* Header with profile icon and username */}
       <Box sx={{ display: "flex", alignItems: "center", padding: "16px" }}>
-        <Avatar sx={{ marginRight: "8px" }}>
+        <Avatar sx={{ marginRight: "8px" }} src={user?.picture}>
           <AccountCircleIcon />
         </Avatar>
         <Typography variant="h6">{userName}</Typography>
@@ -152,16 +163,40 @@ export default function NavigationMenuView({
               <ListItem
                 button
                 key={session.id}
-                sx={{ pl: 4 }}
+                sx={{
+                  pl: 4,
+                  transition: "opacity 0.3s",
+                  opacity: deletingSessionId === session.id ? 0 : 1,
+                }}
                 onClick={() => {
                   navigate(`/c/${session.id}`);
                   handleClose();
                 }}
               >
                 <ListItemText
-                  primary=<Typography sx={{ fontSize: "14px" }}>
-                    {session.createdAt.toString()}
-                  </Typography>
+                  primary={
+                    <Typography sx={{ fontSize: "14px" }}>
+                      {format(
+                        new Date(session.createdAt),
+                        "MM/dd/yyyy HH:mm:ss"
+                      )}
+                    </Typography>
+                  }
+                />
+                <DeleteIcon
+                  fontSize="small"
+                  onClick={async (event) => {
+                    event.stopPropagation(); // To prevent the ListItem click event from being triggered
+                    // Set deletingSessionId
+                    setDeletingSessionId(session.id);
+                    // Call deleteChatSession and then refresh chat history
+                    await backendService.deleteChatSession(session.id);
+                    if (user?.email) {
+                      getChatSessions(15, user.email);
+                    }
+                    // Unset deletingSessionId
+                    setDeletingSessionId(null);
+                  }}
                 />
               </ListItem>
             ))}

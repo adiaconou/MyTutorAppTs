@@ -180,6 +180,21 @@ app.put("/messages/:id", async (req, res) => {
         res.status(500).json({ message: "Error adding new message" });
     }
 });
+app.delete("/chatSessions/:id", async (req, res) => {
+    try {
+        const id = req.params.id;
+        console.log("Deleteing chat session " + id);
+        // Delete the chat session
+        await userChatSessionRepo.deleteSessionAndMessages(id);
+        // Optional: Delete all messages associated with the chat session
+        // await userMessageRepo.deleteByChatSessionId(id);
+        res.status(204).send();
+    }
+    catch (error) {
+        console.error("Error deleting chat session: ", error);
+        res.status(500).json({ message: "Error deleting chat session" });
+    }
+});
 app.get("/chatSessions/:id", async (req, res) => {
     try {
         const id = req.params.id;

@@ -1,8 +1,10 @@
 import { UserChatMessage } from "../models/UserChatMessage";
 import { UserChatSession } from "../models/UserChatSession";
 import { GoogleCloudDatastore } from "./GoogleCloudDatastore";
+import { UserChatMessagesRepository } from "./UserChatMessagesRepository";
 
 const kind = "UserChatSession";
+const messageRepo = new UserChatMessagesRepository("for-fun-153903");
 
 export class UserChatSessionRepository {
   private cloudDatastore;
@@ -71,5 +73,36 @@ export class UserChatSessionRepository {
     } while (nextPageToken !== null && (!maxPages || currentPage < maxPages));
 
     return chatSessions;
+  }
+
+  async deleteSessionAndMessages(sessionId: string): Promise<void> {
+    try {
+      console.log("Beginning transaction...");
+      // Begin a new transaction
+      await this.cloudDatastore.beginTransaction();
+  
+      console.log("Deleting chat session...");
+      // Delete the session
+      await this.cloudDatastore.transactionalDelete([sessionId]);
+  
+      console.log("Getting message IDs...");
+      // Get the IDs of the associated messages
+      const messageIds = await messageRepo.getMessageIdsForSession(sessionId);
+  
+      console.log("Deleting messages...");
+      // Delete the associated messages
+      if (messageIds.length > 0) {
+        await this.cloudDatastore.transactionalDelete(messageIds);
+      }
+  
+      console.log("Committing transaction...");
+      // Commit the transaction
+      await this.cloudDatastore.commit();
+    } catch (error) {
+      // If there was an error, rollback the transaction
+      console.log("Transaction failed. Rolling back...");
+      await this.cloudDatastore.rollback();
+      throw error;
+    }
   }
 }

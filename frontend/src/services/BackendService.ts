@@ -6,13 +6,13 @@ import { v4 as uuidv4 } from "uuid";
 const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
 export class BackendService {
-
   // Create a new UserChatSession
   async createChatSession(messageText: string, email: string): Promise<string> {
     try {
-
       if (!email) {
-        throw Error("Unable to create a new chat session because email address is unavailable");
+        throw Error(
+          "Unable to create a new chat session because email address is unavailable"
+        );
       }
 
       let chatSessionId = uuidv4();
@@ -117,16 +117,19 @@ export class BackendService {
   // Update UserSettings
   async updateUserSettings(userSettings: UserSettings): Promise<void> {
     try {
-      const response = await fetch(`${apiUrl}/userSettings/${userSettings.userId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userSettings),
-      });
+      const response = await fetch(
+        `${apiUrl}/userSettings/${userSettings.userId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userSettings),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Error updating user settings');
+        throw new Error("Error updating user settings");
       }
     } catch (error) {
       console.error(`Error attempting to update user settings: ${error}`);
@@ -134,7 +137,10 @@ export class BackendService {
   }
 
   // Function to get messages
-  async getMessages(chatSessionId: string, limit: number): Promise<UserChatMessage[]> {
+  async getMessages(
+    chatSessionId: string,
+    limit: number
+  ): Promise<UserChatMessage[]> {
     try {
       const response = await fetch(
         `${apiUrl}/messages/?chatSessionId=${encodeURIComponent(
@@ -154,7 +160,7 @@ export class BackendService {
       console.error(`Error fetching chat messages: ${error}`);
       return [];
     }
-  };
+  }
 
   // Store a UserChatMessage
   async putNewMessage(text: string, sender: string): Promise<void> {
@@ -202,5 +208,20 @@ export class BackendService {
     const result = await response.json();
     console.log("Result: " + result);
   }
-}
 
+  // Delete a UserChatSession
+  async deleteChatSession(chatSessionId: string): Promise<void> {
+    try {
+      const response = await fetch(`${apiUrl}/chatSessions/${chatSessionId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete chat session");
+      }
+      console.log(`Deleted ChatSession {chatSessionId: ${chatSessionId}}`);
+    } catch (error) {
+      console.error(`Error attempting to delete chat session: ${error}`);
+    }
+  }
+}

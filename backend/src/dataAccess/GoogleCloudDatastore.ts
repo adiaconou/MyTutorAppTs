@@ -1,9 +1,10 @@
-import { Datastore, Entity, Key } from "@google-cloud/datastore";
+import { Datastore, Entity, Key, Transaction } from "@google-cloud/datastore";
 
 export class GoogleCloudDatastore<T> {
   private datastore: Datastore;
   private entityType: string;
-
+  private currentTransaction: Transaction | null = null;
+  
   constructor(projectId: string, entityType: string) {
     this.datastore = new Datastore({ projectId });
     this.entityType = entityType;
@@ -106,5 +107,34 @@ export class GoogleCloudDatastore<T> {
       // Propagate the error to the caller (optional, based on your error handling strategy)
       throw error;
     }
+  }
+
+  async beginTransaction() {
+    this.currentTransaction = this.datastore.transaction();
+    await this.currentTransaction.run();
+  }
+
+  async commit() {
+    if (!this.currentTransaction) {
+      throw new Error("No transaction in progress");
+    }
+    await this.currentTransaction.commit();
+    this.currentTransaction = null;
+  }
+
+  async rollback() {
+    if (!this.currentTransaction) {
+      throw new Error("No transaction in progress");
+    }
+    await this.currentTransaction.rollback();
+    this.currentTransaction = null;
+  }
+
+  async transactionalDelete(keys: string[]): Promise<void> {
+    if (!this.currentTransaction) {
+      throw new Error("No transaction in progress");
+    }
+    const datastoreKeys = keys.map(key => this.datastore.key([this.entityType, key]));
+    this.currentTransaction.delete(datastoreKeys);
   }
 }
