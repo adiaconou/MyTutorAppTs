@@ -10,7 +10,7 @@ interface ChatFormViewProps {
 }
 
 const ChatPageView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
-  const { logout, user, isAuthenticated, isLoading } = useAuth0();
+  const { user, isLoading } = useAuth0();
 
   const {
     messages,

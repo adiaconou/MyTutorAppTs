@@ -14,7 +14,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import useViewModel from "./NavigationMenuViewModel";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -22,6 +22,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { format } from "date-fns";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { BackendService } from "../../services/BackendService";
+import { Divider } from "@mui/material";
 
 interface MenuItem {
   label: string;
@@ -39,12 +40,13 @@ export default function NavigationMenuView({
   handleClose,
 }: NavigationMenuViewProps): JSX.Element {
   const { logout, user, isAuthenticated, isLoading } = useAuth0();
-  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
+  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(
+    null
+  );
 
   const {
     historyExpanded,
     historyItems,
-    // isLoading,
     getChatSessions,
     handleNewChat,
     toggleHistoryExpanded,
@@ -59,7 +61,6 @@ export default function NavigationMenuView({
   useLayoutEffect(() => {
     console.log("User object: " + user);
     if (user?.email) {
-      // getChatSessions(15, sessionStorage.getItem("email"));
       getChatSessions(15, user.email);
     }
     console.log(
@@ -135,12 +136,26 @@ export default function NavigationMenuView({
       }}
     >
       {/* Header with profile icon and username */}
-      <Box sx={{ display: "flex", alignItems: "center", padding: "16px" }}>
-        <Avatar sx={{ marginRight: "8px" }} src={user?.picture}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "16px",
+        }}
+      >
+        <Avatar sx={{ marginBottom: "8px" }} src={user?.picture}>
           <AccountCircleIcon />
         </Avatar>
         <Typography variant="h6">{userName}</Typography>
+        {user?.email && (
+          <Typography variant="subtitle2" color="text.secondary">
+            {user.email}
+          </Typography>
+        )}
       </Box>
+
+      <Divider />
 
       <List>
         {menuItems.map((item, index) => (
@@ -150,58 +165,71 @@ export default function NavigationMenuView({
           </ListItem>
         ))}
 
-        <ListItem button onClick={toggleHistoryExpanded}>
-          <ListItemIcon>
-            <HistoryIcon />
-          </ListItemIcon>
-          <ListItemText primary="History" />
-          {historyExpanded ? <ExpandLess /> : <ExpandMore />}
-        </ListItem>
-        <Collapse in={historyExpanded} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            {historyItems.map((session) => (
-              <ListItem
-                button
-                key={session.id}
-                sx={{
-                  pl: 4,
-                  transition: "opacity 0.3s",
-                  opacity: deletingSessionId === session.id ? 0 : 1,
-                }}
-                onClick={() => {
-                  navigate(`/c/${session.id}`);
-                  handleClose();
-                }}
-              >
-                <ListItemText
-                  primary={
-                    <Typography sx={{ fontSize: "14px" }}>
-                      {format(
-                        new Date(session.createdAt),
-                        "MM/dd/yyyy HH:mm:ss"
-                      )}
-                    </Typography>
-                  }
-                />
-                <DeleteIcon
-                  fontSize="small"
-                  onClick={async (event) => {
-                    event.stopPropagation(); // To prevent the ListItem click event from being triggered
-                    // Set deletingSessionId
-                    setDeletingSessionId(session.id);
-                    // Call deleteChatSession and then refresh chat history
-                    await backendService.deleteChatSession(session.id);
-                    if (user?.email) {
-                      getChatSessions(15, user.email);
-                    }
-                    // Unset deletingSessionId
-                    setDeletingSessionId(null);
-                  }}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Collapse>
+        {historyItems.length > 0 && (
+          <>
+            <ListItem button onClick={toggleHistoryExpanded}>
+              <ListItemIcon>
+                <HistoryIcon />
+              </ListItemIcon>
+              <ListItemText primary="History" />
+              {historyExpanded ? <ExpandLess /> : <ExpandMore />}
+            </ListItem>
+            <Collapse in={historyExpanded} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {historyItems.map((session) => (
+                  <ListItem
+                    button
+                    key={session.id}
+                    sx={{
+                      pl: 4,
+                      transition: "opacity 0.3s",
+                      opacity: deletingSessionId === session.id ? 0 : 1,
+                    }}
+                    onClick={() => {
+                      navigate(`/c/${session.id}`);
+                      handleClose();
+                    }}
+                  >
+                    <ListItemText
+                      primary={
+                        <Typography sx={{ fontSize: "14px" }}>
+                          {format(
+                            new Date(session.createdAt),
+                            "MM/dd/yyyy HH:mm:ss"
+                          )}
+                        </Typography>
+                      }
+                    />
+                    <DeleteIcon
+                      fontSize="small"
+                      onClick={async (event) => {
+                        event.stopPropagation(); // To prevent the ListItem click event from being triggered
+                        // Set deletingSessionId
+                        setDeletingSessionId(session.id);
+                        // Call deleteChatSession and then refresh chat history
+                        await backendService.deleteChatSession(session.id);
+                        if (user?.email) {
+                          getChatSessions(15, user.email);
+                        }
+                        // Unset deletingSessionId
+                        setDeletingSessionId(null);
+                      }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Collapse>
+          </>
+        )}
+
+        {historyItems.length === 0 && (
+          <ListItem disabled>
+            <ListItemIcon>
+              <HistoryIcon />
+            </ListItemIcon>
+            <ListItemText primary="History" />
+          </ListItem>
+        )}
       </List>
     </Drawer>
   );
