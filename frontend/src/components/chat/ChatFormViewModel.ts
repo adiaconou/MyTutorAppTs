@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BackendService } from "../../services/BackendService";
-import promptGPT from "../../services/OpenaiService";
+import promptGPT from "../../services/openaiService";
 import { UserChatMessage } from "../../models/UserChatMessage";
 import { useAuth0 } from "@auth0/auth0-react";
 

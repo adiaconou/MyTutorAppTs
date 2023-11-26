@@ -1,0 +1,16 @@
+{
+	"workspace": "C:\\Code\\MyTutorAppTs\\MyTutorAppTs.code-workspace",
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"remote.extensionKind": {
+
+			"pub.name": [
+				"ui"
+			]
+		}
+	}
+}

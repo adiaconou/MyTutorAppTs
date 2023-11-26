@@ -75,6 +75,7 @@ export class BackendService {
     userId: string,
     limit: number
   ): Promise<UserChatSession[]> {
+    console.log(apiUrl);
     try {
       const response = await fetch(
         `${apiUrl}/chatSessions/?userId=${encodeURIComponent(

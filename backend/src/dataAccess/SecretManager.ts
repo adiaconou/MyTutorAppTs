@@ -1,17 +1,19 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 
+/* 
+This is a helper class for accessing secrets from Google Secret Manager.
+*/
 export class SecretManager {
   private client: SecretManagerServiceClient;
-  private projectId: string;
+  private googleProjectId = 'for-fun-153903';
 
-  constructor(projectId: string) {
-    this.projectId = projectId;
+  constructor() {
     this.client = new SecretManagerServiceClient();
   }
 
   async accessSecretVersion(secretName: string): Promise<string> {
-    console.log("Getting secret...");
-    const name = `projects/${this.projectId}/secrets/${secretName}/versions/latest`;
+    const name = `projects/${this.googleProjectId}/secrets/${secretName}/versions/latest`;
+    console.log("Getting secret " + name);
     const [version] = await this.client.accessSecretVersion({ name });
 
     if (!version.payload || !version.payload.data) {

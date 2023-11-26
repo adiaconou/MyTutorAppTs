@@ -21,9 +21,6 @@ const envPath = path_1.default.resolve(__dirname, "../.env");
 // Load the .env file
 dotenv_1.default.config({ path: envPath });
 const JWT_SECRET = process.env.JWT_SECRET || "NO_SECRET_FOUND";
-// Log the SESSION_SECRET
-console.log("SESSION_SECRET: ", process.env.SESSION_SECRET);
-console.log("PROJECT ID: ", process.env.GOOGLE_PROJECT_ID);
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
@@ -43,7 +40,7 @@ app.use(passport_1.default.session());
 const userSettingsRepo = new UserSettingsRepository_1.UserSettingsRepository("for-fun-153903");
 const userChatSessionRepo = new UserChatSessionRepository_1.UserChatSessionRepository("for-fun-153903");
 const userMessageRepo = new UserChatMessagesRepository_1.UserChatMessagesRepository("for-fun-153903");
-const secretManager = new SecretManager_1.SecretManager("for-fun-153903");
+const secretManager = new SecretManager_1.SecretManager();
 const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 /*** Google Auth Routes ***/
@@ -69,8 +66,6 @@ app.get("/auth/google/callback", passport_1.default.authenticate("google"), (req
     res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'none' });
     res.redirect(FRONTEND_URL);
 });
-const { OAuth2Client } = require('google-auth-library');
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 app.get('/auth/status', (req, res) => {
     // Get the JWT from the cookie
     const token = req.cookies.token;
@@ -108,7 +103,7 @@ app.post('/auth/logout', (req, res) => {
 });
 app.post("/log", async (req, res) => {
     try {
-        const secretName = "gcloud-logging-api-key"; // Replace with the name of the secret containing the logging service account key
+        const secretName = "gcloud-logging-api-key";
         const keyFileContents = await secretManager.accessSecretVersion(secretName);
         const keyFileJson = JSON.parse(keyFileContents);
         // Initialize the Logging client with the parsed JSON credentials
@@ -244,7 +239,7 @@ app.get("/chatSessions/", async (req, res) => {
         if (isNaN(limit)) {
             return res.status(400).json({ message: "Invalid limit" });
         }
-        console.log("LIMIT: " + limit);
+        console.log("LIMIT**: " + limit);
         const session = await userChatSessionRepo.getByUserId(userId, limit, 1);
         res.json(session);
     }

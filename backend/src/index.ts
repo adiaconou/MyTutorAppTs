@@ -8,7 +8,6 @@ import { UserChatMessagesRepository } from "./dataAccess/UserChatMessagesReposit
 import { SecretManager } from "./dataAccess/SecretManager";
 import { UserChatSession } from "./models/UserChatSession";
 import { UserChatMessage } from "./models/UserChatMessage";
-import { isAuthenticated } from "./auth/AuthMiddleware";
 import passport from "passport";
 import session from "express-session";
 import dotenv from "dotenv";
@@ -47,10 +46,6 @@ dotenv.config({ path: envPath });
 
 const JWT_SECRET = process.env.JWT_SECRET || "NO_SECRET_FOUND";
 
-// Log the SESSION_SECRET
-console.log("SESSION_SECRET: ", process.env.SESSION_SECRET);
-console.log("PROJECT ID: ", process.env.GOOGLE_PROJECT_ID);
-
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -76,7 +71,7 @@ const userSettingsRepo = new UserSettingsRepository("for-fun-153903");
 const userChatSessionRepo = new UserChatSessionRepository("for-fun-153903");
 const userMessageRepo = new UserChatMessagesRepository("for-fun-153903");
 
-const secretManager = new SecretManager("for-fun-153903");
+const secretManager = new SecretManager();
 
 const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
@@ -125,9 +120,6 @@ app.get(
   }
 );
 
-const {OAuth2Client} = require('google-auth-library');
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
 app.get('/auth/status', (req: Request, res: Response) => {
   // Get the JWT from the cookie
   const token = req.cookies.token;
@@ -169,7 +161,7 @@ app.post('/auth/logout', (req, res) => {
 
 app.post("/log", async (req: Request, res: Response) => {
   try {
-    const secretName = "gcloud-logging-api-key"; // Replace with the name of the secret containing the logging service account key
+    const secretName = "gcloud-logging-api-key";
     const keyFileContents = await secretManager.accessSecretVersion(secretName);
     const keyFileJson = JSON.parse(keyFileContents);
 
@@ -333,7 +325,7 @@ app.get("/chatSessions/", async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid limit" });
     }
 
-    console.log("LIMIT: " + limit);
+    console.log("LIMIT**: " + limit);
     const session = await userChatSessionRepo.getByUserId(userId, limit, 1);
 
     res.json(session);

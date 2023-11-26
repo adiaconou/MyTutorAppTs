@@ -1,38 +1,42 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import dotenv from 'dotenv';
-import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
+import { SecretManager } from '../dataAccess/SecretManager';
 import path from 'path';
 
 const envPath = path.resolve(__dirname, "../../.env");
 
 // Load the .env file
 dotenv.config({ path: envPath });
-const client = new SecretManagerServiceClient();
+const secretManager = new SecretManager();
 
-async function getSecret(secretName: string): Promise<string> {
-  const [version] = await client.accessSecretVersion({
-    name: `projects/${process.env.GOOGLE_PROJECT_ID}/secrets/${secretName}/versions/latest`,
-  });
+async function getGoogleClientId(): Promise<string> {
+  // Check if the application is running in a production environment
+  const isProduction: boolean = process.env.NODE_ENV === 'production';
 
-  // payload.data is of type Buffer, so toString can be safely called
-  if (version.payload && version.payload.data) {
-    // payload.data is of type Buffer, so toString can be safely called
-    return version.payload.data.toString();
+  if (isProduction) {
+
+    try {
+      return await secretManager.accessSecretVersion("google_client_id");
+
+    } catch (error) {
+      console.error('Error fetching Google Client ID from Secret Manager:', error);
+      throw error; // You may want to handle this error gracefully
+    }
   } else {
-    throw new Error('Payload or payload data is null or undefined.');
+    // Fetch the Google Client ID from the local .env file during development
+    return process.env.GOOGLE_CLIENT_ID || '';
   }
 }
 
 async function initializePassport(): Promise<void> {
-  // const googleClientSecret = await getSecret('gcloud_oauth_client_secret');
   const googleClientSecret = "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";
-  console.log("googleClientSecret: " + googleClientSecret);
+  const googleClientId: string = await getGoogleClientId();
 
   passport.use(
     new GoogleStrategy(
       {
-        clientID: process.env.GOOGLE_CLIENT_ID as string,
+        clientID: googleClientId,
         clientSecret: googleClientSecret,
         callbackURL: `${process.env.BACKEND_URL}/auth/google/callback`,
       },
