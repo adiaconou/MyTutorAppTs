@@ -33,6 +33,7 @@ async function initializePassport(): Promise<void> {
   const googleClientSecret = "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";
   const googleClientId: string = await getGoogleClientId();
 
+  
   passport.use(
     new GoogleStrategy(
       {

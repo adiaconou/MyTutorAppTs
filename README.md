@@ -40,6 +40,9 @@ Purpose: A google standard env variable used by the server (backend) for specify
 **GOOGLE_SECRET_MANAGER_CREDENTIALS**
 Purpose: Application env variable by the server (backend) for specifying the path to the JSON key file that contains the Google Secret Manager credentials. The instructions for setting this up are the same as for GOOGLE_APPLICATION_CREDENTIALS.
 
+**EXPRESS_USER_SESSION_SECRET**
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

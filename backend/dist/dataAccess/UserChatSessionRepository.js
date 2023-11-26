@@ -6,6 +6,7 @@ const UserChatMessagesRepository_1 = require("./UserChatMessagesRepository");
 const kind = "UserChatSession";
 const messageRepo = new UserChatMessagesRepository_1.UserChatMessagesRepository("for-fun-153903");
 class UserChatSessionRepository {
+    cloudDatastore;
     constructor(projectId) {
         this.cloudDatastore = new GoogleCloudDatastore_1.GoogleCloudDatastore(projectId, kind);
     }

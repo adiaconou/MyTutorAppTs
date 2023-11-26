@@ -6,8 +6,9 @@ const secret_manager_1 = require("@google-cloud/secret-manager");
 This is a helper class for accessing secrets from Google Secret Manager.
 */
 class SecretManager {
+    client;
+    googleProjectId = 'for-fun-153903';
     constructor() {
-        this.googleProjectId = 'for-fun-153903';
         this.client = new secret_manager_1.SecretManagerServiceClient();
     }
     async accessSecretVersion(secretName) {

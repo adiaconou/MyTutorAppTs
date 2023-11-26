@@ -21,7 +21,6 @@ export class SecretManager {
     }
 
     const secretValue = version.payload.data.toString();
-
     console.log("Secret value: " + secretValue);
     return secretValue;
   }

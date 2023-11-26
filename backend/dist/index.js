@@ -17,32 +17,61 @@ require("./auth/PassportSetup");
 const path_1 = __importDefault(require("path"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const envPath = path_1.default.resolve(__dirname, "../.env");
-// Load the .env file
-dotenv_1.default.config({ path: envPath });
-const JWT_SECRET = process.env.JWT_SECRET || "NO_SECRET_FOUND";
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+const secretManager = new SecretManager_1.SecretManager();
 const app = (0, express_1.default)();
-app.use(express_1.default.json());
-app.use((0, cookie_parser_1.default)());
-// Enable CORS for your frontend
-console.log("FRONTEND URL: " + process.env.FRONTEND_URL);
-app.use((0, cors_1.default)({ origin: process.env.FRONTEND_URL, credentials: true }));
-/*** Auth setup ***/
-app.use((0, express_session_1.default)({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000, secure: 'auto' }, // 1 day
-}));
-app.use(passport_1.default.initialize());
-app.use(passport_1.default.session());
+// Async function to initialize the app
+async function initializeApp() {
+    // Load the .env file
+    const envPath = path_1.default.resolve(__dirname, "../.env");
+    dotenv_1.default.config({ path: envPath });
+    // Enable CORS for your frontend
+    app.use((0, cors_1.default)({
+        origin: process.env.FRONTEND_URL,
+        credentials: true
+    }));
+    // Other middleware setup
+    app.use(express_1.default.json());
+    app.use((0, cookie_parser_1.default)());
+    const sessionSecret = await getExpressUserSessionSecret();
+    app.use((0, express_session_1.default)({
+        secret: sessionSecret,
+        resave: false,
+        saveUninitialized: false,
+        cookie: { maxAge: 24 * 60 * 60 * 1000, secure: 'auto' },
+    }));
+    app.use(passport_1.default.initialize());
+    app.use(passport_1.default.session());
+    // ... rest of your Express app setup ...
+    const PORT = process.env.PORT || 3001;
+    app.listen(PORT, () => {
+        console.log(`Backend server listening on port ${PORT}`);
+    });
+}
+// Call the async function to start the app
+initializeApp().catch(console.error);
+const JWT_SECRET = process.env.JWT_SECRET || "NO_SECRET_FOUND";
 /********************/
 const userSettingsRepo = new UserSettingsRepository_1.UserSettingsRepository("for-fun-153903");
 const userChatSessionRepo = new UserChatSessionRepository_1.UserChatSessionRepository("for-fun-153903");
 const userMessageRepo = new UserChatMessagesRepository_1.UserChatMessagesRepository("for-fun-153903");
-const secretManager = new SecretManager_1.SecretManager();
-const PORT = process.env.PORT || 3001;
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+async function getExpressUserSessionSecret() {
+    // Check if the application is running in a production environment
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction) {
+        try {
+            return await secretManager.accessSecretVersion("express_user_session_secret");
+        }
+        catch (error) {
+            console.error('Error fetching express_user_session_secret from Secret Manager:', error);
+            throw error; // You may want to handle this error gracefully
+        }
+    }
+    else {
+        // Fetch the Google Client ID from the local .env file during development
+        return process.env.EXPRESS_USER_SESSION_SECRET || '';
+    }
+}
 /*** Google Auth Routes ***/
 app.get("/auth/google", passport_1.default.authenticate("google", {
     scope: ["profile", "email"],
@@ -290,7 +319,4 @@ app.put("/chatSessions/:id", async (req, res) => {
         console.log("Error creating chat session: " + error);
         res.status(500).json({ message: "Error creating chat session" });
     }
-});
-app.listen(PORT, () => {
-    console.log("Backend server listening on port 3001");
 });

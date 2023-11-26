@@ -4,6 +4,7 @@ exports.UserSettingsRepository = void 0;
 const GoogleCloudDatastore_1 = require("./GoogleCloudDatastore");
 const kind = "UserSettings";
 class UserSettingsRepository {
+    cloudDatastore;
     constructor(projectId) {
         this.cloudDatastore = new GoogleCloudDatastore_1.GoogleCloudDatastore(projectId, kind);
     }
