@@ -61,8 +61,6 @@ initializeApp().catch(console.error);
 
 /********************/
 
-const userSettingsRepo = new UserSettingsRepository("for-fun-153903");
-const userChatSessionRepo = new UserChatSessionRepository("for-fun-153903");
 const userMessageRepo = new UserChatMessagesRepository("for-fun-153903");
 
 async function getExpressUserSessionSecret(): Promise<string> {
@@ -147,34 +145,6 @@ app.put("/messages/:id", async (req: Request, res: Response) => {
   }
 });
 
-app.delete("/chatSessions/:id", async (req: Request, res: Response) => {
-  try {
-    const id = req.params.id;
-
-    console.log("Deleteing chat session " + id);
-    // Delete the chat session
-    await userChatSessionRepo.deleteSessionAndMessages(id);
-
-    // Optional: Delete all messages associated with the chat session
-    // await userMessageRepo.deleteByChatSessionId(id);
-
-    res.status(204).send();
-  } catch (error) {
-    console.error("Error deleting chat session: ", error);
-    res.status(500).json({ message: "Error deleting chat session" });
-  }
-});
-
-app.get("/chatSessions/:id", async (req: Request, res: Response) => {
-  try {
-    const id = req.params.id;
-    const session = await userChatSessionRepo.get(id);
-    res.json(session);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching chat session" });
-  }
-});
-
 app.get("/messages/", async (req: Request, res: Response) => {
   try {
     // Access query parameters using req.query
@@ -201,94 +171,5 @@ app.get("/messages/", async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ message: "Error fetching chat session list " + error });
-  }
-});
-
-app.get("/chatSessions/", async (req: Request, res: Response) => {
-  try {
-    // Access query parameters using req.query
-    const userId = req.query.userId as string;
-    const limitStr = req.query.limit as string;
-
-    // Validate query parameters
-    if (!userId || !limitStr) {
-      return res.status(400).json({ message: "Missing userId or limit" });
-    }
-
-    // Convert limit to an integer
-    const limit = parseInt(limitStr, 10);
-
-    // Check if limit is a valid number
-    if (isNaN(limit)) {
-      return res.status(400).json({ message: "Invalid limit" });
-    }
-
-    console.log("LIMIT**: " + limit);
-    const session = await userChatSessionRepo.getByUserId(userId, limit, 1);
-
-    res.json(session);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching chat session list " + error });
-  }
-});
-
-app.put("/chatSessions/:id", async (req: Request, res: Response) => {
-  try {
-    // Extract 'session' and 'initialMessage' from the request body
-    const { session, initialMessage } = req.body;
-
-    // Validate and destructure the 'session' object
-    if (!session) {
-      return res
-        .status(400)
-        .json({ message: "Missing session object in request body" });
-    }
-    const { userId, id, createdAt, lastUpdatedAt, summary } =
-      session as UserChatSession;
-
-    // Create the session object to be stored in the repository
-    const sessionToCreate: UserChatSession = {
-      userId,
-      id,
-      createdAt: new Date(createdAt),
-      lastUpdatedAt: new Date(lastUpdatedAt),
-      summary,
-    };
-
-    // Validate and destructure the 'initialMessage' object (if needed)
-    if (initialMessage) {
-      const {
-        id: messageId,
-        chatSessionId,
-        text,
-        timestamp,
-        sender,
-      } = initialMessage as UserChatMessage;
-
-      // Create the initialMessage object to be stored in the repository (if needed)
-      const messageToCreate: UserChatMessage = {
-        id: messageId,
-        chatSessionId,
-        text,
-        timestamp: new Date(timestamp),
-        sender,
-      };
-
-      await userChatSessionRepo.createNew(
-        sessionToCreate.id,
-        sessionToCreate,
-        initialMessage.id,
-        initialMessage
-      );
-    } else {
-      await userChatSessionRepo.create(id, session);
-    }
-
-    res.status(204).send();
-  } catch (error) {
-    console.log("Error creating chat session: " + error);
-    res.status(500).json({ message: "Error creating chat session" });
   }
 });
