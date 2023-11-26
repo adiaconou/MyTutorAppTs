@@ -50,7 +50,6 @@ async function initializeApp() {
 }
 // Call the async function to start the app
 initializeApp().catch(console.error);
-const JWT_SECRET = process.env.JWT_SECRET || "NO_SECRET_FOUND";
 /********************/
 const userSettingsRepo = new UserSettingsRepository_1.UserSettingsRepository("for-fun-153903");
 const userChatSessionRepo = new UserChatSessionRepository_1.UserChatSessionRepository("for-fun-153903");
@@ -72,6 +71,23 @@ async function getExpressUserSessionSecret() {
         return process.env.EXPRESS_USER_SESSION_SECRET || '';
     }
 }
+async function getJwtSecret() {
+    // Check if the application is running in a production environment
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction) {
+        try {
+            return await secretManager.accessSecretVersion("jwt_secret");
+        }
+        catch (error) {
+            console.error('Error fetching express_user_session_secret from Secret Manager:', error);
+            throw error; // You may want to handle this error gracefully
+        }
+    }
+    else {
+        // Fetch the Google Client ID from the local .env file during development
+        return process.env.JWT_SECRET || '';
+    }
+}
 /*** Google Auth Routes ***/
 app.get("/auth/google", passport_1.default.authenticate("google", {
     scope: ["profile", "email"],
@@ -79,48 +95,66 @@ app.get("/auth/google", passport_1.default.authenticate("google", {
     failureRedirect: FRONTEND_URL + "/login",
     prompt: "consent"
 }));
-app.get("/auth/google/callback", passport_1.default.authenticate("google"), (req, res) => {
-    const user = req.user;
-    console.log("User req: " + JSON.stringify(user));
-    console.log("JWT SECRET: " + JWT_SECRET);
-    const { id, displayName, emails } = req.user;
-    const token = jsonwebtoken_1.default.sign({
-        userID: id,
-        displayName,
-        email: emails && emails.length > 0 ? emails[0].value : null,
-    }, JWT_SECRET, { expiresIn: '1h' });
-    console.log("DISPLAY NAME: " + displayName);
-    console.log("userId: " + user.id + " token!!: " + token);
-    // Set the JWT in a secure HTTP-only cookie
-    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'none' });
-    res.redirect(FRONTEND_URL);
+app.get("/auth/google/callback", passport_1.default.authenticate("google"), async (req, res) => {
+    try {
+        const user = req.user;
+        console.log("User req: " + JSON.stringify(user));
+        // Retrieve JWT_SECRET asynchronously
+        const JWT_SECRET = await getJwtSecret();
+        console.log("JWT SECRET: " + JWT_SECRET);
+        const { id, displayName, emails } = user;
+        const token = jsonwebtoken_1.default.sign({
+            userID: id,
+            displayName,
+            email: emails && emails.length > 0 ? emails[0].value : null,
+        }, JWT_SECRET, { expiresIn: '1h' });
+        console.log("DISPLAY NAME: " + displayName);
+        console.log("userId: " + user.id + " token!!: " + token);
+        // Set the JWT in a secure HTTP-only cookie
+        res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'none' });
+        res.redirect(FRONTEND_URL);
+    }
+    catch (error) {
+        console.error("Error in auth/google/callback: ", error);
+        // Handle error, maybe redirect to an error page or send a response
+        res.status(500).send("An error occurred");
+    }
 });
-app.get('/auth/status', (req, res) => {
-    // Get the JWT from the cookie
-    const token = req.cookies.token;
-    // If the token exists
-    if (token) {
-        console.log("Token retrieved: " + token);
-        // Verify the token
-        jsonwebtoken_1.default.verify(token, JWT_SECRET, (err, decodedToken) => {
-            if (err) {
-                // Token verification failed
-                console.log("Token verification failed: " + err);
+app.get('/auth/status', async (req, res) => {
+    try {
+        const token = req.cookies.token;
+        if (token) {
+            console.log("Token retrieved: " + token);
+            // Retrieve JWT_SECRET asynchronously
+            const JWT_SECRET = await getJwtSecret();
+            try {
+                // Wrap jwt.verify in a Promise with explicit types for err and decoded
+                const decodedToken = await new Promise((resolve, reject) => {
+                    jsonwebtoken_1.default.verify(token, JWT_SECRET, (err, decoded) => {
+                        if (err) {
+                            reject(err);
+                        }
+                        else {
+                            resolve(decoded);
+                        }
+                    });
+                });
+                console.log(decodedToken.email + " is authenticated.");
+                res.json({ authenticated: true, ...decodedToken });
+            }
+            catch (err) {
+                console.log("Token verification failed: ", err);
                 res.json({ authenticated: false });
             }
-            else {
-                // Token is valid, user is authenticated
-                // You can also send back any other user data stored in the token
-                const { userID, displayName, email } = decodedToken;
-                console.log(email + " is authenticated.");
-                res.json({ authenticated: true, userID, displayName, email });
-            }
-        });
+        }
+        else {
+            console.log("Token not found.");
+            res.json({ authenticated: false });
+        }
     }
-    else {
-        // No token, user is not authenticated
-        console.log("Token not found.");
-        res.json({ authenticated: false });
+    catch (error) {
+        console.error("Error in /auth/status: ", error);
+        res.status(500).send("An error occurred");
     }
 });
 app.post('/auth/logout', (req, res) => {

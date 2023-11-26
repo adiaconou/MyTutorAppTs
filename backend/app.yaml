@@ -10,5 +10,3 @@ env_variables:
   GOOGLE_PROJECT_ID: 'for-fun-153903'
   FRONTEND_URL: 'https://for-fun-153903.uc.r.appspot.com'
   BACKEND_URL: 'https://backend-dot-for-fun-153903.uc.r.appspot.com'
-  
-  JWT_SECRET: '209ewfjwdkgj02wmoiurew24svdgryierg9jg02j209egj20e2'
