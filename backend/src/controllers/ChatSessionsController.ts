@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { UserChatSessionRepository } from "../dataAccess/UserChatSessionRepository";
+import { UserChatSessionRepository } from "../repository/UserChatSessionRepository";
 import { UserChatMessage } from "../models/UserChatMessage";
 import { UserChatSession } from "../models/UserChatSession";
 

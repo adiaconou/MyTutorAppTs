@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserSettings } from "../models/UserSettings";
-import { UserSettingsRepository } from "../dataAccess/UserSettingsRepository";
+import { UserSettingsRepository } from "../repository/UserSettingsRepository";
 
 export class UserSettingsController {
     private userSettingsRepo: UserSettingsRepository;

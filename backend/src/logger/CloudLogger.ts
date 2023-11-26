@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Logging } from '@google-cloud/logging';
-import { SecretManager } from '../dataAccess/SecretManager';
+import { SecretManager } from '../repository/SecretManager';
 
 class CloudLogger {
 

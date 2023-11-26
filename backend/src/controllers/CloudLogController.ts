@@ -1,6 +1,6 @@
 import { Logging } from "@google-cloud/logging";
 import { Request, Response } from "express";
-import { SecretManager } from "../dataAccess/SecretManager";
+import { SecretManager } from "../repository/SecretManager";
 
 const secretManager = new SecretManager();
 

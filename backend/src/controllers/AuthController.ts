@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { SecretManager } from "../dataAccess/SecretManager";
+import { SecretManager } from "../repository/SecretManager";
 
 export class AuthController {
 

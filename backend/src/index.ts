@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { SecretManager } from "./dataAccess/SecretManager";
+import { SecretManager } from "./repository/SecretManager";
 import passport from "passport";
 import session from "express-session";
 import dotenv from "dotenv";

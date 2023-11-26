@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserChatMessage } from "../models/UserChatMessage";
-import { UserChatMessagesRepository } from "../dataAccess/UserChatMessagesRepository";
+import { UserChatMessagesRepository } from "../repository/UserChatMessagesRepository";
 
 export class UserChatMessagesController {
     private userChatMessagesRepo: UserChatMessagesRepository;

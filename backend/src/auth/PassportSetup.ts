@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import dotenv from 'dotenv';
-import { SecretManager } from '../dataAccess/SecretManager';
+import { SecretManager } from '../repository/SecretManager';
 import path from 'path';
 
 const envPath = path.resolve(__dirname, "../../.env");
