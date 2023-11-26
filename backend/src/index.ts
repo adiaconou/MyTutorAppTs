@@ -1,13 +1,8 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { UserSettings } from "./models/UserSettings";
 import { Logging } from "@google-cloud/logging";
-import { UserSettingsRepository } from "./dataAccess/UserSettingsRepository";
-import { UserChatSessionRepository } from "./dataAccess/UserChatSessionRepository";
 import { UserChatMessagesRepository } from "./dataAccess/UserChatMessagesRepository";
 import { SecretManager } from "./dataAccess/SecretManager";
-import { UserChatSession } from "./models/UserChatSession";
-import { UserChatMessage } from "./models/UserChatMessage";
 import passport from "passport";
 import session from "express-session";
 import dotenv from "dotenv";
@@ -61,8 +56,6 @@ initializeApp().catch(console.error);
 
 /********************/
 
-const userMessageRepo = new UserChatMessagesRepository("for-fun-153903");
-
 async function getExpressUserSessionSecret(): Promise<string> {
   // Check if the application is running in a production environment
   const isProduction: boolean = process.env.NODE_ENV === 'production';
@@ -81,7 +74,6 @@ async function getExpressUserSessionSecret(): Promise<string> {
     return process.env.EXPRESS_USER_SESSION_SECRET || '';
   }
 }
-
 
 /***** LOGGING  *********/
 interface LogRequestBody {
@@ -121,55 +113,3 @@ app.post("/log", async (req: Request, res: Response) => {
 });
 
 /****************************************** */
-
-app.put("/messages/:id", async (req: Request, res: Response) => {
-  try {
-    const id = req.body.id;
-    const chatSessionId = req.body.chatSessionId;
-    const text = req.body.text;
-    const timestamp = req.body.timestamp;
-    const sender = req.body.sender;
-
-    const newMessage: UserChatMessage = {
-      id,
-      chatSessionId,
-      text,
-      timestamp,
-      sender,
-    };
-
-    const updatedUserSettings = await userMessageRepo.add(id, newMessage);
-    res.json(updatedUserSettings);
-  } catch (error) {
-    res.status(500).json({ message: "Error adding new message" });
-  }
-});
-
-app.get("/messages/", async (req: Request, res: Response) => {
-  try {
-    // Access query parameters using req.query
-    const chatSessionId = req.query.chatSessionId as string;
-    const limitStr = req.query.limit as string;
-
-    // Validate query parameters
-    if (!chatSessionId || !limitStr) {
-      return res.status(400).json({ message: "Missing userId or limit" });
-    }
-
-    // Convert limit to an integer
-    const limit = parseInt(limitStr, 10);
-
-    // Check if limit is a valid number
-    if (isNaN(limit)) {
-      return res.status(400).json({ message: "Invalid limit" });
-    }
-
-    const session = await userMessageRepo.getById(chatSessionId, limit);
-
-    res.json(session);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching chat session list " + error });
-  }
-});

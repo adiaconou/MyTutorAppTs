@@ -3,7 +3,7 @@ import { UserChatSessionRepository } from "../dataAccess/UserChatSessionReposito
 import { UserChatMessage } from "../models/UserChatMessage";
 import { UserChatSession } from "../models/UserChatSession";
 
-export class ChatSessionsController {
+export class UserChatSessionsController {
 
     private userChatSessionRepo: UserChatSessionRepository;
 

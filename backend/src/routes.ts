@@ -2,12 +2,14 @@ import express from "express";
 import { AuthController } from "./controllers/AuthController";
 import passport from "passport";
 import { UserSettingsController } from "./controllers/UserSettingsController";
-import { ChatSessionsController } from "./controllers/ChatSessionsController";
+import { UserChatSessionsController } from "./controllers/ChatSessionsController";
+import { UserChatMessagesController } from "./controllers/UserChatMessagesController";
 
 const router = express.Router();
 const authController = new AuthController();
 const userSettingsController = new UserSettingsController();
-const chatSessionsController = new ChatSessionsController();
+const userChatSessionsController = new UserChatSessionsController();
+const userChatMessagesController = new UserChatMessagesController();
 
 router.get(
   "/auth/google",
@@ -29,9 +31,13 @@ router.get("/userSettings/:userId", userSettingsController.getUserSettings.bind(
 router.put("/userSettings/:userId", userSettingsController.updateUserSettings.bind(userSettingsController));
 
 // UserChatSessions routes
-router.put("/chatSessions/:id", chatSessionsController.createChatSession.bind(chatSessionsController));
-router.get("/chatSessions/:id", chatSessionsController.getChatSessionById.bind(chatSessionsController));
-router.get("/chatSessions/", chatSessionsController.getChatSessionsByUserId.bind(chatSessionsController));
-router.delete("/chatSessions/:id", chatSessionsController.deleteChatSession.bind(chatSessionsController));
+router.put("/chatSessions/:id", userChatSessionsController.createChatSession.bind(userChatSessionsController));
+router.get("/chatSessions/:id", userChatSessionsController.getChatSessionById.bind(userChatSessionsController));
+router.get("/chatSessions/", userChatSessionsController.getChatSessionsByUserId.bind(userChatSessionsController));
+router.delete("/chatSessions/:id", userChatSessionsController.deleteChatSession.bind(userChatSessionsController));
+
+// UserChatMessages routes
+router.put("/messages/:id", userChatMessagesController.writeMessage.bind(userChatMessagesController));
+router.get("/messages/", userChatMessagesController.getMessagesByUserId.bind(userChatMessagesController));
 
 export default router;
