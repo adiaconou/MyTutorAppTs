@@ -5,8 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const logging_1 = require("@google-cloud/logging");
-const UserChatMessagesRepository_1 = require("./dataAccess/UserChatMessagesRepository");
 const SecretManager_1 = require("./dataAccess/SecretManager");
 const passport_1 = __importDefault(require("passport"));
 const express_session_1 = __importDefault(require("express-session"));
@@ -50,7 +48,6 @@ async function initializeApp() {
 // Call the async function to start the app
 initializeApp().catch(console.error);
 /********************/
-const userMessageRepo = new UserChatMessagesRepository_1.UserChatMessagesRepository("for-fun-153903");
 async function getExpressUserSessionSecret() {
     // Check if the application is running in a production environment
     const isProduction = process.env.NODE_ENV === 'production';
@@ -68,28 +65,3 @@ async function getExpressUserSessionSecret() {
         return process.env.EXPRESS_USER_SESSION_SECRET || '';
     }
 }
-/*** Google Auth Routes ***/
-app.post("/log", async (req, res) => {
-    try {
-        const secretName = "gcloud-logging-api-key";
-        const keyFileContents = await secretManager.accessSecretVersion(secretName);
-        const keyFileJson = JSON.parse(keyFileContents);
-        // Initialize the Logging client with the parsed JSON credentials
-        const logging = new logging_1.Logging({
-            projectId: "for-fun-153903",
-            credentials: keyFileJson,
-        });
-        const logName = "my-log";
-        const log = logging.log(logName);
-        const metadata = { resource: { type: "global" } };
-        const logMessage = req.body.message;
-        const entry = log.entry(metadata, { message: logMessage });
-        await log.write(entry);
-        res.status(200).send({ message: "Log entry created" });
-    }
-    catch (error) {
-        console.error("Error accessing logging service account key from Secret Manager: ", error);
-        res.status(500).send({ message: "Error writing log entry", error: error });
-    }
-});
-/****************************************** */

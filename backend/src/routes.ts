@@ -4,12 +4,14 @@ import passport from "passport";
 import { UserSettingsController } from "./controllers/UserSettingsController";
 import { UserChatSessionsController } from "./controllers/ChatSessionsController";
 import { UserChatMessagesController } from "./controllers/UserChatMessagesController";
+import { CloudLogController } from "./controllers/CloudLogController";
 
 const router = express.Router();
 const authController = new AuthController();
 const userSettingsController = new UserSettingsController();
 const userChatSessionsController = new UserChatSessionsController();
 const userChatMessagesController = new UserChatMessagesController();
+const cloudLogController = new CloudLogController();
 
 router.get(
   "/auth/google",
@@ -39,5 +41,8 @@ router.delete("/chatSessions/:id", userChatSessionsController.deleteChatSession.
 // UserChatMessages routes
 router.put("/messages/:id", userChatMessagesController.writeMessage.bind(userChatMessagesController));
 router.get("/messages/", userChatMessagesController.getMessagesByUserId.bind(userChatMessagesController));
+
+// Cloud logging routes
+router.put("/log", cloudLogController.writeLog.bind(cloudLogController));
 
 export default router;
