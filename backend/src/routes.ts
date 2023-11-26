@@ -1,9 +1,11 @@
 import express from "express";
 import { AuthController } from "./controllers/AuthController";
 import passport from "passport";
+import { UserSettingsController } from "./controllers/UserSettingsController";
 
 const router = express.Router();
 const authController = new AuthController();
+const userSettingsController = new UserSettingsController();
 
 router.get(
   "/auth/google",
@@ -15,8 +17,13 @@ router.get(
   })
 );
 
+// Auth routes
 router.get("/auth/google/callback", passport.authenticate("google"), authController.googleAuthCallback);
 router.get('/auth/status', authController.checkAuthStatus);
 router.post('/auth/logout', authController.logout);
+
+// UserSettings routes
+router.get("/userSettings/:userId", userSettingsController.getUserSettings.bind(userSettingsController));
+router.put("/userSettings/:userId", userSettingsController.updateUserSettings.bind(userSettingsController));
 
 export default router;
