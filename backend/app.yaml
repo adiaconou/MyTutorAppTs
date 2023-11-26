@@ -11,6 +11,5 @@ env_variables:
   FRONTEND_URL: 'https://for-fun-153903.uc.r.appspot.com'
   BACKEND_URL: 'https://backend-dot-for-fun-153903.uc.r.appspot.com'
   
-  GOOGLE_CLIENT_ID: '584339523980-tdco0p6l9chpuktje577ff4frnpoj474.apps.googleusercontent.com'
   SESSION_SECRET: 'sih29892h298329h29hg92892h'
   JWT_SECRET: '209ewfjwdkgj02wmoiurew24svdgryierg9jg02j209egj20e2'

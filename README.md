@@ -28,7 +28,7 @@ Purpose: Google Client ID is a critical component of the OAuth 2.0 authenticatio
 The Google Client ID is also stored as a secret in the Google Cloud Secret Manager: https://console.cloud.google.com/security/secret-manager?project=for-fun-153903. This is how the GOOGLE_CLIENT_ID is retrieved in prodution.
 
 **GOOGLE_APPLICATION_CREDENTIALS**
-Purpose: Used by the server (backend) for specifying the path to the JSON key file that contains service account credentials to authenticate your application when making API calls to Google Cloud services, such as Google Cloud Storage, Google Cloud Logging, etc. The JSON key file contains the necessary credentials and permissions for your application to access these resources.
+Purpose: A google standard env variable used by the server (backend) for specifying the path to the JSON key file that contains service account credentials to authenticate your application when making API calls to Google Cloud services, such as Google Cloud Storage, Google Cloud Logging, etc. The JSON key file contains the necessary credentials and permissions for your application to access these resources.
 1. Go to the Google Cloud Console.
 2. Go to 'IAM & Admin' -> 'Service Accounts'.
 3. Select 'Manage Keys' for my-tutor-application@for-fun-153903.iam.gserviceaccount.com.
@@ -36,6 +36,9 @@ Purpose: Used by the server (backend) for specifying the path to the JSON key fi
 5. Set the GOOGLE_APPLICATION_CREDENTAILS in backend/.env to the path of where the .json file is stored (e.g. C:\Code\keys\blah.json).
 
 ''NOTE: This must be commented out in the .env file before deploying to google app engine, or GAE will attempt to read the credentials from the local directory and fail. Alternatively, this an be set as a windows environment variable.''
+
+**GOOGLE_SECRET_MANAGER_CREDENTIALS**
+Purpose: Application env variable by the server (backend) for specifying the path to the JSON key file that contains the Google Secret Manager credentials. The instructions for setting this up are the same as for GOOGLE_APPLICATION_CREDENTIALS.
 
 # Getting Started with Create React App
 
