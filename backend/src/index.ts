@@ -13,31 +13,8 @@ import session from "express-session";
 import dotenv from "dotenv";
 import "./auth/PassportSetup";
 import path from "path";
-import jwt, { JsonWebTokenError } from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
-
-interface GoogleUser {
-  id: string;
-  displayName: string;
-  name: {
-    familyName: string;
-    givenName: string;
-  };
-  emails: Array<{value: string, verified: boolean}>;
-  photos: Array<{value: string}>;
-  provider: string;
-  _raw: string;
-  _json: {
-    sub: string;
-    name: string;
-    given_name: string;
-    family_name: string;
-    picture: string;
-    email: string;
-    email_verified: boolean;
-    locale: string;
-  };
-}
+import routes from './routes';  
 
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 const secretManager = new SecretManager();
@@ -71,7 +48,7 @@ async function initializeApp() {
   
   app.use(passport.initialize());
   app.use(passport.session());
-
+  app.use(routes); 
   // ... rest of your Express app setup ...
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
@@ -132,100 +109,6 @@ interface LogRequestBody {
 }
 
 /*** Google Auth Routes ***/
-app.get(
-  "/auth/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    successRedirect: "/auth/google/callback",
-    failureRedirect: FRONTEND_URL + "/login", // Replace with your failure redirect URL
-    prompt: "consent"
-  })
-);
-
-app.get("/auth/google/callback", passport.authenticate("google"), async (req, res) => {
-  try {
-    const user: GoogleUser = req.user as GoogleUser;
-    console.log("User req: " + JSON.stringify(user));
-
-    // Retrieve JWT_SECRET asynchronously
-    const JWT_SECRET = await getJwtSecret();
-    console.log("JWT SECRET: " + JWT_SECRET);
-
-    const { id, displayName, emails } = user;
-    const token = jwt.sign(
-      {
-        userID: id,
-        displayName,
-        email: emails && emails.length > 0 ? emails[0].value : null,
-      },
-      JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    console.log("DISPLAY NAME: " + displayName);
-    console.log("userId: " + user.id + " token!!: " + token);
-
-    // Set the JWT in a secure HTTP-only cookie
-    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'none' });
-
-    res.redirect(FRONTEND_URL);
-  } catch (error) {
-    console.error("Error in auth/google/callback: ", error);
-    // Handle error, maybe redirect to an error page or send a response
-    res.status(500).send("An error occurred");
-  }
-});
-
-app.get('/auth/status', async (req: Request, res: Response) => {
-  try {
-    const token = req.cookies.token;
-
-    if (token) {
-      console.log("Token retrieved: " + token);
-
-      // Retrieve JWT_SECRET asynchronously
-      const JWT_SECRET = await getJwtSecret();
-
-      try {
-        // Define the type for your JWT payload
-        type JwtPayload = { userID: string, displayName: string, email: string };
-
-        // Wrap jwt.verify in a Promise with explicit types for err and decoded
-        const decodedToken = await new Promise<JwtPayload>((resolve, reject) => {
-          jwt.verify(token, JWT_SECRET, (err: JsonWebTokenError | null, decoded: any) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(decoded as JwtPayload);
-            }
-          });
-        });
-
-        console.log(decodedToken.email + " is authenticated.");
-        res.json({ authenticated: true, ...decodedToken });
-      } catch (err) {
-        console.log("Token verification failed: ", err);
-        res.json({ authenticated: false });
-      }
-    } else {
-      console.log("Token not found.");
-      res.json({ authenticated: false });
-    }
-  } catch (error) {
-    console.error("Error in /auth/status: ", error);
-    res.status(500).send("An error occurred");
-  }
-});
-
-app.post('/auth/logout', (req, res) => {
-  // Get the token from the cookie
-  const token = req.cookies.token;
-
-  // Clear the token cookie
-  res.clearCookie('token');
-
-  res.json({ message: 'Logged out' });
-});
 
 app.post("/log", async (req: Request, res: Response) => {
   try {

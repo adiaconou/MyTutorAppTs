@@ -15,8 +15,8 @@ const express_session_1 = __importDefault(require("express-session"));
 const dotenv_1 = __importDefault(require("dotenv"));
 require("./auth/PassportSetup");
 const path_1 = __importDefault(require("path"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const routes_1 = __importDefault(require("./routes"));
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 const secretManager = new SecretManager_1.SecretManager();
 const app = (0, express_1.default)();
@@ -42,6 +42,7 @@ async function initializeApp() {
     }));
     app.use(passport_1.default.initialize());
     app.use(passport_1.default.session());
+    app.use(routes_1.default);
     // ... rest of your Express app setup ...
     const PORT = process.env.PORT || 3001;
     app.listen(PORT, () => {
@@ -89,81 +90,6 @@ async function getJwtSecret() {
     }
 }
 /*** Google Auth Routes ***/
-app.get("/auth/google", passport_1.default.authenticate("google", {
-    scope: ["profile", "email"],
-    successRedirect: "/auth/google/callback",
-    failureRedirect: FRONTEND_URL + "/login",
-    prompt: "consent"
-}));
-app.get("/auth/google/callback", passport_1.default.authenticate("google"), async (req, res) => {
-    try {
-        const user = req.user;
-        console.log("User req: " + JSON.stringify(user));
-        // Retrieve JWT_SECRET asynchronously
-        const JWT_SECRET = await getJwtSecret();
-        console.log("JWT SECRET: " + JWT_SECRET);
-        const { id, displayName, emails } = user;
-        const token = jsonwebtoken_1.default.sign({
-            userID: id,
-            displayName,
-            email: emails && emails.length > 0 ? emails[0].value : null,
-        }, JWT_SECRET, { expiresIn: '1h' });
-        console.log("DISPLAY NAME: " + displayName);
-        console.log("userId: " + user.id + " token!!: " + token);
-        // Set the JWT in a secure HTTP-only cookie
-        res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'none' });
-        res.redirect(FRONTEND_URL);
-    }
-    catch (error) {
-        console.error("Error in auth/google/callback: ", error);
-        // Handle error, maybe redirect to an error page or send a response
-        res.status(500).send("An error occurred");
-    }
-});
-app.get('/auth/status', async (req, res) => {
-    try {
-        const token = req.cookies.token;
-        if (token) {
-            console.log("Token retrieved: " + token);
-            // Retrieve JWT_SECRET asynchronously
-            const JWT_SECRET = await getJwtSecret();
-            try {
-                // Wrap jwt.verify in a Promise with explicit types for err and decoded
-                const decodedToken = await new Promise((resolve, reject) => {
-                    jsonwebtoken_1.default.verify(token, JWT_SECRET, (err, decoded) => {
-                        if (err) {
-                            reject(err);
-                        }
-                        else {
-                            resolve(decoded);
-                        }
-                    });
-                });
-                console.log(decodedToken.email + " is authenticated.");
-                res.json({ authenticated: true, ...decodedToken });
-            }
-            catch (err) {
-                console.log("Token verification failed: ", err);
-                res.json({ authenticated: false });
-            }
-        }
-        else {
-            console.log("Token not found.");
-            res.json({ authenticated: false });
-        }
-    }
-    catch (error) {
-        console.error("Error in /auth/status: ", error);
-        res.status(500).send("An error occurred");
-    }
-});
-app.post('/auth/logout', (req, res) => {
-    // Get the token from the cookie
-    const token = req.cookies.token;
-    // Clear the token cookie
-    res.clearCookie('token');
-    res.json({ message: 'Logged out' });
-});
 app.post("/log", async (req, res) => {
     try {
         const secretName = "gcloud-logging-api-key";
