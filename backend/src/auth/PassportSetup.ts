@@ -1,20 +1,13 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import dotenv from 'dotenv';
 import { SecretManager } from './SecretManager';
-import path from 'path';
+import config from '../config';
 
-const envPath = path.resolve(__dirname, "../../.env");
-
-// Load the .env file
-dotenv.config({ path: envPath });
 const secretManager = new SecretManager();
 
 async function getGoogleClientId(): Promise<string> {
-  // Check if the application is running in a production environment
-  const isProduction: boolean = process.env.NODE_ENV === 'production';
 
-  if (isProduction) {
+  if (config.isProduction) {
 
     try {
       return await secretManager.accessSecretVersion("google_client_id");
@@ -25,7 +18,7 @@ async function getGoogleClientId(): Promise<string> {
     }
   } else {
     // Fetch the Google Client ID from the local .env file during development
-    return process.env.GOOGLE_CLIENT_ID || '';
+    return config.googleClientId;
   }
 }
 
@@ -33,13 +26,12 @@ async function initializePassport(): Promise<void> {
   const googleClientSecret = "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";
   const googleClientId: string = await getGoogleClientId();
 
-
   passport.use(
     new GoogleStrategy(
       {
         clientID: googleClientId,
         clientSecret: googleClientSecret,
-        callbackURL: `${process.env.BACKEND_URL}/auth/google/callback`,
+        callbackURL: `${config.backendUrl}/auth/google/callback`,
       },
       async (
         accessToken: string,

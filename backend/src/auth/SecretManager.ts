@@ -1,4 +1,5 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
+import config from '../config';
 
 /* 
 This is a helper class for accessing secrets from Google Secret Manager.
@@ -27,9 +28,7 @@ export class SecretManager {
 
   async getExpressUserSessionSecret(): Promise<string> {
     // Check if the application is running in a production environment
-    const isProduction: boolean = process.env.NODE_ENV === 'production';
-
-    if (isProduction) {
+    if (config.isProduction) {
 
       try {
         return await this.accessSecretVersion("express_user_session_secret");
@@ -40,15 +39,13 @@ export class SecretManager {
       }
     } else {
       // Fetch the Google Client ID from the local .env file during development
-      return process.env.EXPRESS_USER_SESSION_SECRET || '';
+      return config.expressUserSessionSecret;
     }
   }
 
   async getJwtSecret(): Promise<string> {
     // Check if the application is running in a production environment
-    const isProduction: boolean = process.env.NODE_ENV === 'production';
-
-    if (isProduction) {
+    if (config.isProduction) {
 
       try {
         return await this.accessSecretVersion("jwt_secret");
@@ -59,7 +56,7 @@ export class SecretManager {
       }
     } else {
       // Fetch the Google Client ID from the local .env file during development
-      return process.env.JWT_SECRET || '';
+      return config.jwtSecret;
     }
   }
 }

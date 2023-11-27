@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { SecretManager } from "../auth/SecretManager";
+import config from '../config';
 
 const secretManager = new SecretManager();
 
@@ -24,7 +25,7 @@ export class AuthController {
             );
 
             res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'none' });
-            res.redirect(process.env.FRONTEND_URL || "http://localhost:3000");
+            res.redirect(config.frontendUrl);
         } catch (error) {
             console.error("Error in googleAuthCallback: ", error);
             res.status(500).send("An error occurred");

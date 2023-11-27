@@ -5,17 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const passport_1 = __importDefault(require("passport"));
 const passport_google_oauth20_1 = require("passport-google-oauth20");
-const dotenv_1 = __importDefault(require("dotenv"));
 const SecretManager_1 = require("./SecretManager");
-const path_1 = __importDefault(require("path"));
-const envPath = path_1.default.resolve(__dirname, "../../.env");
-// Load the .env file
-dotenv_1.default.config({ path: envPath });
+const config_1 = __importDefault(require("../config"));
 const secretManager = new SecretManager_1.SecretManager();
 async function getGoogleClientId() {
-    // Check if the application is running in a production environment
-    const isProduction = process.env.NODE_ENV === 'production';
-    if (isProduction) {
+    if (config_1.default.isProduction) {
         try {
             return await secretManager.accessSecretVersion("google_client_id");
         }
@@ -26,7 +20,7 @@ async function getGoogleClientId() {
     }
     else {
         // Fetch the Google Client ID from the local .env file during development
-        return process.env.GOOGLE_CLIENT_ID || '';
+        return config_1.default.googleClientId;
     }
 }
 async function initializePassport() {
@@ -35,7 +29,7 @@ async function initializePassport() {
     passport_1.default.use(new passport_google_oauth20_1.Strategy({
         clientID: googleClientId,
         clientSecret: googleClientSecret,
-        callbackURL: `${process.env.BACKEND_URL}/auth/google/callback`,
+        callbackURL: `${config_1.default.backendUrl}/auth/google/callback`,
     }, async (accessToken, refreshToken, profile, done) => {
         // Here, you can save the user information to your database.
         // For simplicity, we'll return the user profile.
