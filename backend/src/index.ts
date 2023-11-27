@@ -8,19 +8,17 @@ import "./auth/PassportSetup";
 import path from "path";
 import cookieParser from 'cookie-parser';
 import routes from './routes';  
+import config from "./config";
 
 const secretManager = new SecretManager();
 const app = express();
+
 // Async function to initialize the app
 async function initializeApp() {
   
-  // Load the .env file
-  const envPath = path.resolve(__dirname, "../.env");
-  dotenv.config({ path: envPath });
-
   // Enable CORS for your frontend
   app.use(cors({ 
-    origin: process.env.FRONTEND_URL, 
+    origin: config.frontendUrl, 
     credentials: true 
   }));
 
@@ -41,10 +39,9 @@ async function initializeApp() {
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(routes); 
-  // ... rest of your Express app setup ...
-  const PORT = process.env.PORT || 3001;
-  app.listen(PORT, () => {
-    console.log(`Backend server listening on port ${PORT}`);
+
+  app.listen(config.port, () => {
+    console.log(`Backend server listening on port ${config.port}`);
   });
 }
 
