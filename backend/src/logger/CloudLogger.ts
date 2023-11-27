@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { Logging } from '@google-cloud/logging';
-import { SecretManager } from '../repository/SecretManager';
+import { SecretManager } from '../auth/SecretManager';
 
 class CloudLogger {
 
   constructor() {
-   
+
   }
 
   async writeLog(logName: string, message: string): Promise<void> {
@@ -15,8 +15,8 @@ class CloudLogger {
       const keyFileContents = await secretManager.accessSecretVersion(secretName);
       const keyFileJson = JSON.parse(keyFileContents);
 
-          // Initialize the Logging client with the parsed JSON credentials
-    const logging = new Logging({
+      // Initialize the Logging client with the parsed JSON credentials
+      const logging = new Logging({
         projectId: "for-fun-153903",
         credentials: keyFileJson,
       });

@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const SecretManager_1 = require("./dataAccess/SecretManager");
+const SecretManager_1 = require("./auth/SecretManager");
 const passport_1 = __importDefault(require("passport"));
 const express_session_1 = __importDefault(require("express-session"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -13,7 +13,6 @@ require("./auth/PassportSetup");
 const path_1 = __importDefault(require("path"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const routes_1 = __importDefault(require("./routes"));
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 const secretManager = new SecretManager_1.SecretManager();
 const app = (0, express_1.default)();
 // Async function to initialize the app
@@ -29,7 +28,7 @@ async function initializeApp() {
     // Other middleware setup
     app.use(express_1.default.json());
     app.use((0, cookie_parser_1.default)());
-    const sessionSecret = await getExpressUserSessionSecret();
+    const sessionSecret = await secretManager.getExpressUserSessionSecret();
     app.use((0, express_session_1.default)({
         secret: sessionSecret,
         resave: false,
@@ -47,21 +46,3 @@ async function initializeApp() {
 }
 // Call the async function to start the app
 initializeApp().catch(console.error);
-/********************/
-async function getExpressUserSessionSecret() {
-    // Check if the application is running in a production environment
-    const isProduction = process.env.NODE_ENV === 'production';
-    if (isProduction) {
-        try {
-            return await secretManager.accessSecretVersion("express_user_session_secret");
-        }
-        catch (error) {
-            console.error('Error fetching express_user_session_secret from Secret Manager:', error);
-            throw error; // You may want to handle this error gracefully
-        }
-    }
-    else {
-        // Fetch the Google Client ID from the local .env file during development
-        return process.env.EXPRESS_USER_SESSION_SECRET || '';
-    }
-}

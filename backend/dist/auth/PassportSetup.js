@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const passport_1 = __importDefault(require("passport"));
 const passport_google_oauth20_1 = require("passport-google-oauth20");
 const dotenv_1 = __importDefault(require("dotenv"));
-const SecretManager_1 = require("../dataAccess/SecretManager");
+const SecretManager_1 = require("./SecretManager");
 const path_1 = __importDefault(require("path"));
 const envPath = path_1.default.resolve(__dirname, "../../.env");
 // Load the .env file

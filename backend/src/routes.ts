@@ -2,7 +2,7 @@ import express from "express";
 import { AuthController } from "./controllers/AuthController";
 import passport from "passport";
 import { UserSettingsController } from "./controllers/UserSettingsController";
-import { UserChatSessionsController } from "./controllers/ChatSessionsController";
+import { UserChatSessionsController } from "./controllers/UserChatSessionsController";
 import { UserChatMessagesController } from "./controllers/UserChatMessagesController";
 import { CloudLogController } from "./controllers/CloudLogController";
 

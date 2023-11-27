@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { SecretManager } from "./repository/SecretManager";
+import { SecretManager } from "./auth/SecretManager";
 import passport from "passport";
 import session from "express-session";
 import dotenv from "dotenv";
@@ -9,7 +9,6 @@ import path from "path";
 import cookieParser from 'cookie-parser';
 import routes from './routes';  
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 const secretManager = new SecretManager();
 const app = express();
 // Async function to initialize the app
@@ -29,7 +28,7 @@ async function initializeApp() {
   app.use(express.json());
   app.use(cookieParser());
 
-  const sessionSecret = await getExpressUserSessionSecret();
+  const sessionSecret = await secretManager.getExpressUserSessionSecret();
   app.use(
     session({
       secret: sessionSecret,
@@ -51,24 +50,3 @@ async function initializeApp() {
 
 // Call the async function to start the app
 initializeApp().catch(console.error);
-
-/********************/
-
-async function getExpressUserSessionSecret(): Promise<string> {
-  // Check if the application is running in a production environment
-  const isProduction: boolean = process.env.NODE_ENV === 'production';
-
-  if (isProduction) {
-
-    try {
-      return await secretManager.accessSecretVersion("express_user_session_secret");
-
-    } catch (error) {
-      console.error('Error fetching express_user_session_secret from Secret Manager:', error);
-      throw error; // You may want to handle this error gracefully
-    }
-  } else {
-    // Fetch the Google Client ID from the local .env file during development
-    return process.env.EXPRESS_USER_SESSION_SECRET || '';
-  }
-}

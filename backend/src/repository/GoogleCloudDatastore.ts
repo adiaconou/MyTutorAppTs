@@ -4,7 +4,7 @@ export class GoogleCloudDatastore<T> {
   private datastore: Datastore;
   private entityType: string;
   private currentTransaction: Transaction | null = null;
-  
+
   constructor(projectId: string, entityType: string) {
     this.datastore = new Datastore({ projectId });
     this.entityType = entityType;

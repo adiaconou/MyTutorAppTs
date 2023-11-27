@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import dotenv from 'dotenv';
-import { SecretManager } from '../repository/SecretManager';
+import { SecretManager } from './SecretManager';
 import path from 'path';
 
 const envPath = path.resolve(__dirname, "../../.env");
@@ -33,7 +33,7 @@ async function initializePassport(): Promise<void> {
   const googleClientSecret = "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";
   const googleClientId: string = await getGoogleClientId();
 
-  
+
   passport.use(
     new GoogleStrategy(
       {
@@ -53,7 +53,7 @@ async function initializePassport(): Promise<void> {
       }
     )
   );
-  
+
   passport.serializeUser((user: Express.User, done) => {
     done(null, user);
   });

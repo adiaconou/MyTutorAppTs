@@ -41,7 +41,10 @@ Purpose: A google standard env variable used by the server (backend) for specify
 Purpose: Application env variable by the server (backend) for specifying the path to the JSON key file that contains the Google Secret Manager credentials. The instructions for setting this up are the same as for GOOGLE_APPLICATION_CREDENTIALS.
 
 **EXPRESS_USER_SESSION_SECRET**
+Purpose: This is the secret used by the Express middleware for signing cookies. In production, this secret is retrieved from Google Secret Manager. For local development, the secret value must be retrieved from the Google Secret Manager via Google Console and added to the backend/.env file.
 
+**JWT_SECRET**
+Purpose: Java Web Token secret. In production, this secret is retrieved from Google Secret Manager. For local development, the secret value must be retrieved from the Google Secret Manager via Google Console and added to the backend/.env file.
 
 # Getting Started with Create React App
 
