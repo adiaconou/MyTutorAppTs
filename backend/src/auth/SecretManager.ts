@@ -30,7 +30,6 @@ export class SecretManager {
     // Check if the application is running in a production environment.
     // Retrieve secret from cloud if yes.
     if (config.isProduction) {
-
       try {
         return await this.accessSecretVersion("express_user_session_secret");
 
@@ -48,12 +47,11 @@ export class SecretManager {
     // Check if the application is running in a production environment.
     // Retrieve secret from cloud if yes.
     if (config.isProduction) {
-
       try {
         return await this.accessSecretVersion("jwt_secret");
 
       } catch (error) {
-        console.error('Error fetching express_user_session_secret from Secret Manager:', error);
+        console.error('Error fetching jwt_secret from Secret Manager:', error);
         throw error;
       }
     } else {
