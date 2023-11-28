@@ -1,15 +1,15 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 import config from '../config';
+import { secretManagerServiceClient } from "./SecretManagerServiceClientSingleton";
 
 /* 
 This is a helper class for accessing secrets from Google Secret Manager.
 */
 export class SecretManager {
   private client: SecretManagerServiceClient;
-  
 
-  constructor() {
-    this.client = new SecretManagerServiceClient();
+  constructor(client: SecretManagerServiceClient = secretManagerServiceClient) {
+    this.client = client;
   }
 
   async accessSecretVersion(secretName: string): Promise<string> {
@@ -27,7 +27,8 @@ export class SecretManager {
   }
 
   async getExpressUserSessionSecret(): Promise<string> {
-    // Check if the application is running in a production environment
+    // Check if the application is running in a production environment.
+    // Retrieve secret from cloud if yes.
     if (config.isProduction) {
 
       try {
@@ -35,16 +36,17 @@ export class SecretManager {
 
       } catch (error) {
         console.error('Error fetching express_user_session_secret from Secret Manager:', error);
-        throw error; // You may want to handle this error gracefully
+        throw error;
       }
     } else {
-      // Fetch the Google Client ID from the local .env file during development
+      // Fetch the Google Client ID from the local .env file during local development
       return config.expressUserSessionSecret;
     }
   }
 
   async getJwtSecret(): Promise<string> {
-    // Check if the application is running in a production environment
+    // Check if the application is running in a production environment.
+    // Retrieve secret from cloud if yes.
     if (config.isProduction) {
 
       try {
@@ -52,10 +54,10 @@ export class SecretManager {
 
       } catch (error) {
         console.error('Error fetching express_user_session_secret from Secret Manager:', error);
-        throw error; // You may want to handle this error gracefully
+        throw error;
       }
     } else {
-      // Fetch the Google Client ID from the local .env file during development
+      // Fetch the Google Client ID from the local .env file during local development
       return config.jwtSecret;
     }
   }
