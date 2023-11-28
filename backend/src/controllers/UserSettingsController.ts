@@ -5,8 +5,8 @@ import { UserSettingsRepository } from "../repository/UserSettingsRepository";
 export class UserSettingsController {
     private userSettingsRepo: UserSettingsRepository;
 
-    constructor() {
-        this.userSettingsRepo = new UserSettingsRepository("for-fun-153903");
+    constructor(userSettingsRepo: UserSettingsRepository) {
+        this.userSettingsRepo = userSettingsRepo;
     }
 
     public async getUserSettings(req: Request, res: Response) {

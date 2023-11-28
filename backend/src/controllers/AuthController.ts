@@ -3,15 +3,18 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { SecretManager } from "../auth/SecretManager";
 import config from '../config';
 
-const secretManager = new SecretManager();
-
 export class AuthController {
 
+    private secretManager: SecretManager;
+
+    constructor(secretManager: SecretManager) {
+        this.secretManager = secretManager;
+    }
 
     async googleAuthCallback(req: Request, res: Response) {
         try {
             const user: GoogleUser = req.user as GoogleUser;
-            const JWT_SECRET = await secretManager.getJwtSecret();
+            const JWT_SECRET = await this.secretManager.getJwtSecret();
 
             const { id, displayName, emails } = user;
             const token = jwt.sign(
@@ -36,7 +39,7 @@ export class AuthController {
         try {
             const token = req.cookies.token;
             if (token) {
-                const JWT_SECRET = await secretManager.getJwtSecret();
+                const JWT_SECRET = await this.secretManager.getJwtSecret();
 
                 try {
                     const decodedToken = jwt.verify(token, JWT_SECRET) as JwtPayload;

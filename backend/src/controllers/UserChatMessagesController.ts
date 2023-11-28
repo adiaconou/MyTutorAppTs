@@ -5,8 +5,8 @@ import { UserChatMessagesRepository } from "../repository/UserChatMessagesReposi
 export class UserChatMessagesController {
     private userChatMessagesRepo: UserChatMessagesRepository;
 
-    constructor() {
-        this.userChatMessagesRepo = new UserChatMessagesRepository("for-fun-153903");
+    constructor(userChatMessageRepo: UserChatMessagesRepository) {
+        this.userChatMessagesRepo = userChatMessageRepo;
     }
 
     async writeMessage(req: Request, res: Response) {

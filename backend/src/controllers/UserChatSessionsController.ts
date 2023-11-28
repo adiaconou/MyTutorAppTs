@@ -7,8 +7,8 @@ export class UserChatSessionsController {
 
   private userChatSessionRepo: UserChatSessionRepository;
 
-  constructor() {
-    this.userChatSessionRepo = new UserChatSessionRepository("for-fun-153903");
+  constructor(userChatSessionRepo: UserChatSessionRepository) {
+    this.userChatSessionRepo = userChatSessionRepo;
   }
 
   async createChatSession(req: Request, res: Response) {

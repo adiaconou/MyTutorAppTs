@@ -6,13 +6,17 @@ import { UserChatSessionsController } from "./controllers/UserChatSessionsContro
 import { UserChatMessagesController } from "./controllers/UserChatMessagesController";
 import { CloudLogController } from "./controllers/CloudLogController";
 import { SecretManager } from "./auth/SecretManager";
+import config from "./config";
+import { UserChatMessagesRepository } from "./repository/UserChatMessagesRepository";
+import { UserChatSessionRepository } from "./repository/UserChatSessionRepository";
+import { UserSettingsRepository } from "./repository/UserSettingsRepository";
 
 const router = express.Router();
-const authController = new AuthController();
-const userSettingsController = new UserSettingsController();
-const userChatSessionsController = new UserChatSessionsController();
-const userChatMessagesController = new UserChatMessagesController();
+const authController = new AuthController(new SecretManager());
 const cloudLogController = new CloudLogController(new SecretManager());
+const userSettingsController = new UserSettingsController(new UserSettingsRepository(config.googleProjectId));
+const userChatSessionsController = new UserChatSessionsController(new UserChatSessionRepository(config.googleProjectId));
+const userChatMessagesController = new UserChatMessagesController(new UserChatMessagesRepository(config.googleProjectId));
 
 router.get(
   "/auth/google",
