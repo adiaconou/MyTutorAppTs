@@ -2,14 +2,18 @@ import { Logging } from "@google-cloud/logging";
 import { Request, Response } from "express";
 import { SecretManager } from "../auth/SecretManager";
 
-const secretManager = new SecretManager();
-
 export class CloudLogController {
+
+    private secretManager: SecretManager;
+
+    constructor(secretManager: SecretManager) {
+        this.secretManager = secretManager;
+    }
 
     async writeLog(req: Request, res: Response) {
         try {
             const secretName = "gcloud-logging-api-key";
-            const keyFileContents = await secretManager.accessSecretVersion(secretName);
+            const keyFileContents = await this.secretManager.accessSecretVersion(secretName);
             const keyFileJson = JSON.parse(keyFileContents);
 
             // Initialize the Logging client with the parsed JSON credentials

@@ -6,14 +6,14 @@ This is a helper class for accessing secrets from Google Secret Manager.
 */
 export class SecretManager {
   private client: SecretManagerServiceClient;
-  private googleProjectId = 'for-fun-153903';
+  
 
   constructor() {
     this.client = new SecretManagerServiceClient();
   }
 
   async accessSecretVersion(secretName: string): Promise<string> {
-    const name = `projects/${this.googleProjectId}/secrets/${secretName}/versions/latest`;
+    const name = `projects/${config.googleProjectId}/secrets/${secretName}/versions/latest`;
     console.log("Getting secret " + name);
     const [version] = await this.client.accessSecretVersion({ name });
 

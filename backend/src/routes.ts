@@ -5,13 +5,14 @@ import { UserSettingsController } from "./controllers/UserSettingsController";
 import { UserChatSessionsController } from "./controllers/UserChatSessionsController";
 import { UserChatMessagesController } from "./controllers/UserChatMessagesController";
 import { CloudLogController } from "./controllers/CloudLogController";
+import { SecretManager } from "./auth/SecretManager";
 
 const router = express.Router();
 const authController = new AuthController();
 const userSettingsController = new UserSettingsController();
 const userChatSessionsController = new UserChatSessionsController();
 const userChatMessagesController = new UserChatMessagesController();
-const cloudLogController = new CloudLogController();
+const cloudLogController = new CloudLogController(new SecretManager());
 
 router.get(
   "/auth/google",

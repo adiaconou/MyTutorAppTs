@@ -9,6 +9,7 @@ dotenv.config({ path: envPath });
 // Define an interface for the configuration
 interface Config {
     port: number;
+    googleProjectId: string;
     frontendUrl: string;
     backendUrl: string;
     isProduction: boolean;
@@ -26,9 +27,11 @@ const getConfig = (): Config => {
     const googleClientId = process.env.GOOGLE_CLIENT_ID || '';
     const jwtSecret = process.env.JWT_SECRET || '';
     const expressUserSessionSecret = process.env.EXPRESS_USER_SESSION_SECRET || '';
+    const googleProjectId = 'for-fun-153903';
     
     return {
         port,
+        googleProjectId,
         frontendUrl,
         isProduction,
         googleClientId,
