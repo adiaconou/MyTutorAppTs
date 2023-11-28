@@ -18,11 +18,11 @@ export class SecretManager {
     const [version] = await this.client.accessSecretVersion({ name });
 
     if (!version.payload || !version.payload.data) {
-      throw new Error(`Unable to access secret: ${secretName}`);
+      throw new Error(`Unable to access secret ${secretName}`);
     }
 
     const secretValue = version.payload.data.toString();
-    console.log("Successfully retrieved secret ", secretName);
+    console.log(`Successfully retrieved secret ${secretName}`);
     return secretValue;
   }
 
@@ -34,7 +34,7 @@ export class SecretManager {
         return await this.accessSecretVersion("express_user_session_secret");
 
       } catch (error) {
-        console.error('Error fetching express_user_session_secret from Secret Manager: ', error);
+        console.error('Error fetching express_user_session_secret from Secret Manager', error);
         throw error;
       }
     } else {
@@ -51,7 +51,7 @@ export class SecretManager {
         return await this.accessSecretVersion("jwt_secret");
 
       } catch (error) {
-        console.error('Error fetching jwt_secret from Secret Manager: ', error);
+        console.error('Error fetching jwt_secret from Secret Manager', error);
         throw error;
       }
     } else {
