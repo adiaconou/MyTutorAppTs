@@ -2,8 +2,10 @@ import { Logging } from "@google-cloud/logging";
 import { Request, Response } from "express";
 import { SecretManager } from "../auth/SecretManager";
 
+/*
+    Handle HTTP requests for logging messages to google's Cloud Logger
+*/
 export class CloudLogController {
-
     private secretManager: SecretManager;
 
     constructor(secretManager: SecretManager) {
@@ -38,7 +40,6 @@ export class CloudLogController {
             );
             res.status(500).send({ message: "Error writing log entry", error: error });
         }
-
     }
 }
 

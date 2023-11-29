@@ -4,7 +4,6 @@ import { SecretManager } from "../auth/SecretManager";
 import config from '../config';
 
 export class AuthController {
-
     private secretManager: SecretManager;
 
     constructor(secretManager: SecretManager) {
@@ -15,8 +14,8 @@ export class AuthController {
         try {
             const user: GoogleUser = req.user as GoogleUser;
             const JWT_SECRET = await this.secretManager.getJwtSecret();
-
             const { id, displayName, emails } = user;
+
             const token = jwt.sign(
                 {
                     userID: id,
@@ -30,7 +29,7 @@ export class AuthController {
             res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'none' });
             res.redirect(config.frontendUrl);
         } catch (error) {
-            console.error("Error in googleAuthCallback: ", error);
+            console.error("Error in google auth callback", error);
             res.status(500).send("An error occurred");
         }
     }
@@ -44,15 +43,15 @@ export class AuthController {
                 try {
                     const decodedToken = jwt.verify(token, JWT_SECRET) as JwtPayload;
                     res.json({ authenticated: true, ...decodedToken });
-                } catch (err) {
-                    console.log("Token verification failed: ", err);
+                } catch (error) {
+                    console.log("Token verification failed", error);
                     res.json({ authenticated: false });
                 }
             } else {
                 res.json({ authenticated: false });
             }
         } catch (error) {
-            console.error("Error in checkAuthStatus: ", error);
+            console.error("Error checking authorization status", error);
             res.status(500).send("An error occurred");
         }
     }
@@ -63,8 +62,7 @@ export class AuthController {
     }
 }
 
-// Move to helper class
-
+// TODO: Move out of this class into models
 interface GoogleUser {
     id: string;
     displayName: string;

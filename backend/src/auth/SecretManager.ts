@@ -3,7 +3,7 @@ import config from '../config';
 import { secretManagerServiceClient } from "./SecretManagerServiceClientSingleton";
 
 /* 
-This is a helper class for accessing secrets from Google Secret Manager.
+This is a helper class for accessing secrets used for API access.
 */
 export class SecretManager {
   private client: SecretManagerServiceClient;
@@ -12,6 +12,9 @@ export class SecretManager {
     this.client = client;
   }
 
+  /*
+    This method retrieves the latest version of secretName from the Google Cloud Secret Manager
+  */
   async accessSecretVersion(secretName: string): Promise<string> {
     const name = `projects/${config.googleProjectId}/secrets/${secretName}/versions/latest`;
     console.log("Getting secret " + name);
@@ -26,6 +29,10 @@ export class SecretManager {
     return secretValue;
   }
 
+  /*
+    This method retrieves the express_user_session_secret secret from the cloud
+    if running in prod, otherwise from the environment if running locally.
+  */
   async getExpressUserSessionSecret(): Promise<string> {
     // Check if the application is running in a production environment.
     // Retrieve secret from cloud if yes.
@@ -43,6 +50,10 @@ export class SecretManager {
     }
   }
 
+  /*
+    This method retrieves the jwt_secret secret from the cloud
+    if running in prod, otherwise from the environment if running locally.
+  */
   async getJwtSecret(): Promise<string> {
     // Check if the application is running in a production environment.
     // Retrieve secret from cloud if yes.
