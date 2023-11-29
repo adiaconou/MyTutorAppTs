@@ -1,12 +1,14 @@
 # Architecture
-Language: Typescript
-Frontend: React + MUI (responsive - desktop & mobile)
-Backend: Node.js
+- Language: Typescript
+- Frontend: React + MUI (responsive - desktop & mobile)
+- Backend: Node.js
 
-Auth: Google + Auth0
-Deployment: Google App Engine
-Secret management: Google Cloud Secrets Manager
-Data storage: Google Cloud Datastore
+- Auth: Auth0
+- Deployment: Google App Engine
+- Secret management: Google Cloud Secret Manager
+- Data storage: Google Cloud Datastore
+- Logging: Google Cloud Logging
+- LLM API: OpenAI gpt-3.5
 
 # Setup
 These instructions will help set up the application from scratch.
@@ -26,10 +28,12 @@ These instructions will help set up the application from scratch.
 `git clone https://github.com/adiaconou/MyTutorAppTs`
 
 # Setting Up Environment Variables
+
 These instructions describe how to securely access sensitive environment variable values that are required to deploy and run the application. These environment variable values should not be stored in publicly accessible way (e.g. github). 
 - For local development, these must be set in a /backend/.env file.
 
 **GOOGLE_CLIENT_ID** 
+
 Purpose: Google Client ID is a critical component of the OAuth 2.0 authentication and authorization process when your application interacts with Google services, such as Google APIs or Google Sign-In. To find the application Google Client ID:
 1. Go to the Google Cloud Console.
 2. In the Cloud Console, select `for fun` from the project dropdown at the top of the page.
@@ -38,6 +42,7 @@ Purpose: Google Client ID is a critical component of the OAuth 2.0 authenticatio
 The Google Client ID is also stored as a secret in the Google Cloud Secret Manager: https://console.cloud.google.com/security/secret-manager?project=for-fun-153903. This is how the GOOGLE_CLIENT_ID is retrieved in prodution.
 
 **GOOGLE_APPLICATION_CREDENTIALS**
+
 Purpose: A google standard env variable used by the server (backend) for specifying the path to the JSON key file that contains service account credentials to authenticate your application when making API calls to Google Cloud services, such as Google Cloud Storage, Google Cloud Logging, etc. The JSON key file contains the necessary credentials and permissions for your application to access these resources.
 1. Go to the Google Cloud Console.
 2. Go to 'IAM & Admin' -> 'Service Accounts'.
@@ -48,12 +53,15 @@ Purpose: A google standard env variable used by the server (backend) for specify
 ''NOTE: This must be commented out in the .env file before deploying to google app engine, or GAE will attempt to read the credentials from the local directory and fail. Alternatively, this an be set as a windows environment variable.''
 
 **GOOGLE_SECRET_MANAGER_CREDENTIALS**
+
 Purpose: Application env variable by the server (backend) for specifying the path to the JSON key file that contains the Google Secret Manager credentials. The instructions for setting this up are the same as for GOOGLE_APPLICATION_CREDENTIALS.
 
 **EXPRESS_USER_SESSION_SECRET**
+
 Purpose: This is the secret used by the Express middleware for signing cookies. In production, this secret is retrieved from Google Secret Manager. For local development, the secret value must be retrieved from the Google Secret Manager via Google Console and added to the backend/.env file.
 
 **JWT_SECRET**
+
 Purpose: Java Web Token secret. In production, this secret is retrieved from Google Secret Manager. For local development, the secret value must be retrieved from the Google Secret Manager via Google Console and added to the backend/.env file.
 
 # Getting Started with Create React App
