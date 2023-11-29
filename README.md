@@ -1,3 +1,13 @@
+# Architecture
+Language: Typescript
+Frontend: React + MUI (responsive - desktop & mobile)
+Backend: Node.js
+
+Auth: Google + Auth0
+Deployment: Google App Engine
+Secret management: Google Cloud Secrets Manager
+Data storage: Google Cloud Datastore
+
 # Setup
 These instructions will help set up the application from scratch.
 
