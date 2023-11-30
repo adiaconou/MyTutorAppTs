@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { BackendService } from "../../services/BackendService";
 import { UserChatSessionsService } from "../../services/UserChatSessionsService";
 import promptGPT from "../../services/openaiService";
 import { UserChatMessage } from "../../models/UserChatMessage";
 import { useAuth0 } from "@auth0/auth0-react";
+import { UserChatMessagesService } from "../../services/UserChatMessagesService";
 
 interface Message {
   text: string;
@@ -18,7 +18,7 @@ export default function ChatFormViewModel() {
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(true);
   const [waitingForMessageFromAI, setWaitingForMessageFromAI] = useState(false);
-  const backend = new BackendService();
+  const userChatMessagesService = new UserChatMessagesService();
   const userChatSessionsService = new UserChatSessionsService();
 
   /***  Update window dimensions ***/
@@ -90,7 +90,7 @@ export default function ChatFormViewModel() {
   /*** Get message history for the chat session ***/
   const getMessages = async (chatSessionId: string, limit: number) => {
     const token = await getAccessTokenSilently();
-    const messageList: UserChatMessage[] = await backend.getMessages(
+    const messageList: UserChatMessage[] = await userChatMessagesService.getMessages(
       chatSessionId,
       limit,
       token
@@ -150,7 +150,7 @@ export default function ChatFormViewModel() {
   /*** Store the last message in the database ***/
   async function putNewMessage(text: string, sender: string) {
     const token = await getAccessTokenSilently();
-    backend.putNewMessage(text, sender, token);
+    userChatMessagesService.putNewMessage(text, sender, token);
   }
 
   return {

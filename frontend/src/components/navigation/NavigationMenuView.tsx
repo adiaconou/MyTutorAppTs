@@ -14,14 +14,14 @@ import HistoryIcon from "@mui/icons-material/History";
 import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import useViewModel from "./NavigationMenuViewModel";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth0 } from "@auth0/auth0-react";
 import { format } from "date-fns";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { BackendService } from "../../services/BackendService";
+import { CloudLoggingService } from "../../services/CloudLoggingService";
 import { Divider } from "@mui/material";
 import { UserChatSessionsService } from "../../services/UserChatSessionsService";
 
@@ -54,7 +54,7 @@ export default function NavigationMenuView({
     userName,
   } = useViewModel();
 
-  const backendService = new BackendService();
+  const backendService = new CloudLoggingService();
   const userChatSessionsService = new UserChatSessionsService();
 
   // Get access to the useHistory hook from react-router-dom

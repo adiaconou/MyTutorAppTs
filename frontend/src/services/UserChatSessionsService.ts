@@ -4,6 +4,9 @@ import { v4 as uuidv4 } from "uuid";
 
 const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
+/*
+    Class to allow the frontend to interact with UserChatSessions HTTP APIs
+*/
 export class UserChatSessionsService {
 
     // Create a new UserChatSession

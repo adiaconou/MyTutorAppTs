@@ -8,16 +8,16 @@ import { Route, Routes } from "react-router-dom";
 import SettingsView from "./components/settings/SettingsView";
 import Gpt4Prompt from "./prompt/Gpt4Prompt";
 import { UserSettings } from "./models/UserSettings";
-import { BackendService } from "./services/BackendService";
 import LoginPageView from "./auth/LoginPageView";
 import CallbackPageView from "./auth/CallbackPageView";
 import { useAuth0 } from "@auth0/auth0-react";
 import { AuthenticationGuard } from "./auth/authentication-guard";
+import { UserSettingsService } from "./services/UserSettingsService";
 
 const App: React.FC = () => {
   const {  user, getAccessTokenSilently } = useAuth0();
   const [systemPrompt, setSystemPrompt] = useState("");
-  const backend = new BackendService();
+  const userSettingsService = new UserSettingsService();
 
   useEffect(() => {
     const fetchUserSettings = async () => {
@@ -25,7 +25,7 @@ const App: React.FC = () => {
       const token = await getAccessTokenSilently();
       if (email) {
         // Get UserSettings object from the backend
-        const userSettings: UserSettings | null = await backend.getUserSettings(
+        const userSettings: UserSettings | null = await userSettingsService.getUserSettings(
           email, token
         );
 

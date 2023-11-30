@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { UserChatSession } from "../../models/UserChatSession";
-import { BackendService } from "../../services/BackendService";
 import { useAuth0 } from "@auth0/auth0-react";
 import { UserChatSessionsService } from "../../services/UserChatSessionsService";
 
@@ -10,7 +9,6 @@ export default function NavigationMenuViewModel() {
   const [historyItems, setHistoryItems] = useState<UserChatSession[]>([]);
   const [isLoading, setIsLoading] = useState(true); // New state variable to track loading status
 
-  const backend = new BackendService();
   const userChatSessionsService = new UserChatSessionsService();
 
   const userName = user?.name;

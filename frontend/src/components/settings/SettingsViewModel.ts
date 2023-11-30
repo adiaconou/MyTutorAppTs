@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { UserSettings } from "../../models/UserSettings";
-import { BackendService } from "../../services/BackendService";
 import { SelectChangeEvent } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
+import { UserSettingsService } from "../../services/UserSettingsService";
 
 export default function SettingsViewModel() {
-  const backend = new BackendService();
+  const userSettingsService = new UserSettingsService();
   const {  user, getAccessTokenSilently  } = useAuth0(); 
-
   const [languageProficiency, setLanguageProficiency] = useState<number>(5);
   const [languageChoice, setLanguageChoice] = useState<string>("Greek"); 
 
@@ -19,7 +18,7 @@ export default function SettingsViewModel() {
   /*** Retrieve the stored user settings when the SettingsView is first loaded ***/
   const getUserSettings = (userId: string, token: string): void => {
     console.log("Getting user settings for " + userId);
-    backend
+    userSettingsService
       .getUserSettings(userId, token)
       .then((userSettings) => {
         if (userSettings && userSettings.settings) {
@@ -83,7 +82,7 @@ export default function SettingsViewModel() {
   /*** Send the settings update request to the server ***/
   async function updateUserSettings(userSettings: UserSettings): Promise<void> {
     const token = await getAccessTokenSilently();
-    backend.updateUserSettings(userSettings, token);
+    userSettingsService.updateUserSettings(userSettings, token);
   }
 
   return {
