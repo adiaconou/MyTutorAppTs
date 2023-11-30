@@ -12,6 +12,7 @@ ReactDOM.render(
       clientId="dlijXHwUF79ccHBqB9cRv0nMZux9irbj"
       authorizationParams={{
         redirect_uri: window.location.origin + "/callback",
+        audience: "https://dev-qprsmox8bpmaln3b.us.auth0.com/api/v2/"
       }}
     >
       <App />

@@ -10,6 +10,7 @@ import config from "./config";
 import { UserChatMessagesRepository } from "./repository/UserChatMessagesRepository";
 import { UserChatSessionRepository } from "./repository/UserChatSessionRepository";
 import { UserSettingsRepository } from "./repository/UserSettingsRepository";
+import { checkJwt } from "./auth/JwtChecker";
 
 const router = express.Router();
 const authController = new AuthController(new SecretManager());
@@ -34,8 +35,7 @@ router.get('/auth/status', authController.checkAuthStatus);
 router.post('/auth/logout', authController.logout);
 
 // UserSettings routes
-router.get("/userSettings/:userId", userSettingsController.getUserSettings.bind(userSettingsController));
-router.put("/userSettings/:userId", userSettingsController.updateUserSettings.bind(userSettingsController));
+router.get("/userSettings/:userId", checkJwt, userSettingsController.getUserSettings.bind(userSettingsController));router.put("/userSettings/:userId", userSettingsController.updateUserSettings.bind(userSettingsController));
 
 // UserChatSessions routes
 router.put("/chatSessions/:id", userChatSessionsController.createChatSession.bind(userChatSessionsController));

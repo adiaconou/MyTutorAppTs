@@ -15,17 +15,18 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { AuthenticationGuard } from "./auth/authentication-guard";
 
 const App: React.FC = () => {
-  const {  user } = useAuth0();
+  const {  user, getAccessTokenSilently } = useAuth0();
   const [systemPrompt, setSystemPrompt] = useState("");
   const backend = new BackendService();
 
   useEffect(() => {
     const fetchUserSettings = async () => {
       const email = user?.email;
+      const token = await getAccessTokenSilently();
       if (email) {
         // Get UserSettings object from the backend
         const userSettings: UserSettings | null = await backend.getUserSettings(
-          email
+          email, token
         );
 
         // If userSettings is not null, get the system prompt using the Gpt4Prompt static method

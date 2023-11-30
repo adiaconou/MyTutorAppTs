@@ -96,10 +96,13 @@ export class BackendService {
   }
 
   // Get UserSettings
-  async getUserSettings(userId: string): Promise<UserSettings | null> {
+  async getUserSettings(userId: string, token: string): Promise<UserSettings | null> {
     console.log("URL: " + apiUrl + "/userSettings/" + userId);
     try {
-      const response = await fetch(`${apiUrl}/userSettings/${userId}`);
+      const headers = new Headers();
+      headers.append('Authorization', `Bearer ${token}`);
+
+      const response = await fetch(`${apiUrl}/userSettings/${userId}`, { headers: headers });
 
       // Check if the response status code indicates success
       if (!response.ok) {
@@ -107,10 +110,9 @@ export class BackendService {
       }
 
       const userSettings: UserSettings = await response.json();
-
       return userSettings;
     } catch (error) {
-      console.error("Error fetching user settings:", error);
+      console.error("Error fetching user settings", error);
       return null;
     }
   }

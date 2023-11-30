@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ESNext", // or keep it as "ES2022" if that works for you
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "commonjs",
+    "moduleResolution": "node",
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,

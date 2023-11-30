@@ -17,10 +17,10 @@ export default function SettingsViewModel() {
   const email = user?.email;
 
   /*** Retrieve the stored user settings when the SettingsView is first loaded ***/
-  const getUserSettings = (userId: string): void => {
+  const getUserSettings = (userId: string, token: string): void => {
     console.log("Getting user settings for " + userId);
     backend
-      .getUserSettings(userId)
+      .getUserSettings(userId, token)
       .then((userSettings) => {
         if (userSettings && userSettings.settings) {
           setLanguageChoice(userSettings.settings.languageChoice);

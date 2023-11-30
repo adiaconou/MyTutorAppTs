@@ -6,8 +6,8 @@ import useViewModel from "./SettingsViewModel";
 import { useAuth0 } from "@auth0/auth0-react";
 
 const SettingsView: React.FC = () => {
-  const { user, isAuthenticated } = useAuth0();
-  
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+
   const {
     languageProficiency,
     languageChoice,
@@ -17,15 +17,23 @@ const SettingsView: React.FC = () => {
     getUserSettings,
   } = useViewModel();
 
-  // Fetch user settings on component mount and update state values
   useEffect(() => {
-    if (user?.email) {
-      getUserSettings(user.email);
-    } else {
-      throw Error("User settings cannot be looked up because the user's email address is not available in the session data.");
-    }
-    
-  }, []); // Empty dependency array ensures this effect only runs on component mount
+    const fetchSettings = async () => {
+      if (user?.email && isAuthenticated) {
+        try {
+          const token = await getAccessTokenSilently();
+          console.log("Token: " + token);
+          getUserSettings(user.email, token);
+        } catch (error) {
+          console.error("Error fetching access token:", error);
+        }
+      } else {
+        console.error("User email is not available");
+      }
+    };
+
+    fetchSettings();
+  }, [getAccessTokenSilently]);
 
   if (isLoading) {
     return (
