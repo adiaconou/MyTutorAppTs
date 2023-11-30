@@ -8,45 +8,22 @@ const apiUrl = process.env.REACT_APP_BACKEND_URL;
 */
 export class UserChatMessagesService {
     // Function to get messages
-    async getMessages(
-        chatSessionId: string,
-        limit: number,
-        token: string
-    ): Promise<UserChatMessage[]> {
+    async getMessages(chatSessionId: string, limit: number, token: string): Promise<UserChatMessage[]> {
         try {
-            const headers = new Headers();
-            headers.append('Authorization', `Bearer ${token}`);
-
-            const response = await fetch(
-                `${apiUrl}/messages/?chatSessionId=${encodeURIComponent(
-                    chatSessionId
-                )}&limit=${limit}`, { headers: headers }
-            );
-
-            console.log("Getting messages: " + chatSessionId);
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch messages");
-            }
-            const messageList: UserChatMessage[] = await response.json();
-
-            return messageList;
+            const headers = this.createAuthHeaders(token);
+            const response = await this.sendRequest(`${apiUrl}/messages/?chatSessionId=${encodeURIComponent(chatSessionId)}&limit=${limit}`, { headers });
+            return await response.json();
         } catch (error) {
-            console.error(`Error fetching chat messages: ${error}`);
-            return [];
+            console.error("Error fetching UserChatMessages", error);
+            throw error;
         }
     }
 
-    // Store a UserChatMessage
+    // Write a chat message to the datastore
     async putNewMessage(text: string, sender: string, token: string): Promise<void> {
         try {
             const chatSessionId = sessionStorage.getItem("chatSessionId");
-
-            console.log("Chat Session ID: " + chatSessionId);
-
-            if (chatSessionId == null) {
-                return;
-            }
+            if (!chatSessionId) return;
 
             const initialMessage: UserChatMessage = {
                 id: uuidv4(),
@@ -56,20 +33,33 @@ export class UserChatMessagesService {
                 sender: sender,
             };
 
-            const response = await fetch(`${apiUrl}/messages/${initialMessage.id}`, {
+            const headers = this.createAuthHeaders(token);
+            headers.append("Content-Type", "application/json");
+
+            await this.sendRequest(`${apiUrl}/messages/${initialMessage.id}`, {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                },
+                headers,
                 body: JSON.stringify(initialMessage),
             });
-
-            if (!response.ok) {
-                throw new Error("Response not ok");
-            }
         } catch (error) {
-            console.error(`Error attempting to update user chat: ${error}`);
+            console.error("Error writing UserChatMessage", error);
+            throw error;
         }
+    }
+
+    // Send http request to server
+    private async sendRequest(url: string, options: RequestInit): Promise<Response> {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`HTTP error status: ${response.status}`);
+        }
+        return response;
+    }
+
+    // Create http headers with auth
+    private createAuthHeaders(token: string): Headers {
+        const headers = new Headers();
+        headers.append('Authorization', `Bearer ${token}`);
+        return headers;
     }
 }
