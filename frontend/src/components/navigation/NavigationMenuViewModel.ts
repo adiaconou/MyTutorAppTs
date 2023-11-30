@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { UserChatSession } from "../../models/UserChatSession";
 import { BackendService } from "../../services/BackendService";
 import { useAuth0 } from "@auth0/auth0-react";
+import { UserChatSessionsService } from "../../services/UserChatSessionsService";
 
 export default function NavigationMenuViewModel() {
   const { user } = useAuth0();
@@ -10,6 +11,7 @@ export default function NavigationMenuViewModel() {
   const [isLoading, setIsLoading] = useState(true); // New state variable to track loading status
 
   const backend = new BackendService();
+  const userChatSessionsService = new UserChatSessionsService();
 
   const userName = user?.name;
 
@@ -20,7 +22,7 @@ export default function NavigationMenuViewModel() {
   // Function to get chat sessions
   const getChatSessions = async (limit: number, userId: string | null, token: string) => {
     if (userId !== undefined && userId !== null) {
-      const sessions: UserChatSession[] = await backend.getChatSessions(userId, limit, token);
+      const sessions: UserChatSession[] = await userChatSessionsService.getChatSessions(userId, limit, token);
       setHistoryItems(sessions);
     } else {
       console.log("Cannot get chat sessions because email address (userId) is not set");

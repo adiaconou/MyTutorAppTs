@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { BackendService } from "../../services/BackendService";
+import { UserChatSessionsService } from "../../services/UserChatSessionsService";
 import promptGPT from "../../services/openaiService";
 import { UserChatMessage } from "../../models/UserChatMessage";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -18,6 +19,7 @@ export default function ChatFormViewModel() {
   const [isLoading, setIsLoading] = useState(true);
   const [waitingForMessageFromAI, setWaitingForMessageFromAI] = useState(false);
   const backend = new BackendService();
+  const userChatSessionsService = new UserChatSessionsService();
 
   /***  Update window dimensions ***/
   function useWindowDimensions() {
@@ -138,7 +140,7 @@ export default function ChatFormViewModel() {
   async function createChatSession(messageText: string) {
     if (user && user.email) {
       const token = await getAccessTokenSilently();
-      return backend.createChatSession(messageText, user.email, token);
+      return userChatSessionsService.createChatSession(messageText, user.email, token);
     }
 
     throw Error("Cannot create chat session because user email is not available.");

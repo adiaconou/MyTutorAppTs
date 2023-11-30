@@ -23,6 +23,7 @@ import { format } from "date-fns";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { BackendService } from "../../services/BackendService";
 import { Divider } from "@mui/material";
+import { UserChatSessionsService } from "../../services/UserChatSessionsService";
 
 interface MenuItem {
   label: string;
@@ -54,6 +55,7 @@ export default function NavigationMenuView({
   } = useViewModel();
 
   const backendService = new BackendService();
+  const userChatSessionsService = new UserChatSessionsService();
 
   // Get access to the useHistory hook from react-router-dom
   const navigate = useNavigate();
@@ -212,7 +214,7 @@ export default function NavigationMenuView({
                         setDeletingSessionId(session.id);
                         // Call deleteChatSession and then refresh chat history
                         const token = await getAccessTokenSilently();
-                        await backendService.deleteChatSession(session.id, token);
+                        await userChatSessionsService.deleteChatSession(session.id, token);
                         if (user?.email) {
                           getChatSessions(15, user.email, token);
                         }
