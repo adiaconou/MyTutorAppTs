@@ -35,19 +35,20 @@ router.get('/auth/status', authController.checkAuthStatus);
 router.post('/auth/logout', authController.logout);
 
 // UserSettings routes
-router.get("/userSettings/:userId", checkJwt, userSettingsController.getUserSettings.bind(userSettingsController));router.put("/userSettings/:userId", userSettingsController.updateUserSettings.bind(userSettingsController));
+router.get("/userSettings/:userId", checkJwt, userSettingsController.getUserSettings.bind(userSettingsController)); 
+router.put("/userSettings/:userId", checkJwt, userSettingsController.updateUserSettings.bind(userSettingsController));
 
 // UserChatSessions routes
-router.put("/chatSessions/:id", userChatSessionsController.createChatSession.bind(userChatSessionsController));
-router.get("/chatSessions/:id", userChatSessionsController.getChatSessionById.bind(userChatSessionsController));
-router.get("/chatSessions/", userChatSessionsController.getChatSessionsByUserId.bind(userChatSessionsController));
-router.delete("/chatSessions/:id", userChatSessionsController.deleteChatSession.bind(userChatSessionsController));
+router.put("/chatSessions/:id", checkJwt, userChatSessionsController.createChatSession.bind(userChatSessionsController));
+router.get("/chatSessions/:id", checkJwt, userChatSessionsController.getChatSessionById.bind(userChatSessionsController));
+router.get("/chatSessions/", checkJwt, userChatSessionsController.getChatSessionsByUserId.bind(userChatSessionsController));
+router.delete("/chatSessions/:id", checkJwt, userChatSessionsController.deleteChatSession.bind(userChatSessionsController));
 
 // UserChatMessages routes
-router.put("/messages/:id", userChatMessagesController.writeMessage.bind(userChatMessagesController));
-router.get("/messages/", userChatMessagesController.getMessagesByUserId.bind(userChatMessagesController));
+router.put("/messages/:id", checkJwt, userChatMessagesController.writeMessage.bind(userChatMessagesController));
+router.get("/messages/", checkJwt, userChatMessagesController.getMessagesByUserId.bind(userChatMessagesController));
 
 // Cloud logging routes
-router.put("/log", cloudLogController.writeLog.bind(cloudLogController));
+router.put("/log", checkJwt, cloudLogController.writeLog.bind(cloudLogController));
 
 export default router;

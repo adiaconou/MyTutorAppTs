@@ -11,7 +11,7 @@ interface Message {
 }
 
 export default function ChatFormViewModel() {
-  const { user } = useAuth0();
+  const { user, getAccessTokenSilently } = useAuth0();
   const [messages, setMessages] = useState<Message[]>([]);
   const { height: viewportHeight } = useWindowDimensions();
   const { id } = useParams<{ id: string }>();
@@ -87,9 +87,11 @@ export default function ChatFormViewModel() {
 
   /*** Get message history for the chat session ***/
   const getMessages = async (chatSessionId: string, limit: number) => {
+    const token = await getAccessTokenSilently();
     const messageList: UserChatMessage[] = await backend.getMessages(
       chatSessionId,
-      limit
+      limit,
+      token
     );
 
     // Convert UserChatMessage[] to Message[]
@@ -135,7 +137,8 @@ export default function ChatFormViewModel() {
   /*** Store the new chat session record in the database ***/
   async function createChatSession(messageText: string) {
     if (user && user.email) {
-      return backend.createChatSession(messageText, user.email);
+      const token = await getAccessTokenSilently();
+      return backend.createChatSession(messageText, user.email, token);
     }
 
     throw Error("Cannot create chat session because user email is not available.");
@@ -144,7 +147,8 @@ export default function ChatFormViewModel() {
 
   /*** Store the last message in the database ***/
   async function putNewMessage(text: string, sender: string) {
-    backend.putNewMessage(text, sender);
+    const token = await getAccessTokenSilently();
+    backend.putNewMessage(text, sender, token);
   }
 
   return {

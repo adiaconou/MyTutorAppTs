@@ -18,9 +18,9 @@ export default function NavigationMenuViewModel() {
   };
 
   // Function to get chat sessions
-  const getChatSessions = async (limit: number, userId: string | null) => {
+  const getChatSessions = async (limit: number, userId: string | null, token: string) => {
     if (userId !== undefined && userId !== null) {
-      const sessions: UserChatSession[] = await backend.getChatSessions(userId, limit);
+      const sessions: UserChatSession[] = await backend.getChatSessions(userId, limit, token);
       setHistoryItems(sessions);
     } else {
       console.log("Cannot get chat sessions because email address (userId) is not set");

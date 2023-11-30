@@ -6,7 +6,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 export default function SettingsViewModel() {
   const backend = new BackendService();
-  const {  user  } = useAuth0(); 
+  const {  user, getAccessTokenSilently  } = useAuth0(); 
 
   const [languageProficiency, setLanguageProficiency] = useState<number>(5);
   const [languageChoice, setLanguageChoice] = useState<string>("Greek"); 
@@ -82,7 +82,8 @@ export default function SettingsViewModel() {
 
   /*** Send the settings update request to the server ***/
   async function updateUserSettings(userSettings: UserSettings): Promise<void> {
-    backend.updateUserSettings(userSettings);
+    const token = await getAccessTokenSilently();
+    backend.updateUserSettings(userSettings, token);
   }
 
   return {

@@ -7,7 +7,7 @@ const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
 export class BackendService {
   // Create a new UserChatSession
-  async createChatSession(messageText: string, email: string): Promise<string> {
+  async createChatSession(messageText: string, email: string, token: string): Promise<string> {
     try {
       if (!email) {
         throw Error(
@@ -54,6 +54,7 @@ export class BackendService {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(requestBody),
       });
@@ -73,14 +74,18 @@ export class BackendService {
   // Function to get chat sessions
   async getChatSessions(
     userId: string,
-    limit: number
+    limit: number, 
+    token: string
   ): Promise<UserChatSession[]> {
     console.log(apiUrl);
     try {
+      const headers = new Headers();
+      headers.append('Authorization', `Bearer ${token}`);
+
       const response = await fetch(
         `${apiUrl}/chatSessions/?userId=${encodeURIComponent(
           userId
-        )}&limit=${limit}`
+        )}&limit=${limit}`, { headers: headers}
       );
 
       if (!response.ok) {
@@ -118,14 +123,16 @@ export class BackendService {
   }
 
   // Update UserSettings
-  async updateUserSettings(userSettings: UserSettings): Promise<void> {
+  async updateUserSettings(userSettings: UserSettings, token: string): Promise<void> {
     try {
+      
       const response = await fetch(
         `${apiUrl}/userSettings/${userSettings.userId}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
           },
           body: JSON.stringify(userSettings),
         }
@@ -142,13 +149,17 @@ export class BackendService {
   // Function to get messages
   async getMessages(
     chatSessionId: string,
-    limit: number
+    limit: number, 
+    token: string
   ): Promise<UserChatMessage[]> {
     try {
+      const headers = new Headers();
+      headers.append('Authorization', `Bearer ${token}`);
+
       const response = await fetch(
         `${apiUrl}/messages/?chatSessionId=${encodeURIComponent(
           chatSessionId
-        )}&limit=${limit}`
+        )}&limit=${limit}`, {headers: headers}
       );
 
       console.log("Getting messages: " + chatSessionId);
@@ -166,7 +177,7 @@ export class BackendService {
   }
 
   // Store a UserChatMessage
-  async putNewMessage(text: string, sender: string): Promise<void> {
+  async putNewMessage(text: string, sender: string, token: string): Promise<void> {
     try {
       const chatSessionId = sessionStorage.getItem("chatSessionId");
 
@@ -188,6 +199,7 @@ export class BackendService {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(initialMessage),
       });
@@ -201,22 +213,29 @@ export class BackendService {
   }
 
   // Create Google Cloud Log
-  async sendLogToBackend(logMessage: string): Promise<void> {
+  async sendLogToBackend(logMessage: string, token: string): Promise<void> {
     const response = await fetch(`${apiUrl}/log`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: logMessage }),
     });
 
+    const headers = new Headers();
+    headers.append('Authorization', `Bearer ${token}`);
     const result = await response.json();
+
     console.log("Result: " + result);
   }
 
   // Delete a UserChatSession
-  async deleteChatSession(chatSessionId: string): Promise<void> {
+  async deleteChatSession(chatSessionId: string, token: string): Promise<void> {
     try {
+      const headers = new Headers();
+      headers.append('Authorization', `Bearer ${token}`);
       const response = await fetch(`${apiUrl}/chatSessions/${chatSessionId}`, {
-        method: "DELETE",
+        method: "DELETE", headers: {
+          "Authorization": `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {

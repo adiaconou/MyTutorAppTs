@@ -39,7 +39,7 @@ export default function NavigationMenuView({
   drawerOpen,
   handleClose,
 }: NavigationMenuViewProps): JSX.Element {
-  const { logout, user, isAuthenticated, isLoading } = useAuth0();
+  const { logout, user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(
     null
   );
@@ -59,19 +59,23 @@ export default function NavigationMenuView({
   const navigate = useNavigate();
 
   useLayoutEffect(() => {
-    console.log("User object: " + user);
-    if (user?.email) {
-      getChatSessions(15, user.email);
-    }
-    console.log(
-      "Mounting nav menu: " +
+    const fetchSettings = async () => {
+      console.log("User object: " + user);
+      if (user?.email) {
+        const token = await getAccessTokenSilently();
+        getChatSessions(15, user.email, token);
+      }
+      console.log(
+        "Mounting nav menu: " +
         user?.email +
         " name: " +
         user?.name +
         " isAuthenticated: " +
         isAuthenticated
-    );
-  }, [user, isAuthenticated]);
+      );
+    };
+    fetchSettings();
+  }, [user, isAuthenticated, getAccessTokenSilently]);
 
   // Items for the navigation menu
   const menuItems: MenuItem[] = [
@@ -207,9 +211,10 @@ export default function NavigationMenuView({
                         // Set deletingSessionId
                         setDeletingSessionId(session.id);
                         // Call deleteChatSession and then refresh chat history
-                        await backendService.deleteChatSession(session.id);
+                        const token = await getAccessTokenSilently();
+                        await backendService.deleteChatSession(session.id, token);
                         if (user?.email) {
-                          getChatSessions(15, user.email);
+                          getChatSessions(15, user.email, token);
                         }
                         // Unset deletingSessionId
                         setDeletingSessionId(null);
