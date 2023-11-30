@@ -21,7 +21,6 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth0 } from "@auth0/auth0-react";
 import { format } from "date-fns";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { CloudLoggingService } from "../../services/CloudLoggingService";
 import { Divider } from "@mui/material";
 import { UserChatSessionsService } from "../../services/UserChatSessionsService";
 
@@ -54,7 +53,6 @@ export default function NavigationMenuView({
     userName,
   } = useViewModel();
 
-  const backendService = new CloudLoggingService();
   const userChatSessionsService = new UserChatSessionsService();
 
   // Get access to the useHistory hook from react-router-dom
@@ -62,19 +60,10 @@ export default function NavigationMenuView({
 
   useLayoutEffect(() => {
     const fetchSettings = async () => {
-      console.log("User object: " + user);
       if (user?.email) {
         const token = await getAccessTokenSilently();
         getChatSessions(15, user.email, token);
       }
-      console.log(
-        "Mounting nav menu: " +
-        user?.email +
-        " name: " +
-        user?.name +
-        " isAuthenticated: " +
-        isAuthenticated
-      );
     };
     fetchSettings();
   }, [user, isAuthenticated, getAccessTokenSilently]);

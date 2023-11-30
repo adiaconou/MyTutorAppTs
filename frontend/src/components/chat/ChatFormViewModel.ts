@@ -39,7 +39,6 @@ export default function ChatFormViewModel() {
       return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    console.log("Window dimensions: " + windowDimensions.height);
     return windowDimensions;
   }
 
@@ -110,7 +109,7 @@ export default function ChatFormViewModel() {
   /*** Handle new messages submitted by the user through chat ***/
   const handleTextSubmit = async (text: string) => {
 
-    if (messages.length == 0) {
+    if (messages.length === 0) {
       const newChatSessionId: string = await createChatSession(text);
       sessionStorage.setItem("chatSessionId", newChatSessionId);
     } else {
@@ -161,7 +160,7 @@ export default function ChatFormViewModel() {
     const token = await getAccessTokenSilently();
 
     // Send the request to the server
-    return userChatSessionsService.createChatSession(messageText, user.email, chatSessionId, userChatMessage, token);
+    return userChatSessionsService.createChatSession(user.email, chatSessionId, userChatMessage, token);
   }
 
   /*** Store the last message in the database ***/

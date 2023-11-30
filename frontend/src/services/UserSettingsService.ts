@@ -11,7 +11,7 @@ export class UserSettingsService {
     async getUserSettings(userId: string, token: string): Promise<UserSettings | null> {
         // Create HTTP headers
         const headers = this.createAuthHeaders(token);
-        const response = await this.sendRequest(`${apiUrl}/userSettings/${userId}`, { headers });
+        const response = await this.sendRequest(`${apiUrl}/userSettings/${userId}`, { method: "GET", headers });
         
         try {
             // Send HTTP request
@@ -43,7 +43,7 @@ export class UserSettingsService {
 
     // Send the http request to the server
     private async sendRequest(url: string, options: RequestInit): Promise<Response> {
-        console.log(`Request URL: ${url}`);
+        console.log(`[Request] ${options.method} ${url}`);
         const response = await fetch(url, options);
         if (!response.ok) {
             throw new Error(`HTTP error status ${response.status}`);

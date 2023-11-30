@@ -1,6 +1,5 @@
 import { UserChatMessage } from "../models/UserChatMessage";
 import { UserChatSession } from "../models/UserChatSession";
-import { v4 as uuidv4 } from "uuid";
 
 const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -10,7 +9,7 @@ const apiUrl = process.env.REACT_APP_BACKEND_URL;
 export class UserChatSessionsService {
 
     // Create a new UserChatSession
-    async createChatSession(messageText: string, email: string, chatSessionId: string, userChatMessage: UserChatMessage, token: string): Promise<string> {
+    async createChatSession(email: string, chatSessionId: string, userChatMessage: UserChatMessage, token: string): Promise<string> {
         // Create UserChatSession object
         const session: UserChatSession = {
             id: chatSessionId,
@@ -39,7 +38,7 @@ export class UserChatSessionsService {
 
         try {
             // Send HTTP request
-            const response = await this.sendRequest(`${apiUrl}/chatSessions/${session.id}`, {
+            await this.sendRequest(`${apiUrl}/chatSessions/${session.id}`, {
                 method: "PUT",
                 headers,
                 body: JSON.stringify(requestBody),
@@ -58,7 +57,7 @@ export class UserChatSessionsService {
 
         try {
             // Send HTTP request
-            const response = await this.sendRequest(`${apiUrl}/chatSessions/?userId=${encodeURIComponent(userId)}&limit=${limit}`, { headers });
+            const response = await this.sendRequest(`${apiUrl}/chatSessions/?userId=${encodeURIComponent(userId)}&limit=${limit}`, { method: "GET", headers });
             return await response.json();
         } catch (error) {
             console.error("Error fetching UserChatSessions", error);
@@ -83,7 +82,7 @@ export class UserChatSessionsService {
 
     // Send http request to server
     private async sendRequest(url: string, options: RequestInit): Promise<Response> {
-        console.log(`Request URL: ${url}`);
+        console.log(`[Request] ${options.method} ${url}`);
         const response = await fetch(url, options);
         if (!response.ok) {
             throw new Error(`HTTP error status ${response.status}`);

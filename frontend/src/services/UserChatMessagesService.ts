@@ -14,7 +14,7 @@ export class UserChatMessagesService {
 
         try {
             // Send HTTP request
-            const response = await this.sendRequest(`${apiUrl}/messages/?chatSessionId=${encodeURIComponent(chatSessionId)}&limit=${limit}`, { headers });
+            const response = await this.sendRequest(`${apiUrl}/messages/?chatSessionId=${encodeURIComponent(chatSessionId)}&limit=${limit}`, { method: "GET", headers });
             return await response.json();
         } catch (error) {
             console.error("Error fetching UserChatMessages", error);
@@ -50,7 +50,7 @@ export class UserChatMessagesService {
 
     // Send http request to server
     private async sendRequest(url: string, options: RequestInit): Promise<Response> {
-        console.log(`Request URL: ${url}`);
+        console.log(`[Request] ${options.method} ${url}`);
         const response = await fetch(url, options);
         if (!response.ok) {
             throw new Error(`HTTP error status ${response.status}`);

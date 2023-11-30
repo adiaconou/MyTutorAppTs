@@ -22,7 +22,6 @@ const SettingsView: React.FC = () => {
       if (user?.email && isAuthenticated) {
         try {
           const token = await getAccessTokenSilently();
-          console.log("Token: " + token);
           getUserSettings(user.email, token);
         } catch (error) {
           console.error("Error fetching access token:", error);

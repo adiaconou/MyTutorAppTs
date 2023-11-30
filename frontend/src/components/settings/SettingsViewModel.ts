@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { UserSettings } from "../../models/UserSettings";
 import { SelectChangeEvent } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -17,7 +17,6 @@ export default function SettingsViewModel() {
 
   /*** Retrieve the stored user settings when the SettingsView is first loaded ***/
   const getUserSettings = (userId: string, token: string): void => {
-    console.log("Getting user settings for " + userId);
     userSettingsService
       .getUserSettings(userId, token)
       .then((userSettings) => {
@@ -28,7 +27,7 @@ export default function SettingsViewModel() {
         setIsLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching user settings:", error);
+        console.error("Error fetching user settings", error);
         setIsLoading(false);
       });
   };
@@ -39,7 +38,6 @@ export default function SettingsViewModel() {
     newValue: number | number[],
     activeThumb: number
   ) => void = (event, newValue, activeThumb) => {
-
     if (!email) {
       throw Error("Email address is unavailable. User settings cannot be updated.");
     }
@@ -60,7 +58,6 @@ export default function SettingsViewModel() {
 
   /*** Store the language choice update when a new selection is made from the drop down ***/
   const handleLanguageChoiceChange = (event: SelectChangeEvent<string>) => {
-
     if (!email) {
       throw Error("Email address is unavailable. User settings cannot be updated.");
     }

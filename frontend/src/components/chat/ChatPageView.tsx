@@ -10,7 +10,7 @@ interface ChatFormViewProps {
 }
 
 const ChatPageView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
-  const { user, isLoading, getAccessTokenSilently } = useAuth0();
+  const { isLoading } = useAuth0();
 
   const {
     messages,
@@ -22,7 +22,6 @@ const ChatPageView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
   } = useViewModel();
 
   useEffect(() => {
-    console.log("ChatPageView mounting: " + user?.email);
     if (systemPrompt) {
       loadChatSession(systemPrompt);
     } else {
