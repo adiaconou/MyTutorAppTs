@@ -1,5 +1,4 @@
 import express from "express";
-import { AuthController } from "./controllers/AuthController";
 import passport from "passport";
 import { UserSettingsController } from "./controllers/UserSettingsController";
 import { UserChatSessionsController } from "./controllers/UserChatSessionsController";
@@ -13,7 +12,6 @@ import { UserSettingsRepository } from "./repository/UserSettingsRepository";
 import { checkJwt } from "./auth/JwtChecker";
 
 const router = express.Router();
-const authController = new AuthController(new SecretManager());
 const cloudLogController = new CloudLogController(new SecretManager());
 const userSettingsController = new UserSettingsController(new UserSettingsRepository(config.googleProjectId));
 const userChatSessionsController = new UserChatSessionsController(new UserChatSessionRepository(config.googleProjectId));
@@ -28,11 +26,6 @@ router.get(
     prompt: "consent"
   })
 );
-
-// Auth routes
-router.get("/auth/google/callback", passport.authenticate("google"), authController.googleAuthCallback);
-router.get('/auth/status', authController.checkAuthStatus);
-router.post('/auth/logout', authController.logout);
 
 // UserSettings routes
 router.get("/userSettings/:userId", checkJwt, userSettingsController.getUserSettings.bind(userSettingsController)); 
