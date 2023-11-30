@@ -5,6 +5,7 @@ import promptGPT from "../../services/openaiService";
 import { UserChatMessage } from "../../models/UserChatMessage";
 import { useAuth0 } from "@auth0/auth0-react";
 import { UserChatMessagesService } from "../../services/UserChatMessagesService";
+import { v4 as uuidv4 } from "uuid";
 
 interface Message {
   text: string;
@@ -120,7 +121,7 @@ export default function ChatFormViewModel() {
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     setWaitingForMessageFromAI(true);
-    
+
     const fetchResponse = async () => {
       const response = await promptGPT(text, "user");
       if (response !== null) {
@@ -138,19 +139,43 @@ export default function ChatFormViewModel() {
 
   /*** Store the new chat session record in the database ***/
   async function createChatSession(messageText: string) {
-    if (user && user.email) {
-      const token = await getAccessTokenSilently();
-      return userChatSessionsService.createChatSession(messageText, user.email, token);
+    // The user and user.email objects must exist to create a chat session (or really do anything)
+    if (!user || !user.email) {
+      throw Error("Cannot create chat session because user email is not available.");
     }
 
-    throw Error("Cannot create chat session because user email is not available.");
-    
+    // Create a unique chatSessionId
+    let chatSessionId = uuidv4();
+
+    // Create UserChatMessage object. A chat session is only
+    // created when a user sends the first message.
+    const userChatMessage: UserChatMessage = {
+      id: uuidv4(),
+      chatSessionId: chatSessionId,
+      text: messageText,
+      timestamp: new Date(),
+      sender: "user",
+    };
+
+    // Get the auth token to authorize the API call
+    const token = await getAccessTokenSilently();
+
+    // Send the request to the server
+    return userChatSessionsService.createChatSession(messageText, user.email, chatSessionId, userChatMessage, token);
   }
 
   /*** Store the last message in the database ***/
   async function putNewMessage(text: string, sender: string) {
+    // Get the chat session id from the browser session.
+    // If it doesn't exist, we can't write the message.
+    const chatSessionId = sessionStorage.getItem("chatSessionId");
+    if (!chatSessionId) return;
+
+    // Get auth access token so the request can be authorized
     const token = await getAccessTokenSilently();
-    userChatMessagesService.putNewMessage(text, sender, token);
+
+    // Send the message
+    userChatMessagesService.putNewMessage(text, sender, chatSessionId, token);
   }
 
   return {

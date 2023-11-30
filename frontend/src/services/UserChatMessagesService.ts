@@ -9,8 +9,11 @@ const apiUrl = process.env.REACT_APP_BACKEND_URL;
 export class UserChatMessagesService {
     // Function to get messages
     async getMessages(chatSessionId: string, limit: number, token: string): Promise<UserChatMessage[]> {
+        // Create HTTP headers
+        const headers = this.createAuthHeaders(token);
+
         try {
-            const headers = this.createAuthHeaders(token);
+            // Send HTTP request
             const response = await this.sendRequest(`${apiUrl}/messages/?chatSessionId=${encodeURIComponent(chatSessionId)}&limit=${limit}`, { headers });
             return await response.json();
         } catch (error) {
@@ -20,22 +23,20 @@ export class UserChatMessagesService {
     }
 
     // Write a chat message to the datastore
-    async putNewMessage(text: string, sender: string, token: string): Promise<void> {
+    async putNewMessage(text: string, sender: string, chatSessionId: string, token: string): Promise<void> {
+        const initialMessage: UserChatMessage = {
+            id: uuidv4(),
+            chatSessionId: chatSessionId,
+            text: text,
+            timestamp: new Date(),
+            sender: sender,
+        };
+        // Create HTTP headers
+        const headers = this.createAuthHeaders(token);
+        headers.append("Content-Type", "application/json");
+        
         try {
-            const chatSessionId = sessionStorage.getItem("chatSessionId");
-            if (!chatSessionId) return;
-
-            const initialMessage: UserChatMessage = {
-                id: uuidv4(),
-                chatSessionId: chatSessionId,
-                text: text,
-                timestamp: new Date(),
-                sender: sender,
-            };
-
-            const headers = this.createAuthHeaders(token);
-            headers.append("Content-Type", "application/json");
-
+            // Send HTTP request
             await this.sendRequest(`${apiUrl}/messages/${initialMessage.id}`, {
                 method: "PUT",
                 headers,
@@ -49,9 +50,10 @@ export class UserChatMessagesService {
 
     // Send http request to server
     private async sendRequest(url: string, options: RequestInit): Promise<Response> {
+        console.log(`Request URL: ${url}`);
         const response = await fetch(url, options);
         if (!response.ok) {
-            throw new Error(`HTTP error status: ${response.status}`);
+            throw new Error(`HTTP error status ${response.status}`);
         }
         return response;
     }
