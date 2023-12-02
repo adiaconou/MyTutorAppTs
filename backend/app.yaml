@@ -1,5 +1,5 @@
 service: backend
-runtime: nodejs16
+runtime: nodejs20
 entrypoint: node dist/index.js
 
 handlers:
