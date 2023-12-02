@@ -15,7 +15,7 @@ This is a fully responsive web application that is a simple chat interface built
 - Frontend: React + MUI (responsive - desktop & mobile)
 - Backend: Node.js
 
-- Auth management: Auth0
+- Auth management: Auth0 (Google IDP supported for login/authenticating)
 - Deployment: Google App Engine
 - Secret management: Google Cloud Secret Manager
 - Data storage: Google Cloud Datastore
