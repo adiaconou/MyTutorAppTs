@@ -1,9 +1,19 @@
+# Summary
+This is a fully responsive web application that is a simple chat interface built on top of openai's GPT API. The goal of this project is largely for me to explore LLMs and various other technologies. The goal of the application itself is to implement an AI language tutor that can do various "tutor" tasks like quizzing and conversation in natural language, the latter of which is lacking in current language-learning applictiosn (e.g. Duolingo). There's nothing special about this, other than creating a tailored prompt for the LLM.
+
+# TODO
+- Error handling is incomplete
+- Need to implement proper dependency injection
+- No unit tests
+- Doesn't actually do language translation yet since gpt3.5 can't return json formatted responses (gpt4 can, however I haven't been given API access to that model)
+- Frontend .env files need to be removed from repo
+
 # Architecture
 - Language: Typescript
 - Frontend: React + MUI (responsive - desktop & mobile)
 - Backend: Node.js
 
-- Auth: Auth0
+- Auth management: Auth0
 - Deployment: Google App Engine
 - Secret management: Google Cloud Secret Manager
 - Data storage: Google Cloud Datastore
