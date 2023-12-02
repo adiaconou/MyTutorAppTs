@@ -1,5 +1,5 @@
 # Summary
-This is a fully responsive web application that is a simple chat interface built on top of openai's GPT API. The goal of this project is largely for me to explore LLMs and various other technologies (which explains why it's probably overengineered). The goal of the application itself is to implement an AI language tutor that can do various "tutor" tasks like quizzing and conversation in natural language, the latter of which is lacking in current language-learning applictiosn (e.g. Duolingo). There's nothing special about this, other than creating a tailored prompt for the LLM.
+This is a fully responsive web application that is a simple chat interface built on top of openai's GPT API. The goal of this project is largely for me to explore LLMs and various other technologies (which explains why it's probably overengineered). The goal of the application itself is to implement an AI language tutor that can do various "tutor" tasks like quizzing and conversation in natural language, the latter of which is lacking in current language-learning applications (e.g. Duolingo). There's nothing special about this, other than creating a tailored prompt for the LLM.
 
 # TODO
 - Error handling is incomplete
