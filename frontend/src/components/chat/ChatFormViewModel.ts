@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { UserChatSessionsService } from "../../services/UserChatSessionsService";
-import promptGPT from "../../services/openaiService";
+import { OpenAIService } from "../../services/OpenAIService";
 import { UserChatMessage } from "../../models/UserChatMessage";
 import { useAuth0 } from "@auth0/auth0-react";
 import { UserChatMessagesService } from "../../services/UserChatMessagesService";
@@ -21,6 +21,7 @@ export default function ChatFormViewModel() {
   const [waitingForMessageFromAI, setWaitingForMessageFromAI] = useState(false);
   const userChatMessagesService = new UserChatMessagesService();
   const userChatSessionsService = new UserChatSessionsService();
+  const openAiService = new OpenAIService();
 
   /***  Update window dimensions ***/
   function useWindowDimensions() {
@@ -70,7 +71,8 @@ export default function ChatFormViewModel() {
         // session.
         if (systemPrompt) {
           const fetchResponse = async () => {
-            const response = await promptGPT(systemPrompt, "system");
+            const token = await getAccessTokenSilently();
+            const response = await openAiService.prompt(systemPrompt, "system", token);
             if (response !== null) {
               const aiMessage: Message = { text: response, isUser: false };
               setMessages((prevMessages) => [...prevMessages, aiMessage]);
@@ -122,7 +124,8 @@ export default function ChatFormViewModel() {
     setWaitingForMessageFromAI(true);
 
     const fetchResponse = async () => {
-      const response = await promptGPT(text, "user");
+      const token = await getAccessTokenSilently();
+      const response = await openAiService.prompt(text, "user", token);
       if (response !== null) {
         const aiMessage: Message = { text: response, isUser: false };
         setMessages((prevMessages) => [...prevMessages, aiMessage]);

@@ -1,5 +1,4 @@
 import express from "express";
-import passport from "passport";
 import { UserSettingsController } from "./controllers/UserSettingsController";
 import { UserChatSessionsController } from "./controllers/UserChatSessionsController";
 import { UserChatMessagesController } from "./controllers/UserChatMessagesController";
@@ -10,22 +9,14 @@ import { UserChatMessagesRepository } from "./repository/UserChatMessagesReposit
 import { UserChatSessionRepository } from "./repository/UserChatSessionRepository";
 import { UserSettingsRepository } from "./repository/UserSettingsRepository";
 import { checkJwt } from "./auth/JwtChecker";
+import { OpenAIController } from "./controllers/OpenAIController";
 
 const router = express.Router();
 const cloudLogController = new CloudLogController(new SecretManager());
 const userSettingsController = new UserSettingsController(new UserSettingsRepository(config.googleProjectId));
 const userChatSessionsController = new UserChatSessionsController(new UserChatSessionRepository(config.googleProjectId));
 const userChatMessagesController = new UserChatMessagesController(new UserChatMessagesRepository(config.googleProjectId));
-
-router.get(
-  "/auth/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    successRedirect: "/auth/google/callback",
-    failureRedirect: "http://localhost:3000/login", // Update this with your failure URL
-    prompt: "consent"
-  })
-);
+const openaiController = new OpenAIController(new SecretManager());
 
 // UserSettings routes
 router.get("/userSettings/:userId", checkJwt, userSettingsController.getUserSettings.bind(userSettingsController)); 
@@ -43,5 +34,8 @@ router.get("/messages/", checkJwt, userChatMessagesController.getMessagesByUserI
 
 // Cloud logging routes
 router.put("/log", checkJwt, cloudLogController.writeLog.bind(cloudLogController));
+
+// OpenAI routes
+router.post("/prompt", checkJwt, openaiController.chatgptPrompt.bind(openaiController));
 
 export default router;

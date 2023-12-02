@@ -1,34 +1,25 @@
-const apiKey = "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";
 
-const headers = {
-  Authorization: `Bearer ${apiKey}`,
-  "Content-Type": "application/json",
-};
+const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
-interface Message {
-  role: string;
-  content: string;
-}
-
-interface CompletionResponse {
-  choices?: {
-    message: {
-      content: string;
+export class OpenAIService {
+  async prompt(context: string, role: string, jwtToken: string, maxTokens: number = 50): Promise<string | null> {
+    // Create http request body
+    const requestBody = {
+      context: context,
+      role: role,
+      maxTokens: maxTokens,
     };
-  }[];
-}
 
-const promptGPT = async (prompt: string, role: string, maxTokens: number = 50): Promise<string | null> => {
-  const data = {
-    model: "gpt-3.5-turbo",
-    messages: [{ role: role, content: JSON.stringify(prompt) }] as Message[],
-  };
+    const headers = {
+      Authorization: `Bearer ${jwtToken}`,
+      "Content-Type": "application/json",
+    };
 
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(data),
+    try {
+      const response = await this.sendRequest(`${apiUrl}/prompt`, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(requestBody),
     });
 
     const json = (await response.json()) as CompletionResponse;
@@ -38,10 +29,26 @@ const promptGPT = async (prompt: string, role: string, maxTokens: number = 50): 
     }
 
     return json.choices[0].message.content;
-  } catch (error) {
-    console.error("Error: ", error);
-    return null;
-  }
-};
+    } catch (error) {
+      console.log("Error request chatgpt prompt", error);
+      throw error;
+    }
+  };
 
-export default promptGPT;
+  private async sendRequest(url: string, options: RequestInit): Promise<Response> {
+    console.log(`[Request] ${options.method} ${url}`);
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new Error(`HTTP error status ${response.status}`);
+    }
+    return response;
+  }
+}
+
+interface CompletionResponse {
+  choices?: {
+      message: {
+          content: string;
+      };
+  }[];
+}

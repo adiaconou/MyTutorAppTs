@@ -16,6 +16,7 @@ interface Config {
     googleClientId: string;
     jwtSecret: string;
     expressUserSessionSecret: string;
+    openaiApiKey: string;
 }
 
 // Validate and load environment variables
@@ -28,6 +29,7 @@ const getConfig = (): Config => {
     const jwtSecret = process.env.JWT_SECRET || '';
     const expressUserSessionSecret = process.env.EXPRESS_USER_SESSION_SECRET || '';
     const googleProjectId = 'for-fun-153903';
+    const openaiApiKey = process.env.OPENAI_API_KEY || '';
     
     return {
         port,
@@ -38,6 +40,7 @@ const getConfig = (): Config => {
         backendUrl,
         jwtSecret,
         expressUserSessionSecret,
+        openaiApiKey,
     };
 };
 

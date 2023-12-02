@@ -11,4 +11,4 @@ export const checkJwt = expressjwt({
   audience: 'https://dev-qprsmox8bpmaln3b.us.auth0.com/api/v2/',
   issuer: `https://dev-qprsmox8bpmaln3b.us.auth0.com/`,
   algorithms: ['RS256']
-});
+}); 

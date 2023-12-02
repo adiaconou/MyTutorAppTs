@@ -70,4 +70,22 @@ export class SecretManager {
       return config.jwtSecret;
     }
   }
+
+  // Get OpenAI API key
+  async getOpenaiApiKey(): Promise<string> {
+    // Check if the application is running in a production environment.
+    // Retrieve secret from cloud if yes.
+    if (config.isProduction) {
+      try {
+        return await this.accessSecretVersion("openai_api_key");
+
+      } catch (error) {
+        console.error('Error fetching openai_api_key from Secret Manager', error);
+        throw error;
+      }
+    } else {
+      // Fetch the Google Client ID from the local .env file during local development
+      return config.openaiApiKey;
+    }
+  }
 }

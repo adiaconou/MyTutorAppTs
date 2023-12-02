@@ -117,7 +117,6 @@ export class UserChatSessionsController {
         return res.status(400).json({ message: "Invalid limit" });
       }
 
-      console.log("LIMIT**: " + limit);
       const session = await this.userChatSessionRepo.getByUserId(userId, limit, 1);
 
       res.json(session);
