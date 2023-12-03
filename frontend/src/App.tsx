@@ -9,10 +9,11 @@ import SettingsView from "./components/settings/SettingsView";
 import Gpt4Prompt from "./prompt/Gpt4Prompt";
 import { UserSettings } from "./models/UserSettings";
 import LoginPageView from "./auth/LoginPageView";
+import CallbackPageView from "./auth/CallbackPageView";
 import { useAuth0 } from "@auth0/auth0-react";
 import { AuthenticationGuard } from "./auth/authentication-guard";
 import { UserSettingsService } from "./services/UserSettingsService";
-import { CallbackPage } from "./auth/CallbackPageView";
+import { CallbackPage } from "./auth/CallbackPageView2";
 import { PageLoader } from "./auth/page-loader";
 
 const App: React.FC = () => {

@@ -13,10 +13,16 @@ export const Auth0ProviderWithNavigate = ({ children }) => {
     navigate(appState?.returnTo || window.location.pathname);
   };
 
+  if (error) {
+    console.log("ERROR ", error);
+    return error;
+  }
+  
   if (!(domain && clientId && redirectUri)) {
     console.log(`Something is fishy: ${domain} ${clientId} ${redirectUri}`);
     return null;
   }
+
 
   console.log("Returning auth provider");
   return (
