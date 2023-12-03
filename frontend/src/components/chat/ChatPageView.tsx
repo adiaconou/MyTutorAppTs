@@ -10,7 +10,7 @@ interface ChatFormViewProps {
 }
 
 const ChatPageView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
-  const { isLoading } = useAuth0();
+  const { isLoading, isAuthenticated } = useAuth0();
 
   const {
     messages,
@@ -22,12 +22,15 @@ const ChatPageView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
   } = useViewModel();
 
   useEffect(() => {
-    if (systemPrompt) {
-      loadChatSession(systemPrompt);
-    } else {
-      loadChatSession();
+    if (isAuthenticated) {
+      if (systemPrompt) {
+        loadChatSession(systemPrompt);
+      } else {
+        loadChatSession();
+      }
     }
-  }, [id]);
+
+  }, [id, isAuthenticated]);
 
   if (isLoading) {
     return <div>Loading...</div>;
