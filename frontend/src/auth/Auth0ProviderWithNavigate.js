@@ -1,0 +1,41 @@
+import { Auth0Provider } from "@auth0/auth0-react";
+import { useNavigate } from "react-router-dom";
+
+export const Auth0ProviderWithNavigate = ({ children }) => {
+  const navigate = useNavigate();
+
+  const domain="dev-qprsmox8bpmaln3b.us.auth0.com"
+  const clientId="dlijXHwUF79ccHBqB9cRv0nMZux9irbj"
+  const redirectUri = window.location.origin + "/callback";
+
+  const onRedirectCallback = (appState) => {
+    console.log("Navigating home");
+    navigate(appState?.returnTo || window.location.pathname);
+  };
+
+  if (error) {
+    console.log("ERROR ", error);
+    return error;
+  }
+  
+  if (!(domain && clientId && redirectUri)) {
+    console.log(`Something is fishy: ${domain} ${clientId} ${redirectUri}`);
+    return null;
+  }
+
+
+  console.log("Returning auth provider");
+  return (
+    <Auth0Provider
+      domain={domain}
+      clientId={clientId}
+      authorizationParams={{
+        redirect_uri: redirectUri,
+        audience: "https://dev-qprsmox8bpmaln3b.us.auth0.com/api/v2/",
+      }}
+      onRedirectCallback={onRedirectCallback}
+    >
+      {children}
+    </Auth0Provider>
+  );
+};
