@@ -1,4 +1,4 @@
-runtime: nodejs16
+runtime: nodejs20
 
 env_variables:
   APP_BACKEND_URL: "https://backend-dot-for-fun-153903.uc.r.appspot.com"
