@@ -13,11 +13,9 @@ import CallbackPageView from "./auth/CallbackPageView";
 import { useAuth0 } from "@auth0/auth0-react";
 import { AuthenticationGuard } from "./auth/authentication-guard";
 import { UserSettingsService } from "./services/UserSettingsService";
-import { CallbackPage } from "./auth/CallbackPageView2";
-import { PageLoader } from "./auth/page-loader";
 
 const App: React.FC = () => {
-  const {  isLoading, user, getAccessTokenSilently } = useAuth0();
+  const {  user, getAccessTokenSilently } = useAuth0();
   const [systemPrompt, setSystemPrompt] = useState("");
   const userSettingsService = new UserSettingsService();
 
@@ -45,14 +43,6 @@ const App: React.FC = () => {
     fetchUserSettings();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="page-layout">
-        <PageLoader />
-      </div>
-    );
-  }
-  
   return (
       <Box
         sx={{
@@ -83,7 +73,7 @@ const App: React.FC = () => {
               <Route path="/settings" element={<AuthenticationGuard component={SettingsView} />} />
               <Route path="/c/:id" element={<AuthenticationGuard component={ChatPageView} />} />
               <Route path="/login" element={<LoginPageView />} />
-              <Route path="/callback" element={<CallbackPage />} />
+              <Route path="/callback" element={<CallbackPageView />} />
             </Routes>
           </Container>
         </Box>

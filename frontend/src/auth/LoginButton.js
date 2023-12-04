@@ -8,10 +8,9 @@ const LoginButton = () => {
     await loginWithRedirect({
       appState: {
         returnTo: "/",
-      }, 
-      scope: 'openid profile email',
+      }, scope: 'openid profile email',
     });
-  }
+  };
 
   return (
     <Box>
