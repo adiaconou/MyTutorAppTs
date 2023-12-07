@@ -13,6 +13,7 @@ import CallbackPageView from "./auth/CallbackPageView";
 import { useAuth0 } from "@auth0/auth0-react";
 import { AuthenticationGuard } from "./auth/authentication-guard";
 import { UserSettingsService } from "./services/UserSettingsService";
+import BeginChatView from "./components/chat/BeginChatView";
 
 const App: React.FC = () => {
   const {  user, getAccessTokenSilently } = useAuth0();
@@ -69,7 +70,8 @@ const App: React.FC = () => {
             sx={{ flexGrow: 1, paddingLeft: "0px", paddingRight: "0px" }}
           >
             <Routes>
-              <Route path="/" element={<AuthenticationGuard component={ChatPageView} />} />
+              <Route path="/" element={<AuthenticationGuard component={BeginChatView} />} />
+              <Route path="/chat" element={<AuthenticationGuard component={ChatPageView} />} />
               <Route path="/settings" element={<AuthenticationGuard component={SettingsView} />} />
               <Route path="/c/:id" element={<AuthenticationGuard component={ChatPageView} />} />
               <Route path="/login" element={<LoginPageView />} />

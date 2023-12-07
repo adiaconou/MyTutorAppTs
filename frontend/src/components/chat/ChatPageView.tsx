@@ -4,6 +4,8 @@ import ChatMessageListView from "./ChatMessageListView";
 import { Box } from "@mui/material";
 import useViewModel from "./ChatFormViewModel";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useLocation } from "react-router-dom"; // Import useLocation from react-router-dom
+
 
 interface ChatFormViewProps {
   systemPrompt?: string;
@@ -11,6 +13,7 @@ interface ChatFormViewProps {
 
 const ChatPageView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
   const { isLoading, isAuthenticated } = useAuth0();
+  const location = useLocation(); // Get the current location
 
   const {
     messages,
@@ -22,6 +25,9 @@ const ChatPageView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
   } = useViewModel();
 
   useEffect(() => {
+    // Access the state passed from the previous page
+    const stateValue = location.state?.value;
+    console.log("State value: " + stateValue);
     if (isAuthenticated) {
       if (systemPrompt) {
         loadChatSession(systemPrompt);
