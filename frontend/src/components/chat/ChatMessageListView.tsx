@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import ChatBubbleView from './ChatBubbleView';
 
 interface ChatMessageListViewProps {
-  messages: { text: string; isUser: boolean; }[];
+  messages: { text: string; isUser: boolean; isVisibleToUser?: boolean }[];
   waitingForMessageFromAI: boolean;
 }
 
@@ -15,6 +15,9 @@ const ChatMessageListView: React.FC<ChatMessageListViewProps> = ({ messages, wai
       bottomRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
+
+  // Filter out messages with isVisibleToUser set to false
+  const visibleMessages = messages.filter((message) => message.isVisibleToUser !== false);
 
   return (
     <Box
@@ -28,7 +31,7 @@ const ChatMessageListView: React.FC<ChatMessageListViewProps> = ({ messages, wai
         width: "100%",
       }}
     >
-      {messages.map((message, index) => (
+      {visibleMessages.map((message, index) => (
         <ChatBubbleView key={index} message={message} sx={{ marginBottom: "8px" }} waitingForMessageFromAI={false} />
       ))}
       {waitingForMessageFromAI && (

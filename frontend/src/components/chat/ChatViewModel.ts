@@ -84,7 +84,7 @@ export default function ChatViewModel() {
 
         setMessages((prevMessages) => [
           ...prevMessages,
-          { text: systemPrompt, isUser: true },
+          { text: systemPrompt, isUser: true, isVisibleToUser: false },
         ]);
 
         // Creating local array to store messages since setMessages
