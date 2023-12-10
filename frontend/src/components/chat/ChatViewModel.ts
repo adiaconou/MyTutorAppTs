@@ -93,6 +93,8 @@ export default function ChatViewModel() {
         currentMessages = [];
         currentMessages.push({text: systemPrompt, isUser: true});
 
+        setWaitingForMessageFromAI(true);
+
         // Send the prompt to the AI
         const response = await openAiService.prompt(currentMessages, token);
         if (response !== null) {
@@ -110,7 +112,7 @@ export default function ChatViewModel() {
           
           await putNewMessage(parsedMessage, "bot");
         }
-
+        setWaitingForMessageFromAI(false);
       }
     } catch (error) {
       console.error(`Error fetching data: ${error}`);
