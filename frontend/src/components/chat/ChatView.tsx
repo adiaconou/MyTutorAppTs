@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import TextFieldView from "./TextFieldView";
 import ChatMessageListView from "./ChatMessageListView";
 import { Box } from "@mui/material";
-import useViewModel from "./ChatFormViewModel";
+import useViewModel from "./ChatViewModel";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useLocation } from "react-router-dom"; // Import useLocation from react-router-dom
 
@@ -45,7 +45,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
     };
 
     fetchToken();
-    
+
   }, [id, isAuthenticated]);
 
   if (isLoading) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import ChatView from "./components/chat/ChatPageView";
+import ChatView from "./components/chat/ChatView";
 import AppBarView from "./components/navigation/AppBarView";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
