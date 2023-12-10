@@ -6,13 +6,12 @@ import useViewModel from "./ChatFormViewModel";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useLocation } from "react-router-dom"; // Import useLocation from react-router-dom
 
-
-interface ChatFormViewProps {
+interface ChatViewProps {
   systemPrompt?: string;
 }
 
-const ChatPageView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
-  const { isLoading, isAuthenticated } = useAuth0();
+const ChatView: React.FC<ChatViewProps> = () => {
+  const { user, isLoading, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const location = useLocation(); // Get the current location
 
   const {
@@ -24,18 +23,29 @@ const ChatPageView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
     handleTextSubmit,
   } = useViewModel();
 
+  // Check auth and load chat session on component mount
   useEffect(() => {
-    // Access the state passed from the previous page
-    const stateValue = location.state?.value;
-    console.log("State value: " + stateValue);
-    if (isAuthenticated) {
-      if (systemPrompt) {
-        loadChatSession(systemPrompt);
-      } else {
-        loadChatSession();
+    const fetchToken = async () => {
+      const token = await getAccessTokenSilently();
+      if (!isAuthenticated || !user?.email) {
+        //TODO: redirect user to login
+        return;
       }
-    }
 
+      // StateValue is provided from the BeginChat flow to select
+      // the practice topic.
+      // TODO: This should only be required for new chat sessions
+      const stateValue = location.state?.value;
+      if (!stateValue) {
+        //TODO: redirect user to BeginChatView to select a practice topic
+        return;
+      }
+
+      loadChatSession(user?.email, token);
+    };
+
+    fetchToken();
+    
   }, [id, isAuthenticated]);
 
   if (isLoading) {
@@ -100,4 +110,4 @@ const ChatPageView: React.FC<ChatFormViewProps> = ({ systemPrompt }) => {
   );
 };
 
-export default ChatPageView;
+export default ChatView;

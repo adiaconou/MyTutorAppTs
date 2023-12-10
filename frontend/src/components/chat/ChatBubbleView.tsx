@@ -61,6 +61,7 @@ const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingFor
               fontFamily: "Noto Sans, monospace",
               fontSize: "13px",
               color: textColor,
+              whiteSpace: 'pre-line' // This will make CSS handle newlines as they are
             }}
           >
             {message.text}

@@ -6,13 +6,13 @@ import { UserChatMessage } from "../../models/UserChatMessage";
 import { useAuth0 } from "@auth0/auth0-react";
 import { UserChatMessagesService } from "../../services/UserChatMessagesService";
 import { v4 as uuidv4 } from "uuid";
+import { BotConversationMessage } from "../../models/BotConversationMessage";
+import { JsonBotMessageParser } from "../../parser/JsonBotMessageParser";
+import Gpt4Prompt from "../../prompt/Gpt4Prompt";
+import { UserSettingsService } from "../../services/UserSettingsService";
+import { Message } from "../../models/Message";
 
-interface Message {
-  text: string;
-  isUser: boolean;
-}
-
-export default function ChatFormViewModel() {
+export default function ChatViewModel() {
   const { user, getAccessTokenSilently } = useAuth0();
   const [messages, setMessages] = useState<Message[]>([]);
   const { height: viewportHeight } = useWindowDimensions();
@@ -22,6 +22,7 @@ export default function ChatFormViewModel() {
   const userChatMessagesService = new UserChatMessagesService();
   const userChatSessionsService = new UserChatSessionsService();
   const openAiService = new OpenAIService();
+  const userSettings = new UserSettingsService();
 
   /***  Update window dimensions ***/
   function useWindowDimensions() {
@@ -54,34 +55,63 @@ export default function ChatFormViewModel() {
    * for that chat session. If it doesn't exist, we will clear the messages
    * from the chat form because it should be a fresh chat session.
    ***/
-  const loadChatSession = async (systemPrompt?: string) => {
+  const loadChatSession = async (userEmail: string, token: string) => {
     try {
-      if (id) {
+      if (id) { // If id exists, it is not a new chat session so retrieve messages from the server
+        console.log("Loading chat session " + id);
         sessionStorage.setItem("chatSessionId", id);
         getMessages(id, 500);
         setIsLoading(false);
-      } else {
+      } else { // Start a new chat session
+        console.log("Starting a new chat session.");
         sessionStorage.setItem("chatSessionId", "");
         clearMessages();
         setIsLoading(false);
 
-        // systemPrompt is an optional prop for the component which
-        // is only passed in if this is a new chat session. This will
-        // trigger the initial gpt system prompt to kick off the chat
-        // session.
-        if (systemPrompt) {
-          const fetchResponse = async () => {
-            const token = await getAccessTokenSilently();
-            const response = await openAiService.prompt(systemPrompt, "system", token);
-            if (response !== null) {
-              const aiMessage: Message = { text: response, isUser: false };
-              setMessages((prevMessages) => [...prevMessages, aiMessage]);
-              await putNewMessage(response, "bot");
-            }
-          };
-
-          fetchResponse();
+        // The user's settings are required to generate the initial AI prompt
+        const settings = await userSettings.getUserSettings(userEmail, token);
+        if (!settings) {
+          //TODO: Handle this properly
+          return;
         }
+
+        // Get the initial user prompt to start the AI chat
+        // TODO: The retrieved prompt should be conditional on stateValue
+        const systemPrompt = Gpt4Prompt.getConversationPrompt(settings);
+        const newChatSessionId: string = await createChatSession(systemPrompt);
+
+        // Store the message in the session and the server
+        sessionStorage.setItem("chatSessionId", newChatSessionId);
+
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: systemPrompt, isUser: true },
+        ]);
+
+        // Creating local array to store messages since setMessages
+        // updates async and the new state won't be available here
+        let currentMessages: Message[];
+        currentMessages = [];
+        currentMessages.push({text: systemPrompt, isUser: true});
+
+        // Send the prompt to the AI
+        const response = await openAiService.prompt(currentMessages, token);
+        if (response !== null) {
+          const parsedJson = JSON.parse(response);
+          const parsedMessage = new BotConversationMessage(
+            parsedJson.botResponse,
+            parsedJson.translatedBotResponse,
+            parsedJson.options
+          ).toChatString();
+
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { text: parsedMessage, isUser: false },
+          ]); 
+          
+          await putNewMessage(parsedMessage, "bot");
+        }
+
       }
     } catch (error) {
       console.error(`Error fetching data: ${error}`);
@@ -110,7 +140,6 @@ export default function ChatFormViewModel() {
 
   /*** Handle new messages submitted by the user through chat ***/
   const handleTextSubmit = async (text: string) => {
-
     if (messages.length === 0) {
       const newChatSessionId: string = await createChatSession(text);
       sessionStorage.setItem("chatSessionId", newChatSessionId);
@@ -121,15 +150,18 @@ export default function ChatFormViewModel() {
     const userMessage: Message = { text, isUser: true };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
+    const currentMessages = messages;
+    currentMessages.push(userMessage);
+
     setWaitingForMessageFromAI(true);
 
     const fetchResponse = async () => {
       const token = await getAccessTokenSilently();
-      const response = await openAiService.prompt(text, "user", token);
+      const response = await openAiService.prompt(currentMessages, token);
+
       if (response !== null) {
         const aiMessage: Message = { text: response, isUser: false };
         setMessages((prevMessages) => [...prevMessages, aiMessage]);
-
         await putNewMessage(response, "bot");
       }
 

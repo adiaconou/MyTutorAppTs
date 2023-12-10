@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import ChatPageView from "./components/chat/ChatPageView";
+import ChatView from "./components/chat/ChatPageView";
 import AppBarView from "./components/navigation/AppBarView";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
@@ -71,9 +71,9 @@ const App: React.FC = () => {
           >
             <Routes>
               <Route path="/" element={<AuthenticationGuard component={BeginChatView} />} />
-              <Route path="/chat" element={<AuthenticationGuard component={ChatPageView} />} />
+              <Route path="/chat" element={<AuthenticationGuard component={ChatView} />} />
               <Route path="/settings" element={<AuthenticationGuard component={SettingsView} />} />
-              <Route path="/c/:id" element={<AuthenticationGuard component={ChatPageView} />} />
+              <Route path="/c/:id" element={<AuthenticationGuard component={ChatView} />} />
               <Route path="/login" element={<LoginPageView />} />
               <Route path="/callback" element={<CallbackPageView />} />
             </Routes>

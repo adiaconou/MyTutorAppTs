@@ -1,13 +1,19 @@
+import { Message } from "../models/Message";
 
 const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
 export class OpenAIService {
-  async prompt(context: string, role: string, jwtToken: string, maxTokens: number = 50): Promise<string | null> {
-    // Create http request body
+  async prompt(context: Message[], jwtToken: string, maxTokens: number = 50): Promise<string | null> {
+    // Create a conversation array by mapping the messages to the required format
+    const conversation = context.map((message) => ({
+      role: message.isUser ? 'user' : 'system',
+      content: message.text,
+    }));
+
+    // Create the request body
     const requestBody = {
-      context: context,
-      role: role,
-      maxTokens: maxTokens,
+      messages: conversation,
+      max_tokens: maxTokens,
     };
 
     const headers = {
@@ -20,15 +26,15 @@ export class OpenAIService {
         method: "POST",
         headers: headers,
         body: JSON.stringify(requestBody),
-    });
+      });
 
-    const json = (await response.json()) as CompletionResponse;
+      const json = (await response.json()) as CompletionResponse;
 
-    if (!json.choices) {
-      return "Undefined";
-    }
+      if (!json.choices) {
+        return "Undefined";
+      }
 
-    return json.choices[0].message.content;
+      return json.choices[0].message.content;
     } catch (error) {
       console.log("Error request chatgpt prompt", error);
       throw error;
@@ -36,7 +42,6 @@ export class OpenAIService {
   };
 
   private async sendRequest(url: string, options: RequestInit): Promise<Response> {
-    console.log(`[Request] ${options.method} ${url}`);
     const response = await fetch(url, options);
     if (!response.ok) {
       throw new Error(`HTTP error status ${response.status}`);
@@ -47,8 +52,8 @@ export class OpenAIService {
 
 interface CompletionResponse {
   choices?: {
-      message: {
-          content: string;
-      };
+    message: {
+      content: string;
+    };
   }[];
 }

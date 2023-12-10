@@ -11,12 +11,12 @@ export class OpenAIController {
     }
 
     async chatgptPrompt(req: Request, res: Response) {
-        const prompt = req.body.context;
-        const role = req.body.role;
+        const messages = req.body.messages;
 
         const data = {
             model: "gpt-3.5-turbo",
-            messages: [{ role: role, content: JSON.stringify(prompt) }] as Message[],
+            // model: "gpt-4",
+            messages: messages,
         };
 
         const apiKey = await this.secretManager.getOpenaiApiKey();
@@ -34,7 +34,7 @@ export class OpenAIController {
             const json = response.data as CompletionResponse;
             res.json(json);
         } catch (error) {
-            console.error("Error: ", error);
+            console.error(`Error Response`, error);
             return null;
         }
     }
