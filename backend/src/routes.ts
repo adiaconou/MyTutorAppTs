@@ -10,6 +10,7 @@ import { UserChatSessionRepository } from "./repository/UserChatSessionRepositor
 import { UserSettingsRepository } from "./repository/UserSettingsRepository";
 import { checkJwt } from "./auth/JwtChecker";
 import { OpenAIController } from "./controllers/OpenAIController";
+import { LanguageTranslationController } from "./controllers/LanguageTranslationController";
 
 const router = express.Router();
 const cloudLogController = new CloudLogController(new SecretManager());
@@ -17,6 +18,7 @@ const userSettingsController = new UserSettingsController(new UserSettingsReposi
 const userChatSessionsController = new UserChatSessionsController(new UserChatSessionRepository(config.googleProjectId));
 const userChatMessagesController = new UserChatMessagesController(new UserChatMessagesRepository(config.googleProjectId));
 const openaiController = new OpenAIController(new SecretManager());
+const languageTranslationController = new LanguageTranslationController();
 
 // UserSettings routes
 router.get("/userSettings/:userId", checkJwt, userSettingsController.getUserSettings.bind(userSettingsController)); 
@@ -34,6 +36,9 @@ router.get("/messages/", checkJwt, userChatMessagesController.getMessagesByUserI
 
 // Cloud logging routes
 router.put("/log", checkJwt, cloudLogController.writeLog.bind(cloudLogController));
+
+// Text Translation routes
+router.post("/translate", checkJwt, languageTranslationController.translateText.bind(languageTranslationController));
 
 // OpenAI routes
 router.post("/prompt", checkJwt, openaiController.chatgptPrompt.bind(openaiController));

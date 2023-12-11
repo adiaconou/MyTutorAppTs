@@ -7,6 +7,10 @@ import SmartToy from "@mui/icons-material/SmartToy";
 import TypingIndicator from "./TypingIndicatorView";
 import TranslateIcon from "@mui/icons-material/Translate";
 import { keyframes } from '@emotion/react';
+import { LanguageTranslationService } from "../../services/LanguageTranslationService";
+import { useAuth0 } from "@auth0/auth0-react";
+
+
 
 
 interface ChatBubbleViewProps {
@@ -17,7 +21,8 @@ interface ChatBubbleViewProps {
 
 const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingForMessageFromAI }) => {
   const textColor = "#ffffff";
-
+  const translationService = new LanguageTranslationService(); // Initialize the translation service
+  const { getAccessTokenSilently } = useAuth0();
   const pulse = keyframes`
   0% {
     transform: scale(1);
@@ -31,10 +36,26 @@ const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingFor
 `;
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [translation, setTranslation] = useState<string | null>(null);
 
-  const handleTranslateClick = (event: React.MouseEvent<SVGSVGElement>) => {
-    //TODO: Implement call to openai to translate the text in quesiton and display in the popover
-    setAnchorEl(event.currentTarget as unknown as HTMLElement);
+  // TODO: Move this into view model. Got it working for now though.
+  const handleTranslateClick = async (event: React.MouseEvent<SVGSVGElement>) => {
+    let currentTarget = event.currentTarget;
+
+    try {
+      const token = await getAccessTokenSilently();
+      const translatedText = await translationService.translate(
+        message.text,
+        "en", //TODO: pass in the language from user settings
+        token
+      );
+      setTranslation(translatedText);
+      setAnchorEl(currentTarget as unknown as HTMLElement);
+
+    } catch (error) {
+      setTranslation("Translation error");
+    } finally {
+    }
   };
 
   const handlePopoverClose = () => {
@@ -120,7 +141,11 @@ const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingFor
                   horizontal: 'left',
                 }}
               >
-                <Typography sx={{ p: 2 }}>Translated!</Typography>
+                {translation ? (
+                  <Typography sx={{ p: 2 }}>{translation}</Typography>
+                ) : (
+                  <Typography sx={{ p: 2 }}>Translation loading...</Typography>
+                )}
               </Popover>
             </>
           )}

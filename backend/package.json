@@ -16,6 +16,7 @@
     "@google-cloud/datastore": "^7.5.1",
     "@google-cloud/logging": "^10.4.0",
     "@google-cloud/secret-manager": "^4.2.2",
+    "@google-cloud/translate": "^8.0.2",
     "@types/cookie-parser": "^1.4.3",
     "@types/dotenv": "^8.2.0",
     "@types/jsonwebtoken": "^9.0.2",
