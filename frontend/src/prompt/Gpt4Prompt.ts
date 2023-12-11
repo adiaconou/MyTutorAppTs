@@ -10,7 +10,8 @@ class Gpt4Prompt {
         Have a conversation with me as if I am your friend. 
         I am a beginner. 
         Your sentences and grammar will reflect my skill level. 
-        Give me three options to choose from included in the json object as a list called "options"
+        Give me three options to choose from included in the json object as a list called "options".
+        You will only include options in the first prompt.
 
         botResponse: Your response to my prompt in ${settings.settings.languageChoice}.
         options: A list of each of the options you've given in ${settings.settings.sourceLanguage}.
@@ -30,7 +31,6 @@ class Gpt4Prompt {
 
         {
           "botResponse": "Ποιο είναι το αγαπημένο σου φαγητό;"
-          "translatedBotResponse": "What is your favorite food?"
         }
 
         You will continue to ask me questions after each response. 

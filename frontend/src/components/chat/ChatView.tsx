@@ -36,10 +36,6 @@ const ChatView: React.FC<ChatViewProps> = () => {
       // the practice topic.
       // TODO: This should only be required for new chat sessions
       const stateValue = location.state?.value;
-      if (!stateValue) {
-        //TODO: redirect user to BeginChatView to select a practice topic
-        return;
-      }
 
       loadChatSession(user?.email, token);
     };

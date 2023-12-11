@@ -62,6 +62,8 @@ export default function ChatViewModel() {
         getMessages(id, 500);
         setIsLoading(false);
       } else { // Start a new chat session
+        setWaitingForMessageFromAI(true);
+
         console.log("Starting a new chat session.");
         sessionStorage.setItem("chatSessionId", "");
         clearMessages();
@@ -91,9 +93,7 @@ export default function ChatViewModel() {
         // updates async and the new state won't be available here
         let currentMessages: Message[];
         currentMessages = [];
-        currentMessages.push({text: systemPrompt, isUser: true});
-
-        setWaitingForMessageFromAI(true);
+        currentMessages.push({ text: systemPrompt, isUser: true });
 
         // Send the prompt to the AI
         const response = await openAiService.prompt(currentMessages, token);
@@ -108,8 +108,8 @@ export default function ChatViewModel() {
           setMessages((prevMessages) => [
             ...prevMessages,
             { text: parsedMessage, isUser: false },
-          ]); 
-          
+          ]);
+
           await putNewMessage(parsedMessage, "bot");
         }
         setWaitingForMessageFromAI(false);
@@ -161,9 +161,15 @@ export default function ChatViewModel() {
       const response = await openAiService.prompt(currentMessages, token);
 
       if (response !== null) {
-        const aiMessage: Message = { text: response, isUser: false };
+        const parsedJson = JSON.parse(response);
+        const parsedMessage = new BotConversationMessage(
+          parsedJson.botResponse,
+          parsedJson.translatedBotResponse,
+          parsedJson.options
+        ).toChatString();
+        const aiMessage: Message = { text: parsedMessage, isUser: false };
         setMessages((prevMessages) => [...prevMessages, aiMessage]);
-        await putNewMessage(response, "bot");
+        await putNewMessage(parsedMessage, "bot");
       }
 
       setWaitingForMessageFromAI(false);
