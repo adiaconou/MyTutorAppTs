@@ -27,7 +27,7 @@ class Gpt4Prompt {
 
         botResponse should be in English for this initial response.
         After I choose an option, you will begin a conversation in the chosen subject. 
-        For example, if I choose "Food" as an option, you will provide JSON formatted responses like this:
+        For example, if I choose "Food" as an option, you will respond in JSON format my chosen language like this:
 
         {
           "botResponse": "Ποιο είναι το αγαπημένο σου φαγητό;"

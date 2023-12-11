@@ -11,7 +11,7 @@ export class BotConversationMessage {
 
     public toChatString(): string {
         // The bot will not always respond with a set of options.
-        if (this.options.length === 0) {
+        if (!this.options || this.options.length === 0) {
             return `${this.botResponse}`;
         }
         return `${this.botResponse}\n\n${this.options.join("\n")}`;
