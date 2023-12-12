@@ -5,4 +5,5 @@ export interface UserChatMessage {
     rawText: string;
     timestamp: Date;
     sender: string;
+    isVisibleToUser?: boolean;
 }

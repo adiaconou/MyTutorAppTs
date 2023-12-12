@@ -17,6 +17,7 @@ export class UserChatMessagesController {
             const rawText = req.body.rawText;
             const timestamp = req.body.timestamp;
             const sender = req.body.sender;
+            const isVisibleToUser = req.body.isVisibleToUser;
 
             const newMessage: UserChatMessage = {
                 id,
@@ -25,6 +26,7 @@ export class UserChatMessagesController {
                 rawText,
                 timestamp,
                 sender,
+                isVisibleToUser,
             };
 
             const updatedUserSettings = await this.userChatMessagesRepo.add(id, newMessage);

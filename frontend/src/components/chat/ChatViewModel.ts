@@ -134,6 +134,7 @@ export default function ChatViewModel() {
       displayableText: message.displayableText,
       rawText: message.rawText,
       isUser: message.sender === "user",
+      isVisibleToUser: message.isVisibleToUser,
     }));
 
     setMessages(mappedMessages);
@@ -198,6 +199,7 @@ export default function ChatViewModel() {
       rawText: messageText,
       timestamp: new Date(),
       sender: "user",
+      isVisibleToUser: false, // Initial prompt should not be visible to user in chat view
     };
 
     // Get the auth token to authorize the API call
@@ -208,7 +210,7 @@ export default function ChatViewModel() {
   }
 
   /*** Store the last message in the database ***/
-  async function putNewMessage(displayableText: string, rawText: string, sender: string) {
+  async function putNewMessage(displayableText: string, rawText: string, sender: string, isVisibleToUser?: boolean) {
     // Get the chat session id from the browser session.
     // If it doesn't exist, we can't write the message.
     const chatSessionId = sessionStorage.getItem("chatSessionId");
@@ -218,7 +220,7 @@ export default function ChatViewModel() {
     const token = await getAccessTokenSilently();
 
     // Send the message
-    userChatMessagesService.putNewMessage(displayableText, rawText, sender, chatSessionId, token);
+    userChatMessagesService.putNewMessage(displayableText, rawText, sender, chatSessionId, token, isVisibleToUser);
   }
 
   return {

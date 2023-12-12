@@ -23,7 +23,7 @@ export class UserChatMessagesService {
     }
 
     // Write a chat message to the datastore
-    async putNewMessage(displayableText: string, rawText: string, sender: string, chatSessionId: string, token: string): Promise<void> {
+    async putNewMessage(displayableText: string, rawText: string, sender: string, chatSessionId: string, token: string, isVisibleToUser?: boolean): Promise<void> {
         const initialMessage: UserChatMessage = {
             id: uuidv4(),
             chatSessionId: chatSessionId,
@@ -31,6 +31,7 @@ export class UserChatMessagesService {
             rawText: rawText,
             timestamp: new Date(),
             sender: sender,
+            isVisibleToUser: isVisibleToUser,
         };
         // Create HTTP headers
         const headers = this.createAuthHeaders(token);

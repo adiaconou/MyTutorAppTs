@@ -10,4 +10,5 @@ export interface UserChatMessage {
     rawText: string;
     timestamp: Date;
     sender: 'user' | 'bot';
+    isVisibleToUser?: boolean; // default: true. If false, message will not be displayed to user.
 }
