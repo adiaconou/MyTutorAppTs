@@ -7,7 +7,7 @@ export class OpenAIService {
     // Create a conversation array by mapping the messages to the required format
     const conversation = context.map((message) => ({
       role: message.isUser ? 'user' : 'system',
-      content: message.text,
+      content: message.rawText,
     }));
 
     // Create the request body

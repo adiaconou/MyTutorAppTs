@@ -13,14 +13,16 @@ export class UserChatMessagesController {
         try {
             const id = req.body.id;
             const chatSessionId = req.body.chatSessionId;
-            const text = req.body.text;
+            const displayableText = req.body.displayableText;
+            const rawText = req.body.rawText;
             const timestamp = req.body.timestamp;
             const sender = req.body.sender;
 
             const newMessage: UserChatMessage = {
                 id,
                 chatSessionId,
-                text,
+                displayableText,
+                rawText,
                 timestamp,
                 sender,
             };

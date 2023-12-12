@@ -12,6 +12,7 @@ class Gpt4Prompt {
         Your sentences and grammar will reflect my skill level. 
         Give me three options to choose from included in the json object as a list called "options".
         You will only include options in the first prompt.
+        ALL responses MUST be in JSON.
 
         botResponse: Your response to my prompt in ${settings.settings.languageChoice}.
         options: A list of each of the options you've given in ${settings.settings.sourceLanguage}.
@@ -27,15 +28,14 @@ class Gpt4Prompt {
 
         botResponse should be in English for this initial response.
         After I choose an option, you will begin a conversation in the chosen subject. 
-        For example, if I choose "Food" as an option, you will respond in JSON format my chosen language like this:
+        For example, if I choose "Food" as an option, you will provide JSON formatted responses like this:
 
         {
           "botResponse": "Ποιο είναι το αγαπημένο σου φαγητό;"
         }
 
-        You will continue to ask me questions after each response. 
-        Respond in the same JSON format as above. 
-        You can ask me any questions about the chosen subject.`
+        You will continue to ask me questions about the chosen subject after each response. 
+        Respond in the same JSON format as above.`
 
         return prompt;
   }

@@ -86,14 +86,14 @@ export default function ChatViewModel() {
 
         setMessages((prevMessages) => [
           ...prevMessages,
-          { text: systemPrompt, isUser: true, isVisibleToUser: false },
+          { displayableText: systemPrompt, rawText: systemPrompt, isUser: true, isVisibleToUser: false },
         ]);
 
         // Creating local array to store messages since setMessages
         // updates async and the new state won't be available here
         let currentMessages: Message[];
         currentMessages = [];
-        currentMessages.push({ text: systemPrompt, isUser: true });
+        currentMessages.push({ displayableText: systemPrompt, rawText: systemPrompt, isUser: true });
 
         // Send the prompt to the AI
         const response = await openAiService.prompt(currentMessages, token);
@@ -107,10 +107,10 @@ export default function ChatViewModel() {
 
           setMessages((prevMessages) => [
             ...prevMessages,
-            { text: parsedMessage, isUser: false },
+            { displayableText: parsedMessage, rawText: response, isUser: false },
           ]);
 
-          await putNewMessage(parsedMessage, "bot");
+          await putNewMessage(parsedMessage, response, "bot");
         }
         setWaitingForMessageFromAI(false);
       }
@@ -131,7 +131,8 @@ export default function ChatViewModel() {
 
     // Convert UserChatMessage[] to Message[]
     const mappedMessages: Message[] = messageList.map((message) => ({
-      text: message.text,
+      displayableText: message.displayableText,
+      rawText: message.rawText,
       isUser: message.sender === "user",
     }));
 
@@ -145,10 +146,10 @@ export default function ChatViewModel() {
       const newChatSessionId: string = await createChatSession(text);
       sessionStorage.setItem("chatSessionId", newChatSessionId);
     } else {
-      await putNewMessage(text, "user");
+      await putNewMessage(text, text, "user");
     }
 
-    const userMessage: Message = { text, isUser: true };
+    const userMessage: Message = { displayableText: text, rawText: text, isUser: true };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     const currentMessages = messages;
@@ -167,9 +168,9 @@ export default function ChatViewModel() {
           parsedJson.translatedBotResponse,
           parsedJson.options
         ).toChatString();
-        const aiMessage: Message = { text: parsedMessage, isUser: false };
+        const aiMessage: Message = { displayableText: parsedMessage, rawText: response, isUser: false };
         setMessages((prevMessages) => [...prevMessages, aiMessage]);
-        await putNewMessage(parsedMessage, "bot");
+        await putNewMessage(parsedMessage, response, "bot");
       }
 
       setWaitingForMessageFromAI(false);
@@ -193,7 +194,8 @@ export default function ChatViewModel() {
     const userChatMessage: UserChatMessage = {
       id: uuidv4(),
       chatSessionId: chatSessionId,
-      text: messageText,
+      displayableText: messageText,
+      rawText: messageText,
       timestamp: new Date(),
       sender: "user",
     };
@@ -206,7 +208,7 @@ export default function ChatViewModel() {
   }
 
   /*** Store the last message in the database ***/
-  async function putNewMessage(text: string, sender: string) {
+  async function putNewMessage(displayableText: string, rawText: string, sender: string) {
     // Get the chat session id from the browser session.
     // If it doesn't exist, we can't write the message.
     const chatSessionId = sessionStorage.getItem("chatSessionId");
@@ -216,7 +218,7 @@ export default function ChatViewModel() {
     const token = await getAccessTokenSilently();
 
     // Send the message
-    userChatMessagesService.putNewMessage(text, sender, chatSessionId, token);
+    userChatMessagesService.putNewMessage(displayableText, rawText, sender, chatSessionId, token);
   }
 
   return {

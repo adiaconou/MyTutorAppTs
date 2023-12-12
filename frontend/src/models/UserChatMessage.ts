@@ -1,7 +1,8 @@
 export interface UserChatMessage {
     id: string;
     chatSessionId: string;
-    text: string;
+    displayableText: string;
+    rawText: string;
     timestamp: Date;
     sender: string;
 }

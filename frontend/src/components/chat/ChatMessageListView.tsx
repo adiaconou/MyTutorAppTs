@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import ChatBubbleView from './ChatBubbleView';
 
 interface ChatMessageListViewProps {
-  messages: { text: string; isUser: boolean; isVisibleToUser?: boolean }[];
+  messages: { displayableText: string; rawText: string; isUser: boolean; isVisibleToUser?: boolean }[];
   waitingForMessageFromAI: boolean;
 }
 
@@ -37,7 +37,7 @@ const ChatMessageListView: React.FC<ChatMessageListViewProps> = ({ messages, wai
       {waitingForMessageFromAI && (
         <ChatBubbleView
           key={messages.length}
-          message={{ text: '...', isUser: false }}
+          message={{ displayableText: '...', rawText: '', isUser: false }}
           sx={{ marginBottom: "8px" }}
           waitingForMessageFromAI={true}
         />

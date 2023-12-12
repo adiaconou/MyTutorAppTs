@@ -39,7 +39,8 @@ export class UserChatSessionsController {
         const {
           id: messageId,
           chatSessionId,
-          text,
+          displayableText,
+          rawText,
           timestamp,
           sender,
         } = initialMessage as UserChatMessage;
@@ -48,7 +49,8 @@ export class UserChatSessionsController {
         const messageToCreate: UserChatMessage = {
           id: messageId,
           chatSessionId,
-          text,
+          displayableText,
+          rawText,
           timestamp: new Date(timestamp),
           sender,
         };

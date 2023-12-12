@@ -14,7 +14,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 
 interface ChatBubbleViewProps {
-  message: { text: string; isUser: boolean; };
+  message: { displayableText: string; rawText: string; isUser: boolean; };
   sx?: SxProps<Theme>;
   waitingForMessageFromAI: boolean;
 }
@@ -44,8 +44,10 @@ const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingFor
 
     try {
       const token = await getAccessTokenSilently();
+
+      // TODO: Translating ain't cheap. Cache translated strings
       const translatedText = await translationService.translate(
-        message.text,
+        message.displayableText,
         "en", //TODO: pass in the language from user settings
         token
       );
@@ -114,7 +116,7 @@ const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingFor
                 whiteSpace: 'pre-line' // This will make CSS handle newlines as they are
               }}
             >
-              {message.text}
+              {message.displayableText}
             </Typography>)}
           {!message.isUser && !waitingForMessageFromAI && ( // Only render for bot messages
             <>
