@@ -30,6 +30,16 @@ export class OpenAIController {
                 headers: headers,
             });
 
+            // Extract headers from the OpenAI response
+            const openAIResponseHeaders = response.headers;
+
+            // Loop through the headers and append them to the Express response
+            for (const header in openAIResponseHeaders) {
+                if (openAIResponseHeaders.hasOwnProperty(header)) {
+                    res.setHeader(header, openAIResponseHeaders[header]);
+                }
+            }
+
             const json = response.data as CompletionResponse;
             res.json(json);
         } catch (error) {
