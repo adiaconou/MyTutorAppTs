@@ -49,11 +49,6 @@ export class OpenAIController {
     }
 }
 
-interface Message {
-    role: string;
-    content: string;
-}
-
 interface CompletionResponse {
     choices?: {
         message: {

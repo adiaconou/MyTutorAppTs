@@ -3,6 +3,8 @@ import { request } from "http";
 const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
 export class LanguageTranslationService {
+
+    // Translate text to target language
     async translate(text: string, target: string, token: string): Promise<string> {
         const headers = this.createAuthHeaders(token);
         headers.append("Content-Type", "application/json");
@@ -26,6 +28,33 @@ export class LanguageTranslationService {
             throw error;
         }
     }
+
+    // Convert text to speech
+    async getTextToSpeech(text: string, jwtToken: string): Promise<string | null> {
+        const requestBody = {
+          text: text,
+        };
+    
+        const headers = {
+          Authorization: `Bearer ${jwtToken}`,
+          "Content-Type": "application/json",
+        };
+    
+        try {
+          const response = await this.sendRequest(`${apiUrl}/textToSpeech`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(requestBody),
+          });
+    
+          const json = (await response.json());
+    
+          return json;
+        } catch (error) {
+          console.log("Error request chatgpt prompt", error);
+          throw error;
+        }
+      }
 
     // Create http headers with auth
     private createAuthHeaders(token: string): Headers {

@@ -11,6 +11,7 @@ import { UserSettingsRepository } from "./repository/UserSettingsRepository";
 import { checkJwt } from "./auth/JwtChecker";
 import { OpenAIController } from "./controllers/OpenAIController";
 import { LanguageTranslationController } from "./controllers/LanguageTranslationController";
+const { TextToSpeechController } = require('./controllers/TextToSpeechController');
 
 const router = express.Router();
 const cloudLogController = new CloudLogController(new SecretManager());
@@ -19,6 +20,7 @@ const userChatSessionsController = new UserChatSessionsController(new UserChatSe
 const userChatMessagesController = new UserChatMessagesController(new UserChatMessagesRepository(config.googleProjectId));
 const openaiController = new OpenAIController(new SecretManager());
 const languageTranslationController = new LanguageTranslationController();
+const textToSpeechController = new TextToSpeechController();
 
 // UserSettings routes
 router.get("/userSettings/:userId", checkJwt, userSettingsController.getUserSettings.bind(userSettingsController)); 
@@ -42,5 +44,8 @@ router.post("/translate", checkJwt, languageTranslationController.translateText.
 
 // OpenAI routes
 router.post("/prompt", checkJwt, openaiController.chatgptPrompt.bind(openaiController));
+
+// Text to speech
+router.post("/textToSpeech", checkJwt, textToSpeechController.googleTextToSpeech.bind(textToSpeechController));
 
 export default router;

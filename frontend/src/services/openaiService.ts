@@ -3,6 +3,7 @@ import { Message } from "../models/Message";
 const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
 export class OpenAIService {
+
   async prompt(context: Message[], jwtToken: string, maxTokens: number = 50): Promise<string | null> {
     // Create a conversation array by mapping the messages to the required format
     const conversation = context.map((message) => ({

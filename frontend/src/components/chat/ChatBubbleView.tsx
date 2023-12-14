@@ -9,9 +9,7 @@ import TranslateIcon from "@mui/icons-material/Translate";
 import { keyframes } from '@emotion/react';
 import { LanguageTranslationService } from "../../services/LanguageTranslationService";
 import { useAuth0 } from "@auth0/auth0-react";
-
-
-
+import VolumeUp from '@mui/icons-material/VolumeUp';
 
 interface ChatBubbleViewProps {
   message: { displayableText: string; rawText: string; isUser: boolean; };
@@ -38,8 +36,13 @@ const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingFor
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [translation, setTranslation] = useState<string | null>(null);
 
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+
   // TODO: Move this into view model. Got it working for now though.
   const handleTranslateClick = async (event: React.MouseEvent<SVGSVGElement>) => {
+    setIsTranslating(true);
+
     let currentTarget = event.currentTarget;
 
     try {
@@ -53,11 +56,39 @@ const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingFor
       );
       setTranslation(translatedText);
       setAnchorEl(currentTarget as unknown as HTMLElement);
+      setIsTranslating(false);
 
     } catch (error) {
       setTranslation("Translation error");
     } finally {
+
     }
+  };
+
+  const handleAudioClick = async () => {
+    setIsPlayingAudio(true);
+    try {
+      const token = await getAccessTokenSilently();
+      const audioUrl = await translationService.getTextToSpeech(message.displayableText, token);
+
+      // TODO: Handle this better
+      if (!audioUrl) {
+        return;
+      }
+
+      // Play the audio
+      const audio = new Audio("https://storage.cloud.google.com/" + audioUrl);
+      console.log("Getting audio from " + "https://storage.cloud.google.com/" + audioUrl);
+      audio.play();
+
+      // When the audio finishes playing, set isPlayingAudio to false
+      audio.onended = () => {
+        setIsPlayingAudio(false);
+      };
+    } catch (error) {
+      console.error("Error playing audio", error);
+      setIsPlayingAudio(false);
+    } 
   };
 
   const handlePopoverClose = () => {
@@ -121,18 +152,46 @@ const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingFor
           {!message.isUser && !waitingForMessageFromAI && ( // Only render for bot messages
             <>
               <div style={{ height: '10px' }} />  {/* New line for spacing */}
-              <TranslateIcon
-                aria-describedby={id}
-                onClick={handleTranslateClick}
+              <Box
                 sx={{
-                  cursor: 'pointer',
-                  color: 'white',
-                  fontSize: '1rem',
-                  alignSelf: 'flex-start',
-                  marginTop: 0.5,
-                  animation: `${pulse} 2s infinite`, // Apply the pulse animation here
+                  display: 'flex',
+                  justifyContent: 'left', // Center the icons
+                  alignItems: 'center'
                 }}
-              />
+              >
+
+                <TranslateIcon
+                  aria-describedby={id}
+                  onClick={(event) => {
+                    if (!isTranslating) {
+                      handleTranslateClick(event);
+                    }
+                  }}
+                  sx={{
+                    cursor: isTranslating ? 'default' : 'pointer',
+                    color: isTranslating ? 'grey' : 'white',
+                    fontSize: '1rem',
+                    alignSelf: 'center',
+                    animation: `${pulse} 2s infinite`, // Apply the pulse animation here
+                  }}
+                />
+
+                <VolumeUp
+                  onClick={() => {
+                    if (!isPlayingAudio) {
+                      handleAudioClick();
+                    }
+                  }}
+                  sx={{
+                    cursor: isPlayingAudio ? 'default' : 'pointer',
+                    color: isPlayingAudio ? 'grey' : 'white',
+                    fontSize: '1rem',
+                    alignSelf: 'center',
+                    marginLeft: 1, // Add some space between the icons
+                  }}
+                />
+
+              </Box>
               <Popover
                 id={id}
                 open={open}

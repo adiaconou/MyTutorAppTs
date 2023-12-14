@@ -44,8 +44,8 @@ const AppBarView: React.FC<AppBarViewProps> = ({ sx }) => {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             My AI Tutor
           </Typography>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Avatar sx={{ marginBottom: "8px" }} src={user?.picture}>
+          <Box sx={{ display: "flex", alignItems: "center", height: "100%"}}>
+            <Avatar src={user?.picture}>
               <AccountCircleIcon />
             </Avatar>
           </Box>
