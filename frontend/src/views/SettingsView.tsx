@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import { Box, Slider, Typography, Divider } from "@mui/material";
-import MyDropDown from "./LanguageChoiceDropDownView";
+import MyDropDown from "../components/settings/LanguageChoiceDropDownView";
 import CircularProgress from "@mui/material/CircularProgress";
-import useViewModel from "./SettingsViewModel";
+import useViewModel from "../viewmodels/SettingsViewModel";
 import { useAuth0 } from "@auth0/auth0-react";
+import Loading from "../components/common/Loading";
 
 const SettingsView: React.FC = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -36,16 +37,7 @@ const SettingsView: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
+      <Loading />
     );
   }
 

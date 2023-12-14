@@ -2,10 +2,14 @@ import React, { useEffect } from "react";
 import { Box, Typography, Paper, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { UserSettingsService } from "../../services/UserSettingsService";
-import { UserSettings } from "../../models/UserSettings";
+import { UserSettingsService } from "../services/UserSettingsService";
+import { UserSettings } from "../models/UserSettings";
 
-const BeginChatView: React.FC = () => {
+/*
+  This view is displayed when a user begins a new chat session.
+  This will prompt the user for what they want to practice.
+*/
+const NewSessionView: React.FC = () => {
   const navigate = useNavigate();
 
   const redirectToChat = () => {
@@ -117,4 +121,4 @@ const BeginChatView: React.FC = () => {
   );
 };
 
-export default BeginChatView;
+export default NewSessionView;

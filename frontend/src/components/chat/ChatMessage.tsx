@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import { SxProps, Theme } from "@mui/system";
 import SmartToy from "@mui/icons-material/SmartToy";
-import TypingIndicator from "./TypingIndicatorView";
+import TypingIndicator from "./TypingIndicator";
 import TranslateIcon from "@mui/icons-material/Translate";
 import { keyframes } from '@emotion/react';
 import { LanguageTranslationService } from "../../services/LanguageTranslationService";
@@ -13,14 +13,14 @@ import VolumeUp from '@mui/icons-material/VolumeUp';
 import config from "../../config";
 import { Session } from "../../models/Session";
 
-interface ChatBubbleViewProps {
+interface ChatMessageProps {
   message: { displayableText: string; rawText: string; isUser: boolean; };
   sx?: SxProps<Theme>;
   waitingForMessageFromAI: boolean;
   chatSession: Session;
 }
 
-const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingForMessageFromAI, chatSession }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ message, sx, waitingForMessageFromAI, chatSession }) => {
   const textColor = "#ffffff";
   const translationService = new LanguageTranslationService(); // Initialize the translation service
   const { getAccessTokenSilently } = useAuth0();
@@ -221,4 +221,4 @@ const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingFor
   );
 };
 
-export default ChatBubbleView;
+export default ChatMessage;

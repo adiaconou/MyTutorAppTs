@@ -5,7 +5,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { blue } from "@mui/material/colors";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
-import { useTextFieldViewModel } from "./TextFieldViewModel";
+import { useTextFieldViewModel } from "./ChatInputViewModel";
 
 const theme = createTheme({
   components: {
@@ -35,12 +35,12 @@ const theme = createTheme({
   },
 });
 
-interface TextFieldViewProps {
+interface ChatInputProps {
   onSubmit: (inputValue: string) => void;
   disabled?: boolean;
 }
 
-const TextFieldView: React.FC<TextFieldViewProps> = ({
+const ChatInput: React.FC<ChatInputProps> = ({
   onSubmit, disabled
 }) => {
   const {
@@ -121,4 +121,4 @@ const TextFieldView: React.FC<TextFieldViewProps> = ({
   );
 };
 
-export default TextFieldView;
+export default ChatInput;

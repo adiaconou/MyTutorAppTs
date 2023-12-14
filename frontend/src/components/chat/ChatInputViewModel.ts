@@ -1,10 +1,10 @@
 import { useState } from "react";
 
-interface TextFieldViewModelProps {
+interface ChatInputViewModel {
   onSubmit: (inputValue: string) => void;
 }
 
-export function useTextFieldViewModel({ onSubmit }: TextFieldViewModelProps) {
+export function useTextFieldViewModel({ onSubmit }: ChatInputViewModel) {
     const [inputValue, setInputValue] = useState("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

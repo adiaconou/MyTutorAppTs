@@ -1,10 +1,11 @@
 import React, { useEffect } from "react";
-import TextFieldView from "./TextFieldView";
-import ChatMessageListView from "./ChatMessageListView";
+import ChatInput from "../components/chat/ChatInput";
+import ChatMessageList from "../components/chat/ChatMessageList";
 import { Box } from "@mui/material";
-import useViewModel from "./ChatViewModel";
+import useViewModel from "../viewmodels/ChatViewModel";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useLocation } from "react-router-dom"; // Import useLocation from react-router-dom
+import Loading from "../components/common/Loading";
 
 interface ChatViewProps {
   systemPrompt?: string;
@@ -45,13 +46,9 @@ const ChatView: React.FC<ChatViewProps> = () => {
 
   }, [id, isAuthenticated]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  // TODO: How do I better handle this? This whole app needs error handling
-  if (!userChatSession) {
-    return <div>No chat session!</div>;
+  // TODO: Hanlde userChatSession better.
+  if (isLoading || !userChatSession) {
+    return <Loading />
   }
 
   return (
@@ -90,7 +87,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
           },
         }}
       >
-        <ChatMessageListView messages={messages} chatSession={userChatSession} waitingForMessageFromAI={waitingForMessageFromAI} />
+        <ChatMessageList messages={messages} chatSession={userChatSession} waitingForMessageFromAI={waitingForMessageFromAI} />
       </Box>
       <Box
         className="TextFieldView_parent"
@@ -106,7 +103,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
           margin: "0 auto",
         }}
       >
-        <TextFieldView onSubmit={handleTextSubmit} disabled={waitingForMessageFromAI} />
+        <ChatInput onSubmit={handleTextSubmit} disabled={waitingForMessageFromAI} />
       </Box>
     </Box>
   );

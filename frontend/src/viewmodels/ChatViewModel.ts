@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { UserChatSessionsService } from "../../services/UserChatSessionsService";
+import { UserChatSessionsService } from "../services/UserChatSessionsService";
 import { useAuth0 } from "@auth0/auth0-react";
-import { UserChatMessagesService } from "../../services/UserChatMessagesService";
+import { UserChatMessagesService } from "../services/UserChatMessagesService";
 import { v4 as uuidv4 } from "uuid";
-import { BotConversationMessage } from "../../models/BotConversationMessage";
-import Gpt4Prompt from "../../prompt/Gpt4Prompt";
-import { UserSettingsService } from "../../services/UserSettingsService";
-import { Message } from "../../models/Message";
-import { OpenAIService } from "../../services/OpenAIService";
-import { UserChatMessage } from "../../models/UserChatMessage";
-import { Session } from "../../models/Session";
+import { BotConversationMessage } from "../models/BotConversationMessage";
+import Gpt4Prompt from "../prompt/Gpt4Prompt";
+import { UserSettingsService } from "../services/UserSettingsService";
+import { Message } from "../models/Message";
+import { OpenAIService } from "../services/OpenAIService";
+import { UserChatMessage } from "../models/UserChatMessage";
+import { Session } from "../models/Session";
 
 export default function ChatViewModel() {
   const { user, getAccessTokenSilently } = useAuth0();

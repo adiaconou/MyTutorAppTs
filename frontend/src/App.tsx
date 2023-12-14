@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import ChatView from "./components/chat/ChatView";
+import ChatView from "./views/ChatView";
 import AppBarView from "./components/navigation/AppBarView";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { Route, Routes } from "react-router-dom";
-import SettingsView from "./components/settings/SettingsView";
+import SettingsView from "./views/SettingsView";
 import Gpt4Prompt from "./prompt/Gpt4Prompt";
 import { UserSettings } from "./models/UserSettings";
-import LoginPageView from "./auth/LoginPageView";
+import LoginView from "./views/LoginView";
 import CallbackPageView from "./auth/CallbackPageView";
 import { useAuth0 } from "@auth0/auth0-react";
 import { AuthenticationGuard } from "./auth/authentication-guard";
 import { UserSettingsService } from "./services/UserSettingsService";
-import BeginChatView from "./components/chat/BeginChatView";
+import NewSessionView from "./views/NewSessionView";
 
 const App: React.FC = () => {
   const { user, getAccessTokenSilently } = useAuth0();
@@ -83,11 +83,11 @@ const App: React.FC = () => {
           sx={{ flexGrow: 1, paddingLeft: "0px", paddingRight: "0px" }}
         >
           <Routes>
-            <Route path="/" element={<AuthenticationGuard component={BeginChatView} />} />
+            <Route path="/" element={<AuthenticationGuard component={NewSessionView} />} />
             <Route path="/chat" element={<AuthenticationGuard component={ChatView} />} />
             <Route path="/settings" element={<AuthenticationGuard component={SettingsView} />} />
             <Route path="/c/:id" element={<AuthenticationGuard component={ChatView} />} />
-            <Route path="/login" element={<LoginPageView />} />
+            <Route path="/login" element={<LoginView />} />
             <Route path="/callback" element={<CallbackPageView />} />
           </Routes>
         </Container>

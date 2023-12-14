@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
-import { UserSettings } from "../../models/UserSettings";
+import { UserSettings } from "../models/UserSettings";
 import { SelectChangeEvent } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
-import { UserSettingsService } from "../../services/UserSettingsService";
+import { UserSettingsService } from "../services/UserSettingsService";
 
 export default function SettingsViewModel() {
   const userSettingsService = new UserSettingsService();

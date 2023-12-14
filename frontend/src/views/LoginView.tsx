@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
-import LoginButton from './LoginButton';
+import LoginButton from '../auth/LoginButton';
 
-const LoginPageView = () => {
+const LoginView = () => {
 
   return (
     <Box
@@ -15,4 +15,4 @@ const LoginPageView = () => {
   );
 };
 
-export default LoginPageView;
+export default LoginView;

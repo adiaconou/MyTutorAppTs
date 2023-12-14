@@ -1,15 +1,15 @@
 import React, { useRef, useEffect } from 'react';
 import Box from '@mui/material/Box';
-import ChatBubbleView from './ChatBubbleView';
+import ChatMessage from './ChatMessage';
 import { Session } from '../../models/Session';
 
-interface ChatMessageListViewProps {
+interface ChatMessageListProps {
   messages: { displayableText: string; rawText: string; isUser: boolean; isVisibleToUser?: boolean }[];
   waitingForMessageFromAI: boolean;
   chatSession: Session;
 }
 
-const ChatMessageListView: React.FC<ChatMessageListViewProps> = ({ messages, waitingForMessageFromAI, chatSession }) => {
+const ChatMessageList: React.FC<ChatMessageListProps> = ({ messages, waitingForMessageFromAI, chatSession }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,10 +34,10 @@ const ChatMessageListView: React.FC<ChatMessageListViewProps> = ({ messages, wai
       }}
     >
       {visibleMessages.map((message, index) => (
-        <ChatBubbleView key={index} message={message} chatSession={chatSession} sx={{ marginBottom: "8px" }} waitingForMessageFromAI={false} />
+        <ChatMessage key={index} message={message} chatSession={chatSession} sx={{ marginBottom: "8px" }} waitingForMessageFromAI={false} />
       ))}
       {waitingForMessageFromAI && (
-        <ChatBubbleView
+        <ChatMessage
           key={messages.length}
           message={{ displayableText: '...', rawText: '', isUser: false }}
           sx={{ marginBottom: "8px" }}
@@ -50,4 +50,4 @@ const ChatMessageListView: React.FC<ChatMessageListViewProps> = ({ messages, wai
   );
 };
 
-export default ChatMessageListView;
+export default ChatMessageList;
