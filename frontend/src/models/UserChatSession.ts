@@ -4,4 +4,6 @@ export interface UserChatSession {
   createdAt: Date;
   lastUpdatedAt: Date;
   summary: string;
+  sourceLanguage: string;
+  targetLanguage: string;
 }

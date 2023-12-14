@@ -10,14 +10,17 @@ import { keyframes } from '@emotion/react';
 import { LanguageTranslationService } from "../../services/LanguageTranslationService";
 import { useAuth0 } from "@auth0/auth0-react";
 import VolumeUp from '@mui/icons-material/VolumeUp';
+import config from "../../config";
+import { Session } from "../../models/Session";
 
 interface ChatBubbleViewProps {
   message: { displayableText: string; rawText: string; isUser: boolean; };
   sx?: SxProps<Theme>;
   waitingForMessageFromAI: boolean;
+  chatSession: Session;
 }
 
-const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingForMessageFromAI }) => {
+const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingForMessageFromAI, chatSession }) => {
   const textColor = "#ffffff";
   const translationService = new LanguageTranslationService(); // Initialize the translation service
   const { getAccessTokenSilently } = useAuth0();
@@ -68,8 +71,10 @@ const ChatBubbleView: React.FC<ChatBubbleViewProps> = ({ message, sx, waitingFor
   const handleAudioClick = async () => {
     setIsPlayingAudio(true);
     try {
+      const languageCode = config.languages[chatSession.targetLanguage];
+      console.log("Language code: " + languageCode);
       const token = await getAccessTokenSilently();
-      const audioUrl = await translationService.getTextToSpeech(message.displayableText, token);
+      const audioUrl = await translationService.getTextToSpeech(message.displayableText, languageCode, token);
 
       // TODO: Handle this better
       if (!audioUrl) {

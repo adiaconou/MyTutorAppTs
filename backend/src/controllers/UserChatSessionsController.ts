@@ -22,7 +22,7 @@ export class UserChatSessionsController {
           .status(400)
           .json({ message: "Missing session object in request body" });
       }
-      const { userId, id, createdAt, lastUpdatedAt, summary } =
+      const { userId, id, createdAt, lastUpdatedAt, summary, sourceLanguage, targetLanguage } =
         session as UserChatSession;
 
       // Create the session object to be stored in the repository
@@ -32,6 +32,8 @@ export class UserChatSessionsController {
         createdAt: new Date(createdAt),
         lastUpdatedAt: new Date(lastUpdatedAt),
         summary,
+        sourceLanguage,
+        targetLanguage,
       };
 
       // Validate and destructure the 'initialMessage' object (if needed)
@@ -92,10 +94,12 @@ export class UserChatSessionsController {
 
   async getChatSessionById(req: Request, res: Response) {
     try {
+      console.log("getChatSessionById " + req.params.id);
       const id = req.params.id;
       const session = await this.userChatSessionRepo.get(id);
       res.json(session);
     } catch (error) {
+      console.log("No chat session " + error);
       res.status(500).json({ message: "Error fetching chat session" });
     }
   }

@@ -10,6 +10,7 @@ import { UserSettingsService } from "../../services/UserSettingsService";
 import { Message } from "../../models/Message";
 import { OpenAIService } from "../../services/OpenAIService";
 import { UserChatMessage } from "../../models/UserChatMessage";
+import { Session } from "../../models/Session";
 
 export default function ChatViewModel() {
   const { user, getAccessTokenSilently } = useAuth0();
@@ -18,6 +19,7 @@ export default function ChatViewModel() {
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(true);
   const [waitingForMessageFromAI, setWaitingForMessageFromAI] = useState(false);
+  const [userChatSession, setUserChatSession] = useState<Session>();
   const userChatMessagesService = new UserChatMessagesService();
   const userChatSessionsService = new UserChatSessionsService();
   const openAiService = new OpenAIService();
@@ -56,30 +58,41 @@ export default function ChatViewModel() {
    ***/
   const loadChatSession = async (userEmail: string, token: string) => {
     try {
+      // The user's settings are required to generate the initial AI prompt
+      const settings = await userSettings.getUserSettings(userEmail, token);
+      if (!settings) {
+        //TODO: Handle this properly
+        return;
+      }
+
+      setUserChatSession({sourceLanguage: settings.settings.sourceLanguage, targetLanguage: settings.settings.languageChoice});
+
       if (id) { // If id exists, it is not a new chat session so retrieve messages from the server
-        console.log("Loading chat session " + id);
         sessionStorage.setItem("chatSessionId", id);
+
+        // If the user is loading a previous chat session, we must
+        // retrieve the chat session object to get the source and
+        // target language since languages can change across sessions.
+        const userChatSession = await userChatSessionsService.getChatSessionById(id, token);
+        if (userChatSession) {
+          setUserChatSession({sourceLanguage: userChatSession.sourceLanguage, targetLanguage: userChatSession.targetLanguage});
+        }
         getMessages(id, 500);
         setIsLoading(false);
       } else { // Start a new chat session
         setWaitingForMessageFromAI(true);
 
-        console.log("Starting a new chat session.");
         sessionStorage.setItem("chatSessionId", "");
         clearMessages();
         setIsLoading(false);
 
-        // The user's settings are required to generate the initial AI prompt
-        const settings = await userSettings.getUserSettings(userEmail, token);
-        if (!settings) {
-          //TODO: Handle this properly
-          return;
-        }
-
         // Get the initial user prompt to start the AI chat
         // TODO: The retrieved prompt should be conditional on stateValue
         const systemPrompt = Gpt4Prompt.getConversationPrompt(settings);
-        const newChatSessionId: string = await createChatSession(systemPrompt);
+        const newChatSessionId: string = await createChatSession(
+          systemPrompt,
+          settings.settings.sourceLanguage,
+          settings.settings.languageChoice);
 
         // Store the message in the session and the server
         sessionStorage.setItem("chatSessionId", newChatSessionId);
@@ -143,8 +156,27 @@ export default function ChatViewModel() {
 
   /*** Handle new messages submitted by the user through chat ***/
   const handleTextSubmit = async (text: string) => {
+    // TODO: Handle this better. Application won't work
+    // without user email.
+    if (!user?.email) {
+      return;
+    }
+
+    const token = await getAccessTokenSilently();
+    const settings = await userSettings.getUserSettings(user?.email, token);
+    if (!settings) {
+      return; // Can't be here if there's no user settings
+    }
+
+    setUserChatSession({sourceLanguage: settings.settings.sourceLanguage, targetLanguage: settings.settings.languageChoice});
+
+    // First user message of the session - only happens once per session
     if (messages.length === 0) {
-      const newChatSessionId: string = await createChatSession(text);
+      const newChatSessionId: string = await createChatSession(
+        text,
+        settings.settings.sourceLanguage,
+        settings.settings.languageChoice);
+
       sessionStorage.setItem("chatSessionId", newChatSessionId);
     } else {
       await putNewMessage(text, text, "user");
@@ -159,7 +191,6 @@ export default function ChatViewModel() {
     setWaitingForMessageFromAI(true);
 
     const fetchResponse = async () => {
-      const token = await getAccessTokenSilently();
       const response = await openAiService.prompt(currentMessages, token);
 
       if (response !== null) {
@@ -181,7 +212,7 @@ export default function ChatViewModel() {
   };
 
   /*** Store the new chat session record in the database ***/
-  async function createChatSession(messageText: string) {
+  async function createChatSession(messageText: string, sourceLanguage: string, targetLanguage: string) {
     // The user and user.email objects must exist to create a chat session (or really do anything)
     if (!user || !user.email) {
       throw Error("Cannot create chat session because user email is not available.");
@@ -206,7 +237,7 @@ export default function ChatViewModel() {
     const token = await getAccessTokenSilently();
 
     // Send the request to the server
-    return userChatSessionsService.createChatSession(user.email, chatSessionId, userChatMessage, token);
+    return userChatSessionsService.createChatSession(user.email, chatSessionId, sourceLanguage, targetLanguage, userChatMessage, token);
   }
 
   /*** Store the last message in the database ***/
@@ -229,6 +260,7 @@ export default function ChatViewModel() {
     id,
     isLoading,
     waitingForMessageFromAI,
+    userChatSession,
     loadChatSession,
     handleTextSubmit,
     useWindowDimensions,

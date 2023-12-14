@@ -30,9 +30,10 @@ export class LanguageTranslationService {
     }
 
     // Convert text to speech
-    async getTextToSpeech(text: string, jwtToken: string): Promise<string | null> {
+    async getTextToSpeech(text: string, languageCode: string, jwtToken: string): Promise<string | null> {
         const requestBody = {
           text: text,
+          languageCode: languageCode,
         };
     
         const headers = {

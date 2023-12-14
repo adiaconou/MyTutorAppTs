@@ -2,6 +2,7 @@ import React from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { blue } from '@mui/material/colors';
+import config from '../../config';
 
 const customTheme = createTheme({
   components: {
@@ -37,6 +38,8 @@ interface MyDropDownProps {
 }
 
 const MyDropDown: React.FC<MyDropDownProps> = ({ languageChoice, handleLanguageChoiceChange }) => {
+  const languages = Object.keys(config.languages);
+
   return (
     <ThemeProvider theme={customTheme}>
       <Select
@@ -52,9 +55,11 @@ const MyDropDown: React.FC<MyDropDownProps> = ({ languageChoice, handleLanguageC
           },
         }}
       >
-        <MenuItem value="Greek">Greek</MenuItem>
-        <MenuItem value="French">French</MenuItem>
-        <MenuItem value="Spanish">Spanish</MenuItem>
+        {languages.map((language) => (
+          <MenuItem key={language} value={language}>
+            {language}
+          </MenuItem>
+        ))}
       </Select>
     </ThemeProvider>
   );

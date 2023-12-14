@@ -9,7 +9,7 @@ const apiUrl = process.env.REACT_APP_BACKEND_URL;
 export class UserChatSessionsService {
 
     // Create a new UserChatSession
-    async createChatSession(email: string, chatSessionId: string, userChatMessage: UserChatMessage, token: string): Promise<string> {
+    async createChatSession(email: string, chatSessionId: string, sourceLanguage: string, targetLanguage: string, userChatMessage: UserChatMessage, token: string): Promise<string> {
         // Create UserChatSession object
         const session: UserChatSession = {
             id: chatSessionId,
@@ -17,6 +17,8 @@ export class UserChatSessionsService {
             createdAt: new Date(),
             lastUpdatedAt: new Date(),
             summary: chatSessionId,
+            sourceLanguage: sourceLanguage,
+            targetLanguage: targetLanguage,
         };
 
         // Create http request body
@@ -61,6 +63,18 @@ export class UserChatSessionsService {
             return await response.json();
         } catch (error) {
             console.error("Error fetching UserChatSessions", error);
+            throw error;
+        }
+    }
+
+    async getChatSessionById(id: string, token: string): Promise<UserChatSession> {
+        const headers = this.createAuthHeaders(token);
+
+        try {
+            const response = await this.sendRequest(`${apiUrl}/chatSessions/${id}`, { method: "GET", headers });
+            return await response.json();
+        } catch (error) {
+            console.error("Error fetching UserChatSession", error);
             throw error;
         }
     }

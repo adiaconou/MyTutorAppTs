@@ -14,10 +14,11 @@ class TextToSpeechController {
 
     async googleTextToSpeech(req, res) {
         const text = req.body.text;
+        const languageCode = req.body.languageCode;
 
         const request = {
             input: { text: text },
-            voice: { languageCode: 'el-GR', ssmlGender: 'FEMALE' },
+            voice: { languageCode: languageCode, ssmlGender: 'FEMALE' },
             audioConfig: { audioEncoding: 'MP3' },
         };
 

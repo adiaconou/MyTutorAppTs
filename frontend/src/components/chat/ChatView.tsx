@@ -19,6 +19,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
     viewportHeight,
     id,
     waitingForMessageFromAI,
+    userChatSession,
     loadChatSession,
     handleTextSubmit,
   } = useViewModel();
@@ -46,6 +47,11 @@ const ChatView: React.FC<ChatViewProps> = () => {
 
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  // TODO: How do I better handle this? This whole app needs error handling
+  if (!userChatSession) {
+    return <div>No chat session!</div>;
   }
 
   return (
@@ -84,7 +90,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
           },
         }}
       >
-        <ChatMessageListView messages={messages} waitingForMessageFromAI={waitingForMessageFromAI} />
+        <ChatMessageListView messages={messages} chatSession={userChatSession} waitingForMessageFromAI={waitingForMessageFromAI} />
       </Box>
       <Box
         className="TextFieldView_parent"
