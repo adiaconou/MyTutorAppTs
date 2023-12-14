@@ -51,6 +51,7 @@ const BeginChatView: React.FC = () => {
           <Button
             variant="contained"
             color="primary"
+            disabled
             sx={{ width: "200px", boxShadow: "0px 4px 7px rgba(0, 0, 0, 0.5)" }}
           >
             <Typography variant="button" style={{ textTransform: "none", fontSize: "14px" }}>
@@ -62,6 +63,7 @@ const BeginChatView: React.FC = () => {
           <Button
             variant="contained"
             color="primary"
+            disabled
             sx={{ width: "200px", boxShadow: "0px 4px 7px rgba(0, 0, 0, 0.5)" }}
           >
             <Typography variant="button" style={{ textTransform: "none", fontSize: "14px" }}>
