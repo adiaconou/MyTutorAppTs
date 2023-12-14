@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Typography, Paper, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
+import { UserSettingsService } from "../../services/UserSettingsService";
+import { UserSettings } from "../../models/UserSettings";
 
 const BeginChatView: React.FC = () => {
   const navigate = useNavigate();
@@ -8,6 +11,44 @@ const BeginChatView: React.FC = () => {
   const redirectToChat = () => {
     navigate("/chat", { state: { value: 1 } });
   };
+
+  const { user, getAccessTokenSilently } = useAuth0();
+  const userSettingsService = new UserSettingsService();
+
+  // TODO: Move to view model
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      const email = user?.email;
+      const token = await getAccessTokenSilently();
+      if (email) {
+        // Get UserSettings object from the backend
+        const userSettings: UserSettings | null = await userSettingsService.getUserSettings(
+          email, token
+        );
+
+        // If is null, this is the first time the user has logged in
+        // and we set default values for the user's settings.
+        // Later on, new login should take them through a wizard
+        // to choose their settings.
+        if (!userSettings)  {
+          const userSettings: UserSettings = {
+            userId: email,
+            settings: {
+              sourceLanguage: 'English',
+              languageChoice: 'French',
+              languageProficiency: 1,
+            }
+          };
+
+          console.log("Setting settings...");
+          await userSettingsService.updateUserSettings(userSettings, token);
+        }
+      }
+    };
+
+    // Call the async function
+    fetchUserSettings();
+  }, []);
 
   return (
     <Box

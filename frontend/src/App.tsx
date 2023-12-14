@@ -16,7 +16,7 @@ import { UserSettingsService } from "./services/UserSettingsService";
 import BeginChatView from "./components/chat/BeginChatView";
 
 const App: React.FC = () => {
-  const {  user, getAccessTokenSilently } = useAuth0();
+  const { user, getAccessTokenSilently } = useAuth0();
   const [systemPrompt, setSystemPrompt] = useState("");
   const userSettingsService = new UserSettingsService();
 
@@ -36,6 +36,19 @@ const App: React.FC = () => {
 
           // Set the system prompt in the state
           setSystemPrompt(prompt);
+        } else {
+          // Set default settings
+          const userSettings: UserSettings = {
+            userId: email,
+            settings: {
+              sourceLanguage: 'English',
+              languageChoice: 'French',
+              languageProficiency: 1,
+            }
+          };
+
+          console.log("Setting settings...");
+          await userSettingsService.updateUserSettings(userSettings, token);
         }
       }
     };
@@ -45,41 +58,41 @@ const App: React.FC = () => {
   }, []);
 
   return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Box
+        className="AppBarView_parent"
+        sx={{ position: "fixed", top: 0, zIndex: 10, width: "100%" }}
+      >
+        <AppBarView />
+      </Box>
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
+          flexGrow: 1,
+          alignItems: "center",
         }}
       >
-        <Box
-          className="AppBarView_parent"
-          sx={{ position: "fixed", top: 0, zIndex: 10, width: "100%" }}
+        <Container
+          maxWidth="md"
+          sx={{ flexGrow: 1, paddingLeft: "0px", paddingRight: "0px" }}
         >
-          <AppBarView />
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            flexGrow: 1,
-            alignItems: "center",
-          }}
-        >
-          <Container
-            maxWidth="md"
-            sx={{ flexGrow: 1, paddingLeft: "0px", paddingRight: "0px" }}
-          >
-            <Routes>
-              <Route path="/" element={<AuthenticationGuard component={BeginChatView} />} />
-              <Route path="/chat" element={<AuthenticationGuard component={ChatView} />} />
-              <Route path="/settings" element={<AuthenticationGuard component={SettingsView} />} />
-              <Route path="/c/:id" element={<AuthenticationGuard component={ChatView} />} />
-              <Route path="/login" element={<LoginPageView />} />
-              <Route path="/callback" element={<CallbackPageView />} />
-            </Routes>
-          </Container>
-        </Box>
+          <Routes>
+            <Route path="/" element={<AuthenticationGuard component={BeginChatView} />} />
+            <Route path="/chat" element={<AuthenticationGuard component={ChatView} />} />
+            <Route path="/settings" element={<AuthenticationGuard component={SettingsView} />} />
+            <Route path="/c/:id" element={<AuthenticationGuard component={ChatView} />} />
+            <Route path="/login" element={<LoginPageView />} />
+            <Route path="/callback" element={<CallbackPageView />} />
+          </Routes>
+        </Container>
       </Box>
+    </Box>
   );
 };
 
