@@ -18,7 +18,11 @@ class TextToSpeechController {
 
         const request = {
             input: { text: text },
-            voice: { languageCode: languageCode, ssmlGender: 'FEMALE' },
+            // Different language codes support different voices.
+            // Leaving out ssmlGender lets google choose for you
+            // otherwise it requires additional lookup to get voices
+            // for the language.
+            voice: { languageCode: languageCode }, // ssmlGender: 'NEUTRAL' }, 
             audioConfig: { audioEncoding: 'MP3' },
         };
 

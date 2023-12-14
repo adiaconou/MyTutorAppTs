@@ -69,7 +69,7 @@ export default function ChatViewModel() {
 
       if (id) { // If id exists, it is not a new chat session so retrieve messages from the server
         sessionStorage.setItem("chatSessionId", id);
-
+        console.log("Loading chat session " + id);
         // If the user is loading a previous chat session, we must
         // retrieve the chat session object to get the source and
         // target language since languages can change across sessions.
@@ -80,6 +80,7 @@ export default function ChatViewModel() {
         getMessages(id, 500);
         setIsLoading(false);
       } else { // Start a new chat session
+        console.log("Starting a new chat session...");
         setWaitingForMessageFromAI(true);
 
         sessionStorage.setItem("chatSessionId", "");
@@ -96,6 +97,14 @@ export default function ChatViewModel() {
 
         // Store the message in the session and the server
         sessionStorage.setItem("chatSessionId", newChatSessionId);
+
+        // Update the URL to reference the new session id.
+        // e.g. from /chat to /chat/{newChatSessionId}
+        // This keeps from creating a new session again
+        // if the user refreshes the page.
+        const currentUrl = window.location.href;
+        const newUrl = `${currentUrl}/${newChatSessionId}`;
+        window.history.pushState(null, '', newUrl);
 
         setMessages((prevMessages) => [
           ...prevMessages,

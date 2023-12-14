@@ -6,6 +6,7 @@ import useViewModel from "../viewmodels/ChatViewModel";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useLocation } from "react-router-dom"; // Import useLocation from react-router-dom
 import Loading from "../components/common/Loading";
+import { UserSettings } from "../models/UserSettings";
 
 interface ChatViewProps {
   systemPrompt?: string;
@@ -34,10 +35,14 @@ const ChatView: React.FC<ChatViewProps> = () => {
         return;
       }
 
-      // StateValue is provided from the BeginChat flow to select
+      // These state values provided from NewChatSession flow to select
       // the practice topic.
-      // TODO: This should only be required for new chat sessions
+      // TODO: Use these to clean up some of the code in the viewModel
       const stateValue = location.state?.value;
+      const userSettings = location.state?.userSettings as UserSettings;
+      if (userSettings) {
+        console.log("User settings: " + userSettings.userId);
+      }
 
       loadChatSession(user?.email, token);
     };

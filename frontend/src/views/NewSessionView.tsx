@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Paper, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -11,9 +11,10 @@ import { UserSettings } from "../models/UserSettings";
 */
 const NewSessionView: React.FC = () => {
   const navigate = useNavigate();
-
+  const[userSettings, setUserSettings] = useState<UserSettings>();
+  
   const redirectToChat = () => {
-    navigate("/chat", { state: { value: 1 } });
+    navigate("/chat", { state: { value: 1, userSettings: userSettings } });
   };
 
   const { user, getAccessTokenSilently } = useAuth0();
@@ -46,6 +47,9 @@ const NewSessionView: React.FC = () => {
 
           console.log("Setting settings...");
           await userSettingsService.updateUserSettings(userSettings, token);
+          setUserSettings(userSettings);
+        } else {
+          setUserSettings(userSettings);
         }
       }
     };

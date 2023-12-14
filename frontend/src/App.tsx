@@ -86,7 +86,7 @@ const App: React.FC = () => {
             <Route path="/" element={<AuthenticationGuard component={NewSessionView} />} />
             <Route path="/chat" element={<AuthenticationGuard component={ChatView} />} />
             <Route path="/settings" element={<AuthenticationGuard component={SettingsView} />} />
-            <Route path="/c/:id" element={<AuthenticationGuard component={ChatView} />} />
+            <Route path="/chat/:id" element={<AuthenticationGuard component={ChatView} />} />
             <Route path="/login" element={<LoginView />} />
             <Route path="/callback" element={<CallbackPageView />} />
           </Routes>

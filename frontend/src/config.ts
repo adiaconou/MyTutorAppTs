@@ -19,6 +19,7 @@ const getConfig = (): Config => {
         Chinese: 'zh-CN',
         Japanese: 'ja-JP',
         Greek: 'el-GR',
+        Latvian: 'lv-LV',
     };
     
     return {

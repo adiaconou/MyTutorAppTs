@@ -181,7 +181,7 @@ export default function NavigationMenuView({
                       opacity: deletingSessionId === session.id ? 0 : 1,
                     }}
                     onClick={() => {
-                      navigate(`/c/${session.id}`);
+                      navigate(`/chat/${session.id}`);
                       handleClose();
                     }}
                   >
