@@ -17,7 +17,7 @@ export default function ChatViewModel() {
   const [messages, setMessages] = useState<Message[]>([]);
   const { height: viewportHeight } = useWindowDimensions();
   const { id } = useParams<{ id: string }>();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isChatViewLoading, setIsChatViewLoading] = useState(true);
   const [waitingForMessageFromAI, setWaitingForMessageFromAI] = useState(false);
   const [userChatSession, setUserChatSession] = useState<Session>();
   const userChatMessagesService = new UserChatMessagesService();
@@ -57,6 +57,9 @@ export default function ChatViewModel() {
    * from the chat form because it should be a fresh chat session.
    ***/
   const loadChatSession = async (userEmail: string, token: string) => {
+
+    clearMessages();
+
     try {
       // The user's settings are required to generate the initial AI prompt
       const settings = await userSettings.getUserSettings(userEmail, token);
@@ -78,14 +81,11 @@ export default function ChatViewModel() {
           setUserChatSession({sourceLanguage: userChatSession.sourceLanguage, targetLanguage: userChatSession.targetLanguage});
         }
         getMessages(id, 500);
-        setIsLoading(false);
       } else { // Start a new chat session
         console.log("Starting a new chat session...");
         setWaitingForMessageFromAI(true);
 
         sessionStorage.setItem("chatSessionId", "");
-        clearMessages();
-        setIsLoading(false);
 
         // Get the initial user prompt to start the AI chat
         // TODO: The retrieved prompt should be conditional on stateValue
@@ -138,7 +138,8 @@ export default function ChatViewModel() {
       }
     } catch (error) {
       console.error(`Error fetching data: ${error}`);
-      setIsLoading(false);
+    } finally {
+      setIsChatViewLoading(false);
     }
   };
 
@@ -160,7 +161,7 @@ export default function ChatViewModel() {
     }));
 
     setMessages(mappedMessages);
-    setIsLoading(false);
+    setIsChatViewLoading(false);
   };
 
   /*** Handle new messages submitted by the user through chat ***/
@@ -267,7 +268,7 @@ export default function ChatViewModel() {
     messages,
     viewportHeight,
     id,
-    isLoading,
+    isChatViewLoading,
     waitingForMessageFromAI,
     userChatSession,
     loadChatSession,

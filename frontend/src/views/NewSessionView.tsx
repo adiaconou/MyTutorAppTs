@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { UserSettingsService } from "../services/UserSettingsService";
 import { UserSettings } from "../models/UserSettings";
+import Loading from "../components/common/Loading";
 
 /*
   This view is displayed when a user begins a new chat session.
@@ -17,7 +18,7 @@ const NewSessionView: React.FC = () => {
     navigate("/chat", { state: { value: 1, userSettings: userSettings } });
   };
 
-  const { user, getAccessTokenSilently } = useAuth0();
+  const { isLoading, user, getAccessTokenSilently } = useAuth0();
   const userSettingsService = new UserSettingsService();
 
   // TODO: Move to view model
@@ -58,6 +59,10 @@ const NewSessionView: React.FC = () => {
     fetchUserSettings();
   }, []);
 
+  if (isLoading) {
+    return <Loading />
+  }
+  
   return (
     <Box
       sx={{

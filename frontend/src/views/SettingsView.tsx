@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { Box, Slider, Typography, Divider } from "@mui/material";
 import MyDropDown from "../components/settings/LanguageChoiceDropDownView";
-import CircularProgress from "@mui/material/CircularProgress";
 import useViewModel from "../viewmodels/SettingsViewModel";
 import { useAuth0 } from "@auth0/auth0-react";
 import Loading from "../components/common/Loading";

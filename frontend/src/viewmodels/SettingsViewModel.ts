@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { UserSettings } from "../models/UserSettings";
 import { SelectChangeEvent } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";

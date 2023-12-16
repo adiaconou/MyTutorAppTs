@@ -4,12 +4,15 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { Auth0ProviderWithNavigate } from "./auth/Auth0ProviderWithNavigate";
+import ErrorBoundary from "./error/ErrorBoundary";
 
 ReactDOM.render(
   <BrowserRouter>
-    <Auth0ProviderWithNavigate>
-      <App />
-    </Auth0ProviderWithNavigate>
+    <ErrorBoundary>
+      <Auth0ProviderWithNavigate>
+        <App />
+      </Auth0ProviderWithNavigate>
+    </ErrorBoundary>
   </BrowserRouter>,
   document.getElementById("root")
 );

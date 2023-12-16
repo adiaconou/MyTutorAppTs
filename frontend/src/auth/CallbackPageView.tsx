@@ -1,6 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import Loading from "../components/common/Loading";
 
 const CallbackPageView = () => {
   const { error, isLoading, handleRedirectCallback } = useAuth0();
@@ -56,7 +57,7 @@ const CallbackPageView = () => {
     <div>Loading...</div>
   }
 */
-  return null;
+  return <Loading />;
 
 };
 

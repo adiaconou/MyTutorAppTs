@@ -20,6 +20,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
     messages,
     viewportHeight,
     id,
+    isChatViewLoading,
     waitingForMessageFromAI,
     userChatSession,
     loadChatSession,
@@ -49,7 +50,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
 
     fetchToken();
 
-  }, [id, isAuthenticated]);
+  }, [id, isChatViewLoading]);
 
   // TODO: Hanlde userChatSession better.
   if (isLoading || !userChatSession) {

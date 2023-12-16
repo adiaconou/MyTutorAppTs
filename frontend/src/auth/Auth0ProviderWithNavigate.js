@@ -6,7 +6,7 @@ export const Auth0ProviderWithNavigate = ({ children }) => {
 
   const domain = "dev-qprsmox8bpmaln3b.us.auth0.com";
   const clientId = "dlijXHwUF79ccHBqB9cRv0nMZux9irbj";
-  const redirectUri = window.location.origin + "/callback";
+  const redirectUri = window.location.origin; // + "/callback";
 
   const onRedirectCallback = (appState) => {
     navigate(appState?.returnTo || window.location.pathname);
