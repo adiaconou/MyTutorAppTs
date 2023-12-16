@@ -15,10 +15,10 @@ class GoogleCloudStorage {
     }
 
     async uploadAudioFile(buffer, text) {
-        const filePath = await this.getFilePath(key)
+        const filePath = await this.getFilePath(text)
         const bucket = this.storage.bucket(this.bucketName);
         const file = bucket.file(filePath);
-        
+
         const stream = file.createWriteStream({
             metadata: {
                 contentType: 'audio/mpeg',
@@ -42,7 +42,7 @@ class GoogleCloudStorage {
 
     async downloadFile(text) {
         const bucket = this.storage.bucket(this.bucketName);
-        filePath = this.bucketName + "/" + this.getFilePath(text);
+        const filePath = await this.getFilePath(text);
         const file = bucket.file(filePath);
 
         return new Promise((resolve, reject) => {

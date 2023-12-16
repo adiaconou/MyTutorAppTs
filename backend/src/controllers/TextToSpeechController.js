@@ -15,35 +15,39 @@ class TextToSpeechController {
     async googleTextToSpeech(req, res) {
         const text = req.body.text;
         const languageCode = req.body.languageCode;
-        
+
         const fileExists = await googleCloudStorage.fileExists(text);
+
         if (fileExists) {
-            console.log("File exists");
-        }
+            const buffer = await googleCloudStorage.downloadFile(text);
+            const base64Audio = buffer.toString('base64');
+            res.json({ audioContent: base64Audio });
 
-        const request = {
-            input: { text: text },
-            // Different language codes support different voices.
-            // Leaving out ssmlGender lets google choose for you
-            // otherwise it requires additional lookup to get voices
-            // for the language.
-            voice: { languageCode: languageCode }, // ssmlGender: 'NEUTRAL' }, 
-            audioConfig: { audioEncoding: 'MP3' },
-        };
-
-        const [response] = await textToSpeechClient.synthesizeSpeech(request);
-        // Check if audio content is available
-        if (response.audioContent) {
-            // Upload the audio content to Google Cloud Storage
-            try {
-                const filePath = await googleCloudStorage.uploadAudioFile(response.audioContent, text);
-                const base64Audio = response.audioContent.toString('base64');
-                res.json({ filePath: filePath, audioContent: base64Audio });
-            } catch (error) {
-                console.error('Error uploading to Google Cloud Storage:', error);
-            }
         } else {
-            console.error('No audio content received from text-to-speech service');
+            const request = {
+                input: { text: text },
+                // Different language codes support different voices.
+                // Leaving out ssmlGender lets google choose for you
+                // otherwise it requires additional lookup to get voices
+                // for the language.
+                voice: { languageCode: languageCode }, // ssmlGender: 'NEUTRAL' }, 
+                audioConfig: { audioEncoding: 'MP3' },
+            };
+            const [response] = await textToSpeechClient.synthesizeSpeech(request);
+
+            // Check if audio content is available
+            if (response.audioContent) {
+                // Upload the audio content to Google Cloud Storage
+                try {
+                    const filePath = await googleCloudStorage.uploadAudioFile(response.audioContent, text);
+                    const base64Audio = response.audioContent.toString('base64');
+                    res.json({ filePath: filePath, audioContent: base64Audio });
+                } catch (error) {
+                    console.error('Error uploading to Google Cloud Storage:', error);
+                }
+            } else {
+                console.error('No audio content received from text-to-speech service');
+            }
         }
     }
 }
