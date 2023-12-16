@@ -20,7 +20,6 @@ const ChatView: React.FC<ChatViewProps> = () => {
     messages,
     viewportHeight,
     id,
-    isChatViewLoading,
     waitingForMessageFromAI,
     userChatSession,
     loadChatSession,
@@ -29,6 +28,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
 
   // Check auth and load chat session on component mount
   useEffect(() => {
+    console.log("ChatView useEffect", {id});
     const fetchToken = async () => {
       const token = await getAccessTokenSilently();
       if (!isAuthenticated || !user?.email) {
@@ -50,7 +50,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
 
     fetchToken();
 
-  }, [id, isChatViewLoading]);
+  }, [id]);
 
   // TODO: Hanlde userChatSession better.
   if (isLoading || !userChatSession) {

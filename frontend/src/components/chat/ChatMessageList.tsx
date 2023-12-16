@@ -13,6 +13,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({ messages, waitingForM
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    console.log("ChatMessageList useEffect", {messages})
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' });
     }

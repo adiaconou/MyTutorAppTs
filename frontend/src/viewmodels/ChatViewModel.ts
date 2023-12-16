@@ -17,7 +17,6 @@ export default function ChatViewModel() {
   const [messages, setMessages] = useState<Message[]>([]);
   const { height: viewportHeight } = useWindowDimensions();
   const { id } = useParams<{ id: string }>();
-  const [isChatViewLoading, setIsChatViewLoading] = useState(true);
   const [waitingForMessageFromAI, setWaitingForMessageFromAI] = useState(false);
   const [userChatSession, setUserChatSession] = useState<Session>();
   const userChatMessagesService = new UserChatMessagesService();
@@ -72,7 +71,7 @@ export default function ChatViewModel() {
 
       if (id) { // If id exists, it is not a new chat session so retrieve messages from the server
         sessionStorage.setItem("chatSessionId", id);
-        console.log("Loading chat session " + id);
+
         // If the user is loading a previous chat session, we must
         // retrieve the chat session object to get the source and
         // target language since languages can change across sessions.
@@ -82,9 +81,7 @@ export default function ChatViewModel() {
         }
         getMessages(id, 500);
       } else { // Start a new chat session
-        console.log("Starting a new chat session...");
         setWaitingForMessageFromAI(true);
-
         sessionStorage.setItem("chatSessionId", "");
 
         // Get the initial user prompt to start the AI chat
@@ -138,9 +135,7 @@ export default function ChatViewModel() {
       }
     } catch (error) {
       console.error(`Error fetching data: ${error}`);
-    } finally {
-      setIsChatViewLoading(false);
-    }
+    } 
   };
 
   /*** Get message history for the chat session ***/
@@ -161,7 +156,6 @@ export default function ChatViewModel() {
     }));
 
     setMessages(mappedMessages);
-    setIsChatViewLoading(false);
   };
 
   /*** Handle new messages submitted by the user through chat ***/
@@ -268,7 +262,6 @@ export default function ChatViewModel() {
     messages,
     viewportHeight,
     id,
-    isChatViewLoading,
     waitingForMessageFromAI,
     userChatSession,
     loadChatSession,

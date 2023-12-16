@@ -20,6 +20,7 @@ const App: React.FC = () => {
   const userSettingsService = new UserSettingsService();
 
   useEffect(() => {
+    console.log("App useEffect", {isLoading});
     const fetchUserSettings = async () => {
       const email = user?.email;
       const token = await getAccessTokenSilently();
