@@ -29,8 +29,8 @@ export class LanguageTranslationService {
         }
     }
 
-    // Convert text to speech
-    async getTextToSpeech(text: string, languageCode: string, jwtToken: string): Promise<string | null> {
+    // Convert text to speech and return an Audio file
+    async getTextToSpeech(text: string, languageCode: string, jwtToken: string): Promise<HTMLAudioElement  | null> {
         const requestBody = {
           text: text,
           languageCode: languageCode,
@@ -50,7 +50,13 @@ export class LanguageTranslationService {
     
           const json = (await response.json());
     
-          return json;
+          if (json && json.audioContent) {
+            // Convert the base64 string to an audio source
+            const audioSrc = `data:audio/mpeg;base64,${json.audioContent}`;
+            const audio = new Audio(audioSrc);
+            return audio;
+        }
+        return null;
         } catch (error) {
           console.log("Error request chatgpt prompt", error);
           throw error;

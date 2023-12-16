@@ -72,21 +72,16 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, sx, waitingForMessag
     setIsPlayingAudio(true);
     try {
       const languageCode = config.languages[chatSession.targetLanguage];
-      console.log("Language code: " + languageCode);
       const token = await getAccessTokenSilently();
-      const audioUrl = await translationService.getTextToSpeech(message.displayableText, languageCode, token);
+      const audio = await translationService.getTextToSpeech(message.displayableText, languageCode, token);
 
       // TODO: Handle this better
-      if (!audioUrl) {
+      if (!audio) {
         return;
       }
 
-      // Play the audio
-      const audio = new Audio("https://storage.cloud.google.com/" + audioUrl);
-      console.log("Getting audio from " + "https://storage.cloud.google.com/" + audioUrl);
       audio.play();
 
-      // When the audio finishes playing, set isPlayingAudio to false
       audio.onended = () => {
         setIsPlayingAudio(false);
       };
