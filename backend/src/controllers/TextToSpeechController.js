@@ -15,6 +15,11 @@ class TextToSpeechController {
     async googleTextToSpeech(req, res) {
         const text = req.body.text;
         const languageCode = req.body.languageCode;
+        
+        const fileExists = await googleCloudStorage.fileExists(text);
+        if (fileExists) {
+            console.log("File exists");
+        }
 
         const request = {
             input: { text: text },
@@ -32,7 +37,8 @@ class TextToSpeechController {
             // Upload the audio content to Google Cloud Storage
             try {
                 const filePath = await googleCloudStorage.uploadAudioFile(response.audioContent, text);
-                res.json(filePath);
+                const base64Audio = response.audioContent.toString('base64');
+                res.json({ filePath: filePath, audioContent: base64Audio });
             } catch (error) {
                 console.error('Error uploading to Google Cloud Storage:', error);
             }

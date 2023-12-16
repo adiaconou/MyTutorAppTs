@@ -15,17 +15,9 @@ class GoogleCloudStorage {
     }
 
     async uploadAudioFile(buffer, text) {
-
-        // Use the hash value of the translated text as the file name.
-        // There could be collisions, but the audio files are short-lived
-        // and this makes caching much easier across users who may be 
-        // generating audio for the same text. Good enough solution for now.
-        const hash = crypto.createHash('sha256');
-        const hashText = hash.update(text).digest('hex'); // convert to string
-        const destination = "text-to-speech/" + hashText + '.mp3';
-
+        const filePath = await this.getFilePath(key)
         const bucket = this.storage.bucket(this.bucketName);
-        const file = bucket.file(destination);
+        const file = bucket.file(filePath);
         
         const stream = file.createWriteStream({
             metadata: {
@@ -40,12 +32,50 @@ class GoogleCloudStorage {
             });
 
             stream.on('finish', () => {
-                console.log(`${destination} uploaded to ${this.bucketName}.`);
-                resolve(this.bucketName + "/" + destination);
+                console.log(`${filePath} uploaded to ${this.bucketName}.`);
+                resolve(this.bucketName + "/" + filePath);
             });
 
             stream.end(buffer);
         });
+    }
+
+    async downloadFile(text) {
+        const bucket = this.storage.bucket(this.bucketName);
+        filePath = this.bucketName + "/" + this.getFilePath(text);
+        const file = bucket.file(filePath);
+
+        return new Promise((resolve, reject) => {
+            file.download((err, content) => {
+                if (err) {
+                    console.log('File not found.', err);
+                    reject(null);
+                } else {
+                    console.log(`${filePath} downloaded from ${this.bucketName}.`);
+                    resolve(content);
+                }
+            });
+        });
+    }
+
+    async fileExists(text) {
+        const filePath = await this.getFilePath(text);
+        const bucket = this.storage.bucket(this.bucketName);
+        const file = bucket.file(filePath);
+        const [exists] = await file.exists();
+        return exists;
+    }
+
+    async getFilePath(text) {
+        // Use the hash value of the translated text as the file name.
+        // There could be collisions, but the audio files are short-lived
+        // and this makes caching much easier across users who may be 
+        // generating audio for the same text. Good enough solution for now.
+        const hash = crypto.createHash('sha256');
+        const hashText = hash.update(text).digest('hex'); // convert to string
+        const destination = "text-to-speech/" + hashText + '.mp3';
+
+        return destination;
     }
 }
 
