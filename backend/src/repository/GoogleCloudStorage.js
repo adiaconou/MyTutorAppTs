@@ -40,7 +40,7 @@ class GoogleCloudStorage {
         });
     }
 
-    async downloadFile(text) {
+    async downloadAudioFile(text) {
         const bucket = this.storage.bucket(this.bucketName);
         const filePath = await this.getFilePath(text);
         const file = bucket.file(filePath);

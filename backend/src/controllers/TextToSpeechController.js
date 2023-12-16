@@ -19,7 +19,7 @@ class TextToSpeechController {
         const fileExists = await googleCloudStorage.fileExists(text);
 
         if (fileExists) {
-            const buffer = await googleCloudStorage.downloadFile(text);
+            const buffer = await googleCloudStorage.downloadAudioFile(text);
             const base64Audio = buffer.toString('base64');
             res.json({ audioContent: base64Audio });
 
