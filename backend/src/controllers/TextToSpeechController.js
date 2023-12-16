@@ -16,8 +16,11 @@ class TextToSpeechController {
         const text = req.body.text;
         const languageCode = req.body.languageCode;
 
+        // Check Google Cloud Storage to see if the file exists before
+        // generating the audio. It's more expensive to generate audio
+        // than download from GCS. There is some risk of a collision
+        // because we're using the hashed text as the file key.
         const fileExists = await googleCloudStorage.fileExists(text);
-
         if (fileExists) {
             const buffer = await googleCloudStorage.downloadAudioFile(text);
             const base64Audio = buffer.toString('base64');
@@ -28,18 +31,19 @@ class TextToSpeechController {
                 input: { text: text },
                 // Different language codes support different voices.
                 // Leaving out ssmlGender lets google choose for you
-                // otherwise it requires additional lookup to get voices
-                // for the language.
                 voice: { languageCode: languageCode }, // ssmlGender: 'NEUTRAL' }, 
                 audioConfig: { audioEncoding: 'MP3' },
             };
+
+            // Convert text to speech
             const [response] = await textToSpeechClient.synthesizeSpeech(request);
 
-            // Check if audio content is available
             if (response.audioContent) {
-                // Upload the audio content to Google Cloud Storage
                 try {
+                    // Upload audio to google cloud in case same text is requested again
                     const filePath = await googleCloudStorage.uploadAudioFile(response.audioContent, text);
+
+                    // Send base64 encoded audio back to the client
                     const base64Audio = response.audioContent.toString('base64');
                     res.json({ filePath: filePath, audioContent: base64Audio });
                 } catch (error) {
