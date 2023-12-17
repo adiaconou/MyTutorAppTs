@@ -11,6 +11,7 @@ import { Message } from "../models/Message";
 import { OpenAIService } from "../services/OpenAIService";
 import { UserChatMessage } from "../models/UserChatMessage";
 import { Session } from "../models/Session";
+import { UserSettings } from "../models/UserSettings";
 
 export default function ChatViewModel() {
   const { user, getAccessTokenSilently } = useAuth0();
@@ -22,7 +23,6 @@ export default function ChatViewModel() {
   const userChatMessagesService = new UserChatMessagesService();
   const userChatSessionsService = new UserChatSessionsService();
   const openAiService = new OpenAIService();
-  const userSettings = new UserSettingsService();
 
   /***  Update window dimensions ***/
   function useWindowDimensions() {
@@ -55,19 +55,13 @@ export default function ChatViewModel() {
    * for that chat session. If it doesn't exist, we will clear the messages
    * from the chat form because it should be a fresh chat session.
    ***/
-  const loadChatSession = async (userEmail: string, token: string) => {
+  const loadChatSession = async (userEmail: string, userSettings: UserSettings, token: string) => {
 
     clearMessages();
 
     try {
-      // The user's settings are required to generate the initial AI prompt
-      const settings = await userSettings.getUserSettings(userEmail, token);
-      if (!settings) {
-        //TODO: Handle this properly
-        return;
-      }
 
-      setUserChatSession({sourceLanguage: settings.settings.sourceLanguage, targetLanguage: settings.settings.languageChoice});
+      setUserChatSession({sourceLanguage: userSettings.settings.sourceLanguage, targetLanguage: userSettings.settings.languageChoice});
 
       if (id) { // If id exists, it is not a new chat session so retrieve messages from the server
         sessionStorage.setItem("chatSessionId", id);
@@ -86,11 +80,11 @@ export default function ChatViewModel() {
 
         // Get the initial user prompt to start the AI chat
         // TODO: The retrieved prompt should be conditional on stateValue
-        const systemPrompt = Gpt4Prompt.getConversationPrompt(settings);
+        const systemPrompt = Gpt4Prompt.getConversationPrompt(userSettings);
         const newChatSessionId: string = await createChatSession(
           systemPrompt,
-          settings.settings.sourceLanguage,
-          settings.settings.languageChoice);
+          userSettings.settings.sourceLanguage,
+          userSettings.settings.languageChoice);
 
         // Store the message in the session and the server
         sessionStorage.setItem("chatSessionId", newChatSessionId);
@@ -159,27 +153,16 @@ export default function ChatViewModel() {
   };
 
   /*** Handle new messages submitted by the user through chat ***/
-  const handleTextSubmit = async (text: string) => {
-    // TODO: Handle this better. Application won't work
-    // without user email.
-    if (!user?.email) {
-      return;
-    }
-
+  const handleTextSubmit = async (text: string, userSettings: UserSettings) => {
     const token = await getAccessTokenSilently();
-    const settings = await userSettings.getUserSettings(user?.email, token);
-    if (!settings) {
-      return; // Can't be here if there's no user settings
-    }
-
-    setUserChatSession({sourceLanguage: settings.settings.sourceLanguage, targetLanguage: settings.settings.languageChoice});
+    setUserChatSession({sourceLanguage: userSettings.settings.sourceLanguage, targetLanguage: userSettings.settings.languageChoice});
 
     // First user message of the session - only happens once per session
     if (messages.length === 0) {
       const newChatSessionId: string = await createChatSession(
         text,
-        settings.settings.sourceLanguage,
-        settings.settings.languageChoice);
+        userSettings.settings.sourceLanguage,
+        userSettings.settings.languageChoice);
 
       sessionStorage.setItem("chatSessionId", newChatSessionId);
     } else {

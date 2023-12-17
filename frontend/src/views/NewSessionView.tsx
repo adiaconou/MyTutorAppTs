@@ -13,11 +13,6 @@ import Loading from "../components/common/Loading";
 const NewSessionView: React.FC = () => {
   const navigate = useNavigate();
   const[userSettings, setUserSettings] = useState<UserSettings>();
-  
-  const redirectToChat = () => {
-    navigate("/chat", { state: { value: 1, userSettings: userSettings } });
-  };
-
   const { isLoading, user, getAccessTokenSilently } = useAuth0();
   const userSettingsService = new UserSettingsService();
 
@@ -27,7 +22,8 @@ const NewSessionView: React.FC = () => {
       const email = user?.email;
       const token = await getAccessTokenSilently();
       if (email) {
-        // Get UserSettings object from the backend
+        // Need user settings to determine language and other settings
+        // when creating a new chat session
         const userSettings: UserSettings | null = await userSettingsService.getUserSettings(
           email, token
         );
@@ -37,7 +33,7 @@ const NewSessionView: React.FC = () => {
         // Later on, new login should take them through a wizard
         // to choose their settings.
         if (!userSettings)  {
-          const userSettings: UserSettings = {
+          const defaultUserSettings: UserSettings = {
             userId: email,
             settings: {
               sourceLanguage: 'English',
@@ -46,18 +42,20 @@ const NewSessionView: React.FC = () => {
             }
           };
 
-          console.log("Setting settings...");
-          await userSettingsService.updateUserSettings(userSettings, token);
-          setUserSettings(userSettings);
+          await userSettingsService.updateUserSettings(defaultUserSettings, token);
+          setUserSettings(defaultUserSettings);
         } else {
           setUserSettings(userSettings);
         }
       }
     };
 
-    // Call the async function
     fetchUserSettings();
   }, []);
+
+  const redirectToChat = () => {
+    navigate("/chat", { state: { value: 1, userSettings: userSettings } });
+  };
 
   if (isLoading) {
     return <Loading />

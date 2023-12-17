@@ -1,20 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ChatInput from "../components/chat/ChatInput";
 import ChatMessageList from "../components/chat/ChatMessageList";
 import { Box } from "@mui/material";
 import useViewModel from "../viewmodels/ChatViewModel";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useLocation } from "react-router-dom"; // Import useLocation from react-router-dom
+import { useLocation, useNavigate } from "react-router-dom"; // Import useLocation from react-router-dom
 import Loading from "../components/common/Loading";
 import { UserSettings } from "../models/UserSettings";
+import { UserSettingsService } from "../services/UserSettingsService";
 
 interface ChatViewProps {
   systemPrompt?: string;
 }
 
 const ChatView: React.FC<ChatViewProps> = () => {
-  const { user, isLoading, isAuthenticated, getAccessTokenSilently } = useAuth0();
-  const location = useLocation(); // Get the current location
+  const navigate = useNavigate();
+  const { user, isLoading, getAccessTokenSilently } = useAuth0();
+  const [userSettings, setUserSettings] = useState<UserSettings>();
+  const location = useLocation(); // Get the current URL location
+  const userSettingsService = new UserSettingsService();
 
   const {
     messages,
@@ -28,11 +32,20 @@ const ChatView: React.FC<ChatViewProps> = () => {
 
   // Check auth and load chat session on component mount
   useEffect(() => {
-    console.log("ChatView useEffect", {id});
+    console.log("ChatView useEffect", { id });
+
+    // Can navigate to /chat through starting a new session,
+    // in which location.state is available, or through
+    // accessing chat history, in which case id is available.
+    // Going directly to /chat in browswer should redirect.
+    if (!id && !location.state) {
+      navigate("/");
+      return;
+    }
+
     const fetchToken = async () => {
-      const token = await getAccessTokenSilently();
-      if (!isAuthenticated || !user?.email) {
-        //TODO: redirect user to login
+      if (!user?.email) {
+        navigate("/login");
         return;
       }
 
@@ -40,17 +53,31 @@ const ChatView: React.FC<ChatViewProps> = () => {
       // the practice topic.
       // TODO: Use these to clean up some of the code in the viewModel
       const stateValue = location.state?.value;
-      const userSettings = location.state?.userSettings as UserSettings;
-      if (userSettings) {
-        console.log("User settings: " + userSettings.userId);
+
+      // Redirect from NewSession creation will include user settings in the state
+      let fetchedUserSettings = location.state?.userSettings as UserSettings;
+      const token = await getAccessTokenSilently();
+
+      // User settings not passed in if loading a chat from the history
+      if (!fetchedUserSettings) {
+        fetchedUserSettings = await userSettingsService.getUserSettings(user.email, token) as UserSettings;
       }
 
-      loadChatSession(user?.email, token);
+      setUserSettings(fetchedUserSettings);
+      loadChatSession(user?.email, fetchedUserSettings, token);
     };
 
     fetchToken();
 
   }, [id]);
+
+  const handleUserTextSubmit = (text: string) => {
+    if (!userSettings) {
+      throw new Error("Missing UserSettings");
+    }
+
+    handleTextSubmit(text, userSettings);
+  }
 
   // TODO: Hanlde userChatSession better.
   if (isLoading || !userChatSession) {
@@ -76,7 +103,6 @@ const ChatView: React.FC<ChatViewProps> = () => {
           width: "100%",
           maxWidth: "md",
           marginTop: '64px',
-          // bgcolor: '#444654',
           borderRadius: 1,
 
           "&::-webkit-scrollbar": {
@@ -109,7 +135,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
           margin: "0 auto",
         }}
       >
-        <ChatInput onSubmit={handleTextSubmit} disabled={waitingForMessageFromAI} />
+        <ChatInput onSubmit={handleUserTextSubmit} disabled={waitingForMessageFromAI} />
       </Box>
     </Box>
   );

@@ -8,7 +8,6 @@ import ErrorBoundary from './error/ErrorBoundary';
 
 const rootElement = document.getElementById('root') as HTMLElement;
 
-// Ensure that rootElement is not null
 if (rootElement) {
   const root = createRoot(rootElement);
 
