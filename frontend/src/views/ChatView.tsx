@@ -64,7 +64,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
       }
 
       setUserSettings(fetchedUserSettings);
-      loadChatSession(user?.email, fetchedUserSettings, token);
+      loadChatSession(fetchedUserSettings, token);
     };
 
     fetchToken();
