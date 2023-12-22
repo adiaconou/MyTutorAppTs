@@ -23,13 +23,13 @@ export class UserChatMessagesService {
     }
 
     // Write a chat message to the datastore
-    async putNewMessage(displayableText: string, rawText: string, sender: string, chatSessionId: string, token: string, isVisibleToUser?: boolean): Promise<void> {
+    async putNewMessage(displayableText: string, rawText: string, sender: string, chatSessionId: string, token: string, timestamp: Date, isVisibleToUser?: boolean): Promise<void> {
         const initialMessage: UserChatMessage = {
             id: uuidv4(),
             chatSessionId: chatSessionId,
             displayableText: displayableText,
             rawText: rawText,
-            timestamp: new Date(),
+            timestamp: timestamp,
             sender: sender,
             isVisibleToUser: isVisibleToUser,
         };

@@ -58,6 +58,13 @@ export class UserChatMessagesRepository {
     this.cloudDatastore.put(id, message);
   }
 
+  async addMultiple(messages: UserChatMessage[]): Promise<void> {
+    const promises = messages.map(message => 
+      this.cloudDatastore.put(message.id, message)
+    );
+    await Promise.all(promises);
+  }
+
   async getMessageIdsForSession(sessionId: string): Promise<string[]> {
     const messages = await this.getById(sessionId, 10000); // Adjust limit as needed
     return messages ? messages.map(message => message.id) : [];

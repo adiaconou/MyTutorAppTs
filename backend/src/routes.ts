@@ -27,7 +27,9 @@ router.get("/userSettings/:userId", checkJwt, userSettingsController.getUserSett
 router.put("/userSettings/:userId", checkJwt, userSettingsController.updateUserSettings.bind(userSettingsController));
 
 // UserChatSessions routes
-router.put("/chatSessions/:id", checkJwt, userChatSessionsController.createChatSession.bind(userChatSessionsController));
+// router.put("/chatSessions/:id", checkJwt, userChatSessionsController.createChatSession.bind(userChatSessionsController));
+router.put("/chatSessions/:id", checkJwt, userChatSessionsController.saveChatSession.bind(userChatSessionsController));
+
 router.get("/chatSessions/:id", checkJwt, userChatSessionsController.getChatSessionById.bind(userChatSessionsController));
 router.get("/chatSessions/", checkJwt, userChatSessionsController.getChatSessionsByUserId.bind(userChatSessionsController));
 router.delete("/chatSessions/:id", checkJwt, userChatSessionsController.deleteChatSession.bind(userChatSessionsController));

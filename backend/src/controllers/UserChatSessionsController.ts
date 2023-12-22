@@ -11,6 +11,51 @@ export class UserChatSessionsController {
     this.userChatSessionRepo = userChatSessionRepo;
   }
 
+  async saveChatSession(req: Request, res: Response) {
+    try {
+      // Extract 'session' and 'initialMessages' from the request body
+      const { session, initialMessages } = req.body;
+
+      // Validate and destructure the 'session' object
+      if (!session) {
+        return res
+          .status(400)
+          .json({ message: "Missing session object in request body" });
+      }
+      const { userId, id, createdAt, lastUpdatedAt, summary, sourceLanguage, targetLanguage } =
+        session as UserChatSession;
+
+      // Create the session object to be stored in the repository
+      const sessionToCreate: UserChatSession = {
+        userId,
+        id,
+        createdAt: new Date(createdAt),
+        lastUpdatedAt: new Date(lastUpdatedAt),
+        summary,
+        sourceLanguage,
+        targetLanguage,
+      };
+
+      // Validate and handle the 'initialMessages' object
+      if (initialMessages && Array.isArray(initialMessages) && initialMessages.length > 0) {
+        // Ensure all messages have the correct chatSessionId
+        const messagesToStore: UserChatMessage[] = initialMessages.map(message => ({
+          ...message,
+          chatSessionId: sessionToCreate.id,
+        }));
+
+        // Use the new repository method to add multiple messages
+        await this.userChatSessionRepo.saveNew(sessionToCreate.id, sessionToCreate, messagesToStore);
+      }
+
+      res.status(204).send();
+    } catch (error) {
+      console.log("Error creating chat session: ", error);
+      res.status(500).json({ message: "Error creating chat session" });
+    }
+  }
+
+
   async createChatSession(req: Request, res: Response) {
     try {
       // Extract 'session' and 'initialMessage' from the request body
@@ -46,16 +91,6 @@ export class UserChatSessionsController {
           timestamp,
           sender,
         } = initialMessage as UserChatMessage;
-
-        // Create the initialMessage object to be stored in the repository (if needed)
-        const messageToCreate: UserChatMessage = {
-          id: messageId,
-          chatSessionId,
-          displayableText,
-          rawText,
-          timestamp: new Date(timestamp),
-          sender,
-        };
 
         await this.userChatSessionRepo.createNew(
           sessionToCreate.id,

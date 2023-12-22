@@ -6,4 +6,5 @@ export interface Message {
     rawText: string; 
     isUser: boolean;
     isVisibleToUser?: boolean;
+    timestamp: Date; 
   }

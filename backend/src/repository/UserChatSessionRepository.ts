@@ -36,6 +36,33 @@ export class UserChatSessionRepository {
     );
   }
 
+  async saveNew(
+    newSessionId: string,
+    newSession: UserChatSession,
+    initialMessages: UserChatMessage[]
+  ): Promise<void> {
+    try {
+      // Prepare initialMessages for batch operation
+      // Assuming each message does not have an ID and we need to assign one
+      const preparedMessages = initialMessages.map(message => ({
+        ...message,
+      }));
+
+      // Use the new transactionalPutArray method
+      await this.cloudDatastore.transactionalPutArray(
+        "UserChatSession",
+        newSessionId,
+        newSession,
+        "UserChatMessage",
+        preparedMessages
+      );
+    } catch (error) {
+      console.error("Error saving new chat session and messages: ", error);
+      throw error;
+    }
+  }
+
+
   async get(id: string): Promise<UserChatSession | null> {
     return this.cloudDatastore.get(id);
   }

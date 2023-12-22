@@ -1,4 +1,6 @@
 import { Datastore, Entity, Key, Transaction } from "@google-cloud/datastore";
+import { v4 as uuidv4 } from "uuid";
+
 
 export class GoogleCloudDatastore<T> {
   private datastore: Datastore;
@@ -61,6 +63,55 @@ export class GoogleCloudDatastore<T> {
       // Propagate the error to the caller (optional, based on your error handling strategy)
       throw error;
     }
+  }
+
+  async transactionalPutArray(
+    kindA: string,
+    keyA: string,
+    entityA: object,
+    kindB: string,
+    entitiesB: object[]
+  ): Promise<void> {
+    const datastoreKeyA: Key = this.datastore.key([kindA, keyA]);
+  
+  // Define datastore entity for kindA
+  const datastoreEntityA: Entity = {
+    key: datastoreKeyA,
+    data: entityA,
+  };
+
+  // Initialize a transaction
+  const transaction = this.datastore.transaction();
+
+  try {
+    // Start the transaction
+    await transaction.run();
+
+    // Perform update operation for kindA within the transaction
+    transaction.save(datastoreEntityA);
+
+    // Iterate over kindB entities and save each
+    for (const entityB of entitiesB) {
+      const keyB = uuidv4(); // Assuming each entityB has an 'id' property
+      const datastoreKeyB: Key = this.datastore.key([kindB, keyB]);
+
+      const datastoreEntityB: Entity = {
+        key: datastoreKeyB,
+        data: entityB,
+      };
+
+      transaction.save(datastoreEntityB);
+    }
+
+    // Commit the transaction (apply the changes)
+    await transaction.commit();
+  } catch (error) {
+    // Handle errors (e.g., rollback the transaction)
+    await transaction.rollback();
+    console.error("Error performing transactional update:", error);
+    // Propagate the error to the caller (optional, based on your error handling strategy)
+    throw error;
+  }
   }
 
   async get(key: string): Promise<T | null> {

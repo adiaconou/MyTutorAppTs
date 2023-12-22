@@ -4,10 +4,14 @@ import ChatMessageList from "../components/chat/ChatMessageList";
 import { Box } from "@mui/material";
 import useViewModel from "../viewmodels/ChatViewModel";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useLocation, useNavigate } from "react-router-dom"; // Import useLocation from react-router-dom
+import { useLocation, useNavigate, useParams } from "react-router-dom"; // Import useLocation from react-router-dom
 import Loading from "../components/common/Loading";
 import { UserSettings } from "../models/UserSettings";
 import { UserSettingsService } from "../services/UserSettingsService";
+import StarIcon from '@mui/icons-material/Star'; // Import StarIcon from MUI Icons
+import StarBorderIcon from '@mui/icons-material/StarBorder'; // For un-selected state
+import { Session } from "../models/Session";
+
 
 interface ChatViewProps {
   systemPrompt?: string;
@@ -17,25 +21,32 @@ const ChatView: React.FC<ChatViewProps> = () => {
   const navigate = useNavigate();
   const { user, isLoading, getAccessTokenSilently } = useAuth0();
   const [userSettings, setUserSettings] = useState<UserSettings>();
+  const [isStarSelected, setIsStarSelected] = useState(false);
   const location = useLocation(); // Get the current URL location
   const userSettingsService = new UserSettingsService();
+  const { id } = useParams<{ id: string }>();
 
   const {
     messages,
     viewportHeight,
-    id,
+  //  id,
     waitingForMessageFromAI,
     userChatSession,
+    saveChatSession,
     loadChatSession,
     handleTextSubmit,
   } = useViewModel();
+
+  useEffect(() => {
+
+  }, [id]);
 
   // Check auth and load chat session on component mount
   useEffect(() => {
     console.log("ChatView useEffect", { id });
 
     // Can navigate to /chat through starting a new session,
-    // in which location.state is available, or through
+    // which passes a location.state value
     // accessing chat history, in which case id is available.
     // Going directly to /chat in browswer should redirect.
     if (!id && !location.state) {
@@ -49,22 +60,26 @@ const ChatView: React.FC<ChatViewProps> = () => {
         return;
       }
 
-      // These state values provided from NewChatSession flow to select
-      // the practice topic.
-      // TODO: Use these to clean up some of the code in the viewModel
-      const stateValue = location.state?.value;
-
       // Redirect from NewSession creation will include user settings in the state
-      let fetchedUserSettings = location.state?.userSettings as UserSettings;
-      const token = await getAccessTokenSilently();
+      let userSettings = location.state?.userSettings as UserSettings;
 
-      // User settings not passed in if loading a chat from the history
-      if (!fetchedUserSettings) {
-        fetchedUserSettings = await userSettingsService.getUserSettings(user.email, token) as UserSettings;
+      // If chat session is loaded from history, settings must be retrieved from server
+      const token = await getAccessTokenSilently();
+      if (!userSettings) {
+        userSettings = await userSettingsService.getUserSettings(user.email, token) as UserSettings;
       }
 
-      setUserSettings(fetchedUserSettings);
-      loadChatSession(fetchedUserSettings, token);
+      setUserSettings(userSettings);
+      const chatSession = await loadChatSession(userSettings, token) as Session;
+
+
+      if (chatSession && chatSession.isSaved) {
+        console.log("SESSION IS SAVED");
+        setIsStarSelected(true);
+      } else {
+  
+        console.log("poopo", {userChatSession});
+      }
     };
 
     fetchToken();
@@ -76,8 +91,26 @@ const ChatView: React.FC<ChatViewProps> = () => {
       throw new Error("Missing UserSettings");
     }
 
-    handleTextSubmit(text, userSettings);
+    handleTextSubmit(text, userSettings, isStarSelected);
   }
+
+  const handleStarClick = () => {
+    console.log("Star click event", { isStarSelected, id, userSettings });
+
+    // Only allow changing the state if isStarSelected is currently false
+    if (!isStarSelected) {
+      setIsStarSelected(true);
+
+      console.log("Star selected");
+      if (userSettings) {
+        console.log("Saving chat session...");
+        saveChatSession(messages, userSettings);
+      }
+    } else {
+      console.log("Star icon is disabled and cannot be reactivated");
+    }
+  };
+
 
   // TODO: Hanlde userChatSession better.
   if (isLoading || !userChatSession) {
@@ -124,17 +157,39 @@ const ChatView: React.FC<ChatViewProps> = () => {
       <Box
         className="TextFieldView_parent"
         sx={{
-          position: "sticky",
-          bottom: 0,
-          zIndex: 1,
-          backgroundColor: "transparent",
+          position: "relative", // Set position as relative
           paddingBottom: "15px",
           paddingTop: "15px",
           width: "100%",
           maxWidth: "md",
           margin: "0 auto",
+          // ... other existing styles ...
         }}
       >
+        {isStarSelected ? (
+          // Render the StarIcon with a disabled look
+          <StarIcon sx={{
+            position: "absolute",
+            bottom: "100%",
+            left: "8%",
+            transform: "translateX(-50%)",
+            color: "gold", // Change color to gray or any other to indicate disabled state
+            cursor: "not-allowed", // Change cursor to indicate non-clickable
+            opacity: 0.5, // Reduce opacity to indicate it's disabled
+            // ... other styling as required ...
+          }} />
+        ) : (
+          // Render the StarBorderIcon for the non-selected state
+          <StarBorderIcon sx={{
+            position: "absolute",
+            bottom: "100%",
+            left: "8%",
+            transform: "translateX(-50%)",
+            color: "gray",
+            cursor: "pointer",
+            // ... other styling as required ...
+          }} onClick={handleStarClick} />
+        )}
         <ChatInput onSubmit={handleUserTextSubmit} disabled={waitingForMessageFromAI} />
       </Box>
     </Box>

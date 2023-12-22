@@ -52,6 +52,54 @@ export class UserChatSessionsService {
         }
     }
 
+    // Create a new UserChatSession
+    async saveChatSession(email: string, chatSessionId: string, sourceLanguage: string, targetLanguage: string, messages: UserChatMessage[], token: string): Promise<string> {
+        // Create UserChatSession object
+        const session: UserChatSession = {
+            id: chatSessionId,
+            userId: email,
+            createdAt: new Date(),
+            lastUpdatedAt: new Date(),
+            summary: chatSessionId,
+            sourceLanguage: sourceLanguage,
+            targetLanguage: targetLanguage,
+        };
+
+        // Update timestamps in each message
+        const initialMessages = messages.map(message => ({
+            ...message,
+            timestamp: message.timestamp.toISOString(),
+        }));
+
+        // Create http request body
+        const requestBody = {
+            session: {
+                ...session,
+                createdAt: session.createdAt.toISOString(),
+                lastUpdatedAt: session.lastUpdatedAt.toISOString(),
+            },
+            initialMessages: initialMessages,
+        };
+
+        console.log("Initial messages saving..", {initialMessages});
+        // Create HTTP headers
+        const headers = this.createAuthHeaders(token);
+        headers.append("Content-Type", "application/json");
+
+        try {
+            // Send HTTP request
+            await this.sendRequest(`${apiUrl}/chatSessions/${session.id}`, {
+                method: "PUT",
+                headers,
+                body: JSON.stringify(requestBody),
+            });
+            return chatSessionId;
+        } catch (error) {
+            console.error("Error attempting to create UserChatSession", error);
+            throw error;
+        }
+    }
+
     // Function to get chat sessions
     async getChatSessions(userId: string, limit: number, token: string): Promise<UserChatSession[]> {
         // Create HTTP headers
