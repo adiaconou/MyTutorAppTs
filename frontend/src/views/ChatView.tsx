@@ -4,14 +4,10 @@ import ChatMessageList from "../components/chat/ChatMessageList";
 import { Box } from "@mui/material";
 import useViewModel from "../viewmodels/ChatViewModel";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useLocation, useNavigate, useParams } from "react-router-dom"; // Import useLocation from react-router-dom
+import { useNavigate } from "react-router-dom";
 import Loading from "../components/common/Loading";
-import { UserSettings } from "../models/UserSettings";
-import { UserSettingsService } from "../services/UserSettingsService";
-import StarIcon from '@mui/icons-material/Star'; // Import StarIcon from MUI Icons
-import StarBorderIcon from '@mui/icons-material/StarBorder'; // For un-selected state
-import { Session } from "../models/Session";
-
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 
 interface ChatViewProps {
   systemPrompt?: string;
@@ -19,17 +15,12 @@ interface ChatViewProps {
 
 const ChatView: React.FC<ChatViewProps> = () => {
   const navigate = useNavigate();
-  const { user, isLoading, getAccessTokenSilently } = useAuth0();
-  const [userSettings, setUserSettings] = useState<UserSettings>();
+  const { user, isLoading } = useAuth0();
   const [isStarSelected, setIsStarSelected] = useState(false);
-  const location = useLocation(); // Get the current URL location
-  const userSettingsService = new UserSettingsService();
-  const { id } = useParams<{ id: string }>();
 
   const {
     messages,
     viewportHeight,
-  //  id,
     waitingForMessageFromAI,
     userChatSession,
     saveChatSession,
@@ -37,80 +28,36 @@ const ChatView: React.FC<ChatViewProps> = () => {
     handleTextSubmit,
   } = useViewModel();
 
-  useEffect(() => {
-
-  }, [id]);
-
   // Check auth and load chat session on component mount
   useEffect(() => {
-    console.log("ChatView useEffect", { id });
-
-    // Can navigate to /chat through starting a new session,
-    // which passes a location.state value
-    // accessing chat history, in which case id is available.
-    // Going directly to /chat in browswer should redirect.
-    if (!id && !location.state) {
-      navigate("/");
-      return;
-    }
+    console.log("ChatView useEffect");
 
     const fetchToken = async () => {
-      if (!user?.email) {
-        navigate("/login");
-        return;
-      }
-
-      // Redirect from NewSession creation will include user settings in the state
-      let userSettings = location.state?.userSettings as UserSettings;
-
-      // If chat session is loaded from history, settings must be retrieved from server
-      const token = await getAccessTokenSilently();
-      if (!userSettings) {
-        userSettings = await userSettingsService.getUserSettings(user.email, token) as UserSettings;
-      }
-
-      setUserSettings(userSettings);
-      const chatSession = await loadChatSession(userSettings, token) as Session;
-
-
+      const chatSession = await loadChatSession();
       if (chatSession && chatSession.isSaved) {
-        console.log("SESSION IS SAVED");
         setIsStarSelected(true);
-      } else {
-  
-        console.log("poopo", {userChatSession});
       }
     };
 
     fetchToken();
 
-  }, [id]);
+  }, []);
 
   const handleUserTextSubmit = (text: string) => {
-    if (!userSettings) {
-      throw new Error("Missing UserSettings");
-    }
-
-    handleTextSubmit(text, userSettings, isStarSelected);
+    handleTextSubmit(text, isStarSelected);
   }
 
   const handleStarClick = () => {
-    console.log("Star click event", { isStarSelected, id, userSettings });
-
+    if (!user?.email) {
+      navigate("/login");
+      return;
+    }
     // Only allow changing the state if isStarSelected is currently false
     if (!isStarSelected) {
       setIsStarSelected(true);
-
-      console.log("Star selected");
-      if (userSettings) {
-        console.log("Saving chat session...");
-        saveChatSession(messages, userSettings);
-      }
-    } else {
-      console.log("Star icon is disabled and cannot be reactivated");
+      saveChatSession(messages, user.email);
     }
   };
-
 
   // TODO: Hanlde userChatSession better.
   if (isLoading || !userChatSession) {
