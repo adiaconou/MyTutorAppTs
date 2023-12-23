@@ -15,16 +15,21 @@ import { UserSettingsService } from "../services/UserSettingsService";
 
 export default function ChatViewModel() {
   const { user, getAccessTokenSilently } = useAuth0();
-  const [messages, setMessages] = useState<Message[]>([]);
   const { height: viewportHeight } = useWindowDimensions();
+
+  // State objects
   const [waitingForMessageFromAI, setWaitingForMessageFromAI] = useState(false);
   const [userChatSession, setUserChatSession] = useState<Session>();
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  // Service objects
   const userChatMessagesService = new UserChatMessagesService();
   const userChatSessionsService = new UserChatSessionsService();
   const userSettingsService = new UserSettingsService();
-  const { id } = useParams<{ id: string }>();
   const openAiService = new OpenAIService();
-  const location = useLocation(); // Get the current URL location
+
+  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
 
   /***  Update window dimensions ***/
@@ -263,7 +268,7 @@ export default function ChatViewModel() {
   };
 
   /*** Handle new messages submitted by the user through chat ***/
-  const submitUserMessage = async (text: string, saveMessages: boolean) => {
+  const submitMessage = async (text: string) => {
     setWaitingForMessageFromAI(true);
 
     // Assuming you have defined a Message interface as above
@@ -279,13 +284,12 @@ export default function ChatViewModel() {
     };
 
     // Store user's message
-    if (saveMessages) {
+    if (userChatSession && userChatSession.isSaved) {
       await putNewMessage(text, text, "user", userMessage.timestamp);
     }
 
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     storedMessages.push(userMessage);
-    // messages.push(userMessage);
 
     const token = await getAccessTokenSilently();
     const fetchResponse = async () => {
@@ -310,7 +314,7 @@ export default function ChatViewModel() {
         setMessages((prevMessages) => [...prevMessages, aiMessage]);
         storedMessages.push(aiMessage);
         // Store AI response to user's message
-        if (saveMessages) {
+        if (userChatSession && userChatSession.isSaved) {
           await putNewMessage(parsedMessage, response, "bot", aiMessage.timestamp);
         }
       }
@@ -324,12 +328,13 @@ export default function ChatViewModel() {
   };
 
   /*** Store the new chat session record in the database ***/
-  async function saveChatSession(messages: Message[], email: string) {
+  async function saveChatSession(messages: Message[]) {
     // The user and user.email objects must exist to create a chat session (or really do anything)
     const sessionId = sessionStorage.getItem("chatSessionId");
 
     if (!user || !user.email || !sessionId) {
-      throw Error("Cannot create chat session because user email is not available.");
+      navigate("/login");
+      return;    
     }
 
     // Create UserChatMessage object. A chat session is only
@@ -349,7 +354,7 @@ export default function ChatViewModel() {
     const token = await getAccessTokenSilently();
     let localUserSettings = location.state?.userSettings as UserSettings;
     if (!localUserSettings) {
-      localUserSettings = await userSettingsService.getUserSettings(email, token) as UserSettings;
+      localUserSettings = await userSettingsService.getUserSettings(user.email, token) as UserSettings;
     }
 
     // Send the request to the server
@@ -361,6 +366,14 @@ export default function ChatViewModel() {
       userChatMessages,
       token
     );
+
+    if (userChatSession) {
+      const updatedSession = {
+        ...userChatSession,
+        isSaved: true
+      };
+      setUserChatSession(updatedSession);
+    }
   }
 
   /*** Store the last message in the database ***/
@@ -368,7 +381,9 @@ export default function ChatViewModel() {
     // Get the chat session id from the browser session.
     // If it doesn't exist, we can't write the message.
     const chatSessionId = sessionStorage.getItem("chatSessionId");
-    if (!chatSessionId) return;
+    if (!chatSessionId) {
+      return;
+    }
 
     // Get auth access token so the request can be authorized
     const token = await getAccessTokenSilently();
@@ -385,7 +400,7 @@ export default function ChatViewModel() {
     startNewChatSession,
     saveChatSession,
     loadChatSession,
-    handleTextSubmit: submitUserMessage,
+    submitMessage,
     useWindowDimensions,
   };
 }

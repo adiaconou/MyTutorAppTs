@@ -1,22 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import ChatInput from "../components/chat/ChatInput";
 import ChatMessageList from "../components/chat/ChatMessageList";
 import { Box } from "@mui/material";
 import useViewModel from "../viewmodels/ChatViewModel";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useNavigate } from "react-router-dom";
 import Loading from "../components/common/Loading";
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 
-interface ChatViewProps {
-  systemPrompt?: string;
-}
-
-const ChatView: React.FC<ChatViewProps> = () => {
-  const navigate = useNavigate();
-  const { user, isLoading } = useAuth0();
-  const [isStarSelected, setIsStarSelected] = useState(false);
+const ChatView: React.FC = () => {
+  const { isLoading } = useAuth0();
 
   const {
     messages,
@@ -25,7 +18,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
     userChatSession,
     saveChatSession,
     loadChatSession,
-    handleTextSubmit,
+    submitMessage,
   } = useViewModel();
 
   // Check auth and load chat session on component mount
@@ -33,29 +26,20 @@ const ChatView: React.FC<ChatViewProps> = () => {
     console.log("ChatView useEffect");
 
     const fetchToken = async () => {
-      const chatSession = await loadChatSession();
-      if (chatSession && chatSession.isSaved) {
-        setIsStarSelected(true);
-      }
+      await loadChatSession();
     };
 
     fetchToken();
 
   }, []);
 
-  const handleUserTextSubmit = (text: string) => {
-    handleTextSubmit(text, isStarSelected);
+  const handleTextSubmit = async (text: string) => {
+    await submitMessage(text);
   }
 
-  const handleStarClick = () => {
-    if (!user?.email) {
-      navigate("/login");
-      return;
-    }
-    // Only allow changing the state if isStarSelected is currently false
-    if (!isStarSelected) {
-      setIsStarSelected(true);
-      saveChatSession(messages, user.email);
+  const handleStarClick = async () => {
+    if (userChatSession && !userChatSession.isSaved) {
+      await saveChatSession(messages);
     }
   };
 
@@ -113,7 +97,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
           // ... other existing styles ...
         }}
       >
-        {isStarSelected ? (
+        {userChatSession.isSaved ? (
           // Render the StarIcon with a disabled look
           <StarIcon sx={{
             position: "absolute",
@@ -137,7 +121,7 @@ const ChatView: React.FC<ChatViewProps> = () => {
             // ... other styling as required ...
           }} onClick={handleStarClick} />
         )}
-        <ChatInput onSubmit={handleUserTextSubmit} disabled={waitingForMessageFromAI} />
+        <ChatInput onSubmit={handleTextSubmit} disabled={waitingForMessageFromAI} />
       </Box>
     </Box>
   );
