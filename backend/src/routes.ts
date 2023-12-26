@@ -12,8 +12,11 @@ import { checkJwt } from "./auth/JwtChecker";
 import { OpenAIController } from "./controllers/OpenAIController";
 import { LanguageTranslationController } from "./controllers/LanguageTranslationController";
 const { TextToSpeechController } = require('./controllers/TextToSpeechController');
+import multer from 'multer';
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
+
 const cloudLogController = new CloudLogController(new SecretManager());
 const userSettingsController = new UserSettingsController(new UserSettingsRepository(config.googleProjectId));
 const userChatSessionsController = new UserChatSessionsController(new UserChatSessionRepository(config.googleProjectId));
@@ -43,6 +46,7 @@ router.put("/log", checkJwt, cloudLogController.writeLog.bind(cloudLogController
 
 // Text Translation routes
 router.post("/translate", checkJwt, languageTranslationController.translateText.bind(languageTranslationController));
+router.post('/transcriptions', upload.single('audio'), openaiController.whisperPrompt);
 
 // OpenAI routes
 router.post("/prompt", checkJwt, openaiController.chatgptPrompt.bind(openaiController));

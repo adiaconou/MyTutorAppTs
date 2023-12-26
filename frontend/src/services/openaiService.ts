@@ -4,6 +4,33 @@ const apiUrl = process.env.REACT_APP_BACKEND_URL;
 
 export class OpenAIService {
 
+  async transcribe(audioBlob: Blob, jwtToken: string, language?: string): Promise<string | null> {
+    const formData = new FormData();
+    formData.append('audio', audioBlob);
+    if (language) {
+      formData.append('language', language);
+    }
+
+    const headers = {
+      Authorization: `Bearer ${jwtToken}`,
+      // 'Content-Type' is not required here as it's set automatically by the browser when using FormData
+    };
+
+    try {
+      const response = await fetch(`${apiUrl}/transcriptions`, {
+        method: "POST",
+        headers: headers,
+        body: formData,
+      });
+      const data = await response.json();
+      return data.text; 
+    } catch (error) {
+      console.log("Error requesting transcription", error);
+    }
+
+    return null;
+  }
+
   async prompt(context: Message[], jwtToken: string, maxTokens: number = 50): Promise<string | null> {
     // Create a conversation array by mapping the messages to the required format
     const conversation = context.map((message) => ({

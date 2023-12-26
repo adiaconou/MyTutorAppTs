@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
-import ChatInput from "../components/chat/ChatInput";
-import ChatMessageList from "../components/chat/ChatMessageList";
-import { Box } from "@mui/material";
-import useViewModel from "../viewmodels/ChatViewModel";
+import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import Loading from "../components/common/Loading";
+import { Box } from "@mui/material";
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
+import useViewModel from "../viewmodels/ChatViewModel";
+import ChatMessageList from "../components/chat/ChatMessageList";
+import ChatInput from "../components/chat/ChatInput";
 
 const ChatView: React.FC = () => {
   const { isLoading } = useAuth0();
@@ -94,6 +94,8 @@ const ChatView: React.FC = () => {
           width: "100%",
           maxWidth: "md",
           margin: "0 auto",
+          display: 'flex',
+          alignItems: 'center',
           // ... other existing styles ...
         }}
       >

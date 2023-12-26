@@ -56,6 +56,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
       style={{
         display: "flex",
         justifyContent: "center",
+        flexGrow: 1,
       }}
     >
       <Container maxWidth="md">

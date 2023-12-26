@@ -12,6 +12,9 @@ import { useAuth0 } from "@auth0/auth0-react";
 import VolumeUp from '@mui/icons-material/VolumeUp';
 import config from "../../config";
 import { Session } from "../../models/Session";
+import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
+import AudioModal from "./AudioModal";
+
 
 interface ChatMessageProps {
   message: { displayableText: string; rawText: string; isUser: boolean; };
@@ -24,6 +27,17 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, sx, waitingForMessag
   const textColor = "#ffffff";
   const translationService = new LanguageTranslationService(); // Initialize the translation service
   const { getAccessTokenSilently } = useAuth0();
+
+  const [isAudioModalOpen, setIsAudioModalOpen] = useState(false);
+
+  const handleOpenAudioModal = () => {
+    setIsAudioModalOpen(true);
+  };
+
+  const handleCloseAudioModal = () => {
+    setIsAudioModalOpen(false);
+  };
+
   const pulse = keyframes`
   0% {
     transform: scale(1);
@@ -88,7 +102,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, sx, waitingForMessag
     } catch (error) {
       console.error("Error playing audio", error);
       setIsPlayingAudio(false);
-    } 
+    }
   };
 
   const handlePopoverClose = () => {
@@ -187,10 +201,21 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, sx, waitingForMessag
                     color: isPlayingAudio ? 'grey' : 'white',
                     fontSize: '1rem',
                     alignSelf: 'center',
-                    marginLeft: 1, // Add some space between the icons
+                    marginLeft: 2, // Add some space between the icons
                   }}
                 />
+                <RecordVoiceOverIcon
+                  onClick={handleOpenAudioModal}
+                  sx={{
+                    cursor: 'pointer',
+                    color: 'white',
+                    fontSize: '1rem',
+                    alignSelf: 'center',
+                    marginLeft: 2, // Add some space between the icons
 
+                  }}
+                />
+                <AudioModal open={isAudioModalOpen} messageText={message.displayableText} onClose={handleCloseAudioModal} />
               </Box>
               <Popover
                 id={id}
