@@ -10,10 +10,11 @@ import { grey } from '@mui/material/colors';
 interface AudioModalProps {
     open: boolean;
     messageText: string;
+    language: string;
     onClose: () => void;
 }
 
-const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, onClose }) => {
+const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, language, onClose }) => {
     const [transcript, setTranscript] = useState('');
     const [similarityScore, setSimilarityScore] = useState<number | null>(null);
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
@@ -67,7 +68,7 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, onClose }) =
             newMediaRecorder.ondataavailable = async (event) => {
                 if (event.data.size > 0) {
                     const token = await getAccessTokenSilently();
-                    const text = await openaiService.transcribe(event.data, token, "el");
+                    const text = await openaiService.transcribe(event.data, token, language);
                     if (text) {
                         setTranscript(text);
                         const score = stringSimilarity.compareTwoStrings(messageText, text) * 100;

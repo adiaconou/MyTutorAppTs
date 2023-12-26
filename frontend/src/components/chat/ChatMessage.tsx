@@ -74,7 +74,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, sx, waitingForMessag
       setTranslation(translatedText);
       setAnchorEl(currentTarget as unknown as HTMLElement);
       setIsTranslating(false);
-
     } catch (error) {
       setTranslation("Translation error");
     } finally {
@@ -215,7 +214,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, sx, waitingForMessag
 
                   }}
                 />
-                <AudioModal open={isAudioModalOpen} messageText={message.displayableText} onClose={handleCloseAudioModal} />
+                <AudioModal open={isAudioModalOpen} messageText={message.displayableText} language={config.languages[chatSession.targetLanguage]} onClose={handleCloseAudioModal} />
               </Box>
               <Popover
                 id={id}

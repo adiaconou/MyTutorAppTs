@@ -8,18 +8,18 @@ interface Config {
 const getConfig = (): Config => {
     
     const languages: Record<string, string> = {
-        English: 'en-US',
-        Spanish: 'es-ES',
-        French: 'fr-FR',
-        German: 'de-DE',
-        Italian: 'it-IT',
-        Portuguese: 'pt-PT',
-        Dutch: 'nl-NL',
-        Russian: 'ru-RU',
-        Chinese: 'zh-CN',
-        Japanese: 'ja-JP',
-        Greek: 'el-GR',
-        Latvian: 'lv-LV',
+        English: 'en',
+        Spanish: 'es',
+        French: 'fr',
+        German: 'de',
+        Italian: 'it',
+        Portuguese: 'pt',
+        Dutch: 'nl',
+        Russian: 'ru',
+        Chinese: 'zh',
+        Japanese: 'ja',
+        Greek: 'el',
+        Latvian: 'lv',
     };
     
     return {
