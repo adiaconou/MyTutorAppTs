@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import React, { useEffect, useRef } from 'react';
 
 interface WaveformProps {
@@ -72,7 +73,16 @@ const Waveform: React.FC<WaveformProps> = ({ audioContext, analyser }) => {
         draw();
     }, [audioContext, analyser]);
 
-    return <canvas ref={canvasRef} height="100" />;
+    return (
+        <Box sx={{
+            width: '80%',
+            display: 'flex', // Use flex display
+            justifyContent: 'center', // Center the content
+            alignItems: 'center' // Vertically center the canvas if needed
+        }}>
+            <canvas ref={canvasRef} height="65px" />
+        </Box>
+    );
 };
 
 export default Waveform;

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { IconButton } from '@mui/material';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import StopIcon from '@mui/icons-material/Stop';
+import { SxProps, Theme } from '@mui/material';
+import MicIcon from '@mui/icons-material/Mic';
+import MicOffIcon from '@mui/icons-material/MicOff';
 
 interface RecordAudioButtonProps {
     onStartRecording: () => void;
     onStopRecording: () => void;
+    sx?: SxProps<Theme>;
+    
 }
 
-const RecordAudioButton: React.FC<RecordAudioButtonProps> = ({ onStartRecording, onStopRecording }) => {
+const RecordAudioButton: React.FC<RecordAudioButtonProps> = ({ onStartRecording, onStopRecording, sx }) => {
     const [isRecording, setIsRecording] = useState(false);
 
     const handleRecordingToggle = () => {
@@ -18,10 +20,6 @@ const RecordAudioButton: React.FC<RecordAudioButtonProps> = ({ onStartRecording,
         } else {
             onStopRecording();
         }
-    };
-
-    const handleContextMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-        event.preventDefault();
     };
 
     useEffect(() => {
@@ -34,21 +32,19 @@ const RecordAudioButton: React.FC<RecordAudioButtonProps> = ({ onStartRecording,
     }, [isRecording, onStopRecording]);
 
     return (
-        <IconButton
-            onContextMenu={handleContextMenu}
-            onClick={handleRecordingToggle}
-            sx={{
-                backgroundColor: isRecording ? '#ff1744' : '#9e9e9e',
-                '&:hover': {
-                    backgroundColor: isRecording ? '#ff4569' : '#bdbdbd',
-                },
-                color: '#fff',
-                width: '70px',
-                height: '70px',
-            }}
-        >
-            {isRecording ? <StopIcon /> : <FiberManualRecordIcon />}
-        </IconButton>
+        <>
+            {isRecording ? (
+                <MicIcon 
+                    onClick={handleRecordingToggle} 
+                    sx={{ color: '#ff1744', cursor: 'pointer', ...sx }}
+                />
+            ) : (
+                <MicOffIcon
+                    onClick={handleRecordingToggle} 
+                    sx={{ color: '#9e9e9e', '&:hover': { color: '#bdbdbd' }, cursor: 'pointer', ...sx }}
+                />
+            )}
+        </>
     );
 };
 

@@ -9,11 +9,11 @@ import TranslateIcon from "@mui/icons-material/Translate";
 import { keyframes } from '@emotion/react';
 import { LanguageTranslationService } from "../../services/LanguageTranslationService";
 import { useAuth0 } from "@auth0/auth0-react";
-import VolumeUp from '@mui/icons-material/VolumeUp';
 import config from "../../config";
 import { Session } from "../../models/Session";
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import AudioModal from "./AudioModal";
+import AudioPlaybackIcon from './AudioPlaybackIcon';
 
 
 interface ChatMessageProps {
@@ -188,20 +188,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, sx, waitingForMessag
                     animation: `${pulse} 2s infinite`, // Apply the pulse animation here
                   }}
                 />
-
-                <VolumeUp
-                  onClick={() => {
-                    if (!isPlayingAudio) {
-                      handleAudioClick();
-                    }
-                  }}
-                  sx={{
-                    cursor: isPlayingAudio ? 'default' : 'pointer',
-                    color: isPlayingAudio ? 'grey' : 'white',
-                    fontSize: '1rem',
-                    alignSelf: 'center',
-                    marginLeft: 2, // Add some space between the icons
-                  }}
+                <AudioPlaybackIcon
+                  messageText={message.displayableText}
+                  languageCode={config.languages[chatSession.targetLanguage]}
+                  sx={{ marginLeft: 2, fontSize: '1rem' }}
                 />
                 <RecordVoiceOverIcon
                   onClick={handleOpenAudioModal}
