@@ -5,17 +5,18 @@ import { OpenAIService } from '../../services/OpenAIService';
 import { useAuth0 } from '@auth0/auth0-react';
 import stringSimilarity from 'string-similarity';
 import Waveform from './WaveForm';
-import { grey } from '@mui/material/colors';
+import { blue, grey } from '@mui/material/colors';
 import { useTheme } from '@mui/material/styles';
+import AudioPlaybackIcon from './AudioPlaybackIcon';
 
 interface AudioModalProps {
     open: boolean;
     messageText: string;
-    language: string;
+    languageCode: string;
     onClose: () => void;
 }
 
-const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, language, onClose }) => {
+const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, languageCode, onClose }) => {
     const theme = useTheme();
 
     const [transcript, setTranscript] = useState('');
@@ -78,7 +79,7 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, language, on
                 setIsLoading(true);
                 if (event.data.size > 0) {
                     const token = await getAccessTokenSilently();
-                    const text = await openaiService.transcribe(event.data, token,);
+                    const text = await openaiService.transcribe(event.data, token, languageCode);
                     if (text) {
                         setTranscript(text);
                         const score = stringSimilarity.compareTwoStrings(messageText, text) * 100;
@@ -107,20 +108,19 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, language, on
     };
 
     return (
-        <Modal
+<Modal
             open={open}
             onClose={handleClose}
             style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                outline: 'none',
             }}
         >
             <Box
                 sx={{
-                    width: '90vw', // Default width
-                    maxWidth: '500px', // Adjust to your preference for larger screens
+                    width: '90vw',
+                    maxWidth: '500px',
                     bgcolor: 'background.paper',
                     boxShadow: 24,
                     p: 0,
@@ -130,9 +130,12 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, language, on
                     alignItems: 'center',
                     justifyContent: 'center',
                     '@media (max-width: 600px)': {
-                        width: '90vw', // Smaller width for mobile devices
-                    }
+                        width: '90vw',
+                    },
+                    outline: 'none', // Remove focus outline
                 }}
+                // Adding tabIndex={-1} makes the element focusable but not tabbable
+                tabIndex={-1}
             >
                 <AppBar position="static" color="primary">
                     <Toolbar>
@@ -152,7 +155,7 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, language, on
                     width: '90%',
                     boxSizing: 'border-box',
                 }}>
-                    <AppBar position="static" sx={{ backgroundColor: grey[600], width: '100%', height: '23px', mb: 2 }}>
+                    <AppBar position="static" sx={{ backgroundColor: grey[800], width: '100%', height: '23px', mb: 2 }}>
                         <Toolbar sx={{
                             justifyContent: 'center',
                             alignItems: 'center',
@@ -180,12 +183,13 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, language, on
                             </Typography>
                         </Box>
                     )}
-                    <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'center', mb: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column', justifyContent: 'center', mb: 1 }}>
                         <RecordAudioButton
                             onStartRecording={startRecording}
                             onStopRecording={stopRecording}
-                            sx={{ mb: 1, fontSize: '2.5rem' }} // Match size with AudioPlaybackIcon
+                            sx={{ mb: 1, fontSize: '2.5rem' }}
                         />
+                        <AudioPlaybackIcon messageText={messageText} languageCode={languageCode} activeColor={blue[500]} inactiveColor={grey[300]} sx={{ fontSize: '1.5rem' }} />
                     </Box>
                     {isRecording && (
                         <Waveform audioContext={audioContextRef.current} analyser={analyzerRef.current} />
@@ -201,7 +205,7 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, language, on
                     width: '90%',
                     boxSizing: 'border-box',
                 }}>
-                    <AppBar position="static" sx={{ backgroundColor: grey[600], width: '100%', height: '23px', mb: 2 }}>
+                    <AppBar position="static" sx={{ backgroundColor: grey[800], width: '100%', height: '23px', mb: 2 }}>
                         <Toolbar sx={{
                             justifyContent: 'center',
                             alignItems: 'center',

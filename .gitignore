@@ -24,6 +24,7 @@ nod_modules
 /frontend/.env.development.local
 /frontend/.env.test.local
 /frontend/.env.production.local
+/frontend/uploads/
 
 npm-debug.log*
 yarn-debug.log*

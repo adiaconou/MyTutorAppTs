@@ -204,7 +204,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, sx, waitingForMessag
 
                   }}
                 />
-                <AudioModal open={isAudioModalOpen} messageText={message.displayableText} language={config.languages[chatSession.targetLanguage]} onClose={handleCloseAudioModal} />
+                <AudioModal open={isAudioModalOpen} messageText={message.displayableText} languageCode={config.languages[chatSession.targetLanguage]} onClose={handleCloseAudioModal} />
               </Box>
               <Popover
                 id={id}
