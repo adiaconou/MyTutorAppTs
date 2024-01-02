@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { UserSettings } from "../models/UserSettings";
 import { UserSettingsRepository } from "../repository/UserSettingsRepository";
+import BaseError from "../error/BaseError";
 
 export class UserSettingsController {
     private userSettingsRepo: UserSettingsRepository;
@@ -10,25 +11,33 @@ export class UserSettingsController {
     }
 
     public async getUserSettings(req: Request, res: Response) {
+        const userId = req.params.userId;
+
+        if (!userId) {
+            return res.status(400).json({ message: "Invalid request: userId missing" });
+        }
+
         try {
-            const userId = req.params.userId;
             const userSettings = await this.userSettingsRepo.getUserSettings(userId);
             res.json(userSettings);
         } catch (error) {
-            res.status(500).json({ message: "Error fetching user settings" });
+            if (error instanceof BaseError) {
+                res.status(error.statusCode).json({ message: error.message });
+            } else {
+                res.status(500).json({ message: `Error getting user settings for userId ${userId}` });
+            }
         }
     }
 
     public async updateUserSettings(req: Request, res: Response) {
+        const userId = req.params.userId;
+        const settings = req.body.settings;
+
+        if (!userId || !settings) {
+            return res.status(400).json({ message: `Invalid request: missing userId (${userId}) or user settings (${settings})` });
+        }
+
         try {
-            const userId = req.params.userId;
-            const settings = req.body.settings;
-
-            if (!settings) {
-                res.status(400).json({ message: "Invalid request data" });
-                return;
-            }
-
             const userSettings: UserSettings = {
                 userId,
                 settings,
@@ -37,7 +46,11 @@ export class UserSettingsController {
             const updatedUserSettings = await this.userSettingsRepo.updateUserSettings(userId, userSettings);
             res.json(updatedUserSettings);
         } catch (error) {
-            res.status(500).json({ message: `Error updating user settings ${error}` });
+            if (error instanceof BaseError) {
+                res.status(error.statusCode).json({ message: error.message });
+            } else {
+                res.status(500).json({ message: `Error updating  user settings for userId ${userId}, settings ${settings}` });
+            }
         }
     }
 }

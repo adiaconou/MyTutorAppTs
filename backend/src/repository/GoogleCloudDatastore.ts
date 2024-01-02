@@ -1,6 +1,22 @@
 import { Datastore, Entity, Key, Transaction } from "@google-cloud/datastore";
 import { v4 as uuidv4 } from "uuid";
+import NotFoundError from "../error/NotFoundError";
+import PermissionError from "../error/PermissionError";
+import AuthenticationError from "../error/AuthenticationError";
+import InvalidArgumentError from "../error/InvalidArgumentError";
+import InternalError from "../error/InternalError";
+import ServiceUnavailableError from "../error/ServiceUnavailableError";
+import BaseError from "../error/BaseError";
+import ResourceExhaustedError from "../error/ResourceExhaustedError";
 
+// https://github.com/googleapis/googleapis/blob/master/google/rpc/code.proto
+type DatastoreError = {
+  error: {
+    statusCode: number;
+    message: string;
+    status: string;
+  }
+};
 
 export class GoogleCloudDatastore<T> {
   private datastore: Datastore;
@@ -18,7 +34,11 @@ export class GoogleCloudDatastore<T> {
       key: datastoreKey,
       data: entity,
     };
-    await this.datastore.upsert(datastoreEntity);
+    try {
+      await this.datastore.upsert(datastoreEntity);
+    } catch (error) {
+      throw this.getError(error as DatastoreError);
+    }
   }
 
   async transactionalPut(
@@ -54,14 +74,10 @@ export class GoogleCloudDatastore<T> {
       transaction.save(datastoreEntityA);
       transaction.save(datastoreEntityB);
 
-      // Commit the transaction (apply the changes)
       await transaction.commit();
     } catch (error) {
-      // Handle errors (e.g., rollback the transaction)
       await transaction.rollback();
-      console.error("Error performing transactional update:", error);
-      // Propagate the error to the caller (optional, based on your error handling strategy)
-      throw error;
+      throw this.getError(error as DatastoreError);
     }
   }
 
@@ -73,54 +89,61 @@ export class GoogleCloudDatastore<T> {
     entitiesB: object[]
   ): Promise<void> {
     const datastoreKeyA: Key = this.datastore.key([kindA, keyA]);
-  
-  // Define datastore entity for kindA
-  const datastoreEntityA: Entity = {
-    key: datastoreKeyA,
-    data: entityA,
-  };
 
-  // Initialize a transaction
-  const transaction = this.datastore.transaction();
+    // Define datastore entity for kindA
+    const datastoreEntityA: Entity = {
+      key: datastoreKeyA,
+      data: entityA,
+    };
 
-  try {
-    // Start the transaction
-    await transaction.run();
+    // Initialize a transaction
+    const transaction = this.datastore.transaction();
 
-    // Perform update operation for kindA within the transaction
-    transaction.save(datastoreEntityA);
+    try {
+      // Start the transaction
+      await transaction.run();
 
-    // Iterate over kindB entities and save each
-    for (const entityB of entitiesB) {
-      const keyB = uuidv4(); // Assuming each entityB has an 'id' property
-      const datastoreKeyB: Key = this.datastore.key([kindB, keyB]);
+      // Perform update operation for kindA within the transaction
+      transaction.save(datastoreEntityA);
 
-      const datastoreEntityB: Entity = {
-        key: datastoreKeyB,
-        data: entityB,
-      };
+      // Iterate over kindB entities and save each
+      for (const entityB of entitiesB) {
+        const keyB = uuidv4(); // Assuming each entityB has an 'id' property
+        const datastoreKeyB: Key = this.datastore.key([kindB, keyB]);
 
-      transaction.save(datastoreEntityB);
+        const datastoreEntityB: Entity = {
+          key: datastoreKeyB,
+          data: entityB,
+        };
+
+        transaction.save(datastoreEntityB);
+      }
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw this.getError(error as DatastoreError);
     }
-
-    // Commit the transaction (apply the changes)
-    await transaction.commit();
-  } catch (error) {
-    // Handle errors (e.g., rollback the transaction)
-    await transaction.rollback();
-    console.error("Error performing transactional update:", error);
-    // Propagate the error to the caller (optional, based on your error handling strategy)
-    throw error;
-  }
   }
 
   async get(key: string): Promise<T | null> {
     const datastoreKey = this.datastore.key([this.entityType, key]);
-    const [datastoreEntity] = await this.datastore.get(datastoreKey);
-    if (!datastoreEntity) {
-      return null;
+    try {
+      const [datastoreEntity] = await this.datastore.get(datastoreKey);
+
+      // The Datastore client returns a null entity if it doesn't exist in the datastore.
+      if (!datastoreEntity) {
+        throw new NotFoundError(`Entity not found for entityType=${this.entityType}, key=${key}`);
+      }
+
+      return datastoreEntity as T;
+    } catch (error) {
+      if (error instanceof BaseError) {
+        throw error;
+      } else {
+        throw this.getError(error as DatastoreError);
+      }
     }
-    return datastoreEntity as T;
   }
 
   async getPage(
@@ -153,10 +176,7 @@ export class GoogleCloudDatastore<T> {
         nextPageToken: nextNextPageToken,
       };
     } catch (error) {
-      // Log the error details for debugging purposes
-      console.error("Error executing query:", error);
-      // Propagate the error to the caller (optional, based on your error handling strategy)
-      throw error;
+      throw this.getError(error as DatastoreError);
     }
   }
 
@@ -167,7 +187,7 @@ export class GoogleCloudDatastore<T> {
 
   async commit() {
     if (!this.currentTransaction) {
-      throw new Error("No transaction in progress");
+      throw new BaseError("No transaction in progress");
     }
     await this.currentTransaction.commit();
     this.currentTransaction = null;
@@ -175,7 +195,7 @@ export class GoogleCloudDatastore<T> {
 
   async rollback() {
     if (!this.currentTransaction) {
-      throw new Error("No transaction in progress");
+      throw new BaseError("No transaction in progress");
     }
     await this.currentTransaction.rollback();
     this.currentTransaction = null;
@@ -183,9 +203,39 @@ export class GoogleCloudDatastore<T> {
 
   async transactionalDelete(keys: string[]): Promise<void> {
     if (!this.currentTransaction) {
-      throw new Error("No transaction in progress");
+      throw new BaseError("No transaction in progress");
     }
     const datastoreKeys = keys.map(key => this.datastore.key([this.entityType, key]));
     this.currentTransaction.delete(datastoreKeys);
+  }
+
+  // Wrap Datastore errors into internal exceptions.
+  private getError(error: DatastoreError): BaseError {
+    console.log({ error });
+
+    // Datastore client status codes defined here: 
+    // https://github.com/googleapis/googleapis/blob/master/google/rpc/code.proto
+    const status = error.error.status;
+    const code = error.error.statusCode;
+    const message = error.error.message;
+
+    switch (status) {
+      case "INTERNAL":
+        return new InternalError(message);
+      case "INVALID_ARGUMENT":
+        return new InvalidArgumentError(message);
+      case "NOT_FOUND":
+        return new NotFoundError(message);
+      case "PERMISSION_DENIED":
+        return new PermissionError(message);
+      case "UNAUTHENTICATED":
+        return new AuthenticationError(message);
+      case "RESOURCE_EXHAUSTED":
+        return new ResourceExhaustedError(message);
+      case "UNAVAILABLE":
+        return new ServiceUnavailableError(message);
+      default:
+        return new BaseError(message, code);
+    }
   }
 }
