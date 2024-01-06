@@ -1,0 +1,21 @@
+{
+    "SetupView.speakLanguage": "Welke taal spreekt u momenteel?",
+    "SetupView.learnLanguage": "Welke taal wilt u leren?",
+    "SetupView.skillLevel": "Wat is uw huidige vaardigheidsniveau in {language}?",
+    "SetupView.search": "Zoeken...",
+    "SetupView.beginner": "Beginner",
+    "SetupView.intermediate": "Gemiddeld",
+    "SetupView.advanced": "Gevorderd",
+    "language.english": "Engels",
+    "language.german": "Duits",
+    "language.french": "Frans",
+    "language.spanish": "Spaans",
+    "language.italian": "Italiaans",
+    "language.russian": "Russisch",
+    "language.chinese": "Chinees",
+    "language.latvian": "Lets",
+    "language.japanese": "Japans",
+    "language.portuguese": "Portugees",
+    "language.dutch": "Nederlands",
+    "language.greek": "Grieks"
+}

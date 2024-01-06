@@ -1,0 +1,21 @@
+{
+    "SetupView.speakLanguage": "現在話している言語は何ですか？",
+    "SetupView.learnLanguage": "どの言語を学びたいですか？",
+    "SetupView.skillLevel": "{language}の現在のスキルレベルは何ですか？",
+    "SetupView.search": "検索...",
+    "SetupView.beginner": "初心者",
+    "SetupView.intermediate": "中級",
+    "SetupView.advanced": "上級",
+    "language.english": "英語",
+    "language.german": "ドイツ語",
+    "language.french": "フランス語",
+    "language.spanish": "スペイン語",
+    "language.italian": "イタリア語",
+    "language.russian": "ロシア語",
+    "language.chinese": "中国語",
+    "language.latvian": "ラトビア語",
+    "language.japanese": "日本語",
+    "language.portuguese": "ポルトガル語",
+    "language.dutch": "オランダ語",
+    "language.greek": "ギリシャ語"
+}

@@ -1,18 +1,18 @@
 import { useState } from "react";
-import { UserSettings } from "../models/UserSettings";
-import { SelectChangeEvent } from "@mui/material";
 import { useAuth0 } from "@auth0/auth0-react";
+import { SelectChangeEvent } from "@mui/material";
+import { UserSettings } from "../models/UserSettings";
 import { UserSettingsService } from "../services/UserSettingsService";
 
 export default function SettingsViewModel() {
-  const userSettingsService = new UserSettingsService();
-  const {  user, getAccessTokenSilently  } = useAuth0(); 
-  const [languageProficiency, setLanguageProficiency] = useState<number>(5);
-  const [languageChoice, setLanguageChoice] = useState<string>("Greek"); 
-
-  // controls the spinner when the settings are being loaded
+  const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-   
+  const [languageChoice, setLanguageChoice] = useState<string>("Greek");
+  const [languageProficiency, setLanguageProficiency] = useState<number>(5);
+  const { user, getAccessTokenSilently } = useAuth0();
+  
+  const userSettingsService = new UserSettingsService();
+
   const email = user?.email;
 
   /*** Retrieve the stored user settings when the SettingsView is first loaded ***/
@@ -23,6 +23,7 @@ export default function SettingsViewModel() {
         if (userSettings && userSettings.settings) {
           setLanguageChoice(userSettings.settings.languageChoice);
           setLanguageProficiency(userSettings.settings.languageProficiency);
+          setUserSettings(userSettings);
         }
         setIsLoading(false);
       })
@@ -57,37 +58,70 @@ export default function SettingsViewModel() {
   };
 
   /*** Store the language choice update when a new selection is made from the drop down ***/
-  const handleLanguageChoiceChange = (event: SelectChangeEvent<string>) => {
+  const handleSourceLanguageChange = async (event: SelectChangeEvent<string>) => {
     if (!email) {
       throw Error("Email address is unavailable. User settings cannot be updated.");
     }
 
-    setLanguageChoice(event.target.value);
+    const token = await getAccessTokenSilently();
+    const currentUserSettings = await userSettingsService.getUserSettings(email, token);
 
-    const userSettings: UserSettings = {
+    if (!currentUserSettings) {
+      throw Error("User settings are unavailable. User settings cannot be updated.");
+    }
+
+    const updatedUserSettings: UserSettings = {
       userId: email,
       settings: {
-        languageChoice: event.target.value,
-        languageProficiency: languageProficiency,
-        sourceLanguage: "English",
+        languageChoice: currentUserSettings.settings.languageChoice,
+        languageProficiency: currentUserSettings.settings.languageProficiency,
+        sourceLanguage: event.target.value,
       },
     };
 
-    updateUserSettings(userSettings);
+    updateUserSettings(updatedUserSettings);
+  };
+
+  /*** Store the language choice update when a new selection is made from the drop down ***/
+  const handleTargetLanguageChange = async (event: SelectChangeEvent<string>) => {
+    if (!email) {
+      throw Error("Email address is unavailable. User settings cannot be updated.");
+    }
+
+    const token = await getAccessTokenSilently();
+    const currentUserSettings = await userSettingsService.getUserSettings(email, token);
+
+    if (!currentUserSettings) {
+      throw Error("User settings are unavailable. User settings cannot be updated.");
+    }
+
+    const updatedUserSettings: UserSettings = {
+      userId: email,
+      settings: {
+        languageChoice: event.target.value,
+        languageProficiency: currentUserSettings.settings.languageProficiency,
+        sourceLanguage: currentUserSettings.settings.languageChoice,
+      },
+    };
+
+    updateUserSettings(updatedUserSettings);
   };
 
   /*** Send the settings update request to the server ***/
   async function updateUserSettings(userSettings: UserSettings): Promise<void> {
     const token = await getAccessTokenSilently();
     userSettingsService.updateUserSettings(userSettings, token);
+    setUserSettings(userSettings);
   }
 
   return {
     languageProficiency,
     languageChoice,
     isLoading,
+    userSettings,
     handleLanguageProficiencyChange,
-    handleLanguageChoiceChange,
+    handleSourceLanguageChange,
+    handleTargetLanguageChange,
     getUserSettings,
   };
 }

@@ -108,7 +108,7 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, languageCode
     };
 
     return (
-<Modal
+        <Modal
             open={open}
             onClose={handleClose}
             style={{
@@ -121,8 +121,8 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, languageCode
                 sx={{
                     width: '90vw',
                     maxWidth: '500px',
-                    bgcolor: 'background.paper',
-                    boxShadow: 24,
+                    bgcolor: theme.palette.primary.light,
+                    opacity: 1.0,
                     p: 0,
                     textAlign: 'center',
                     display: 'flex',
@@ -137,16 +137,16 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, languageCode
                 // Adding tabIndex={-1} makes the element focusable but not tabbable
                 tabIndex={-1}
             >
-                <AppBar position="static" color="primary">
-                    <Toolbar>
+                <AppBar position="static">
+                    <Toolbar sx={{ bgcolor: theme.palette.info.dark }}>
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'center' }}>
                             Speech Practice
                         </Typography>
                     </Toolbar>
                 </AppBar>
                 <Card sx={{
-                    bgColor: 'default',
                     display: 'flex',
+                    bgcolor: theme.palette.action.selected,
                     flexDirection: 'column',
                     alignItems: 'center',
                     marginTop: 2,
@@ -155,7 +155,7 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, languageCode
                     width: '90%',
                     boxSizing: 'border-box',
                 }}>
-                    <AppBar position="static" sx={{ backgroundColor: grey[800], width: '100%', height: '23px', mb: 2 }}>
+                    <AppBar position="static" sx={{ backgroundColor: theme.palette.grey[700], width: '100%', height: '23px', mb: 2 }}>
                         <Toolbar sx={{
                             justifyContent: 'center',
                             alignItems: 'center',
@@ -170,9 +170,9 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, languageCode
                     {messageText && (
                         <Box sx={{ width: '100%', textAlign: 'left', padding: '0 16px' }}> {/* Adjust padding as needed */}
                             <Typography
-                                variant="body1"
                                 sx={{
                                     mb: 1,
+                                    color: theme.palette.primary.contrastText,
                                     fontFamily: 'Noto Sans, monospace',
                                     fontSize: '16px',
                                     whiteSpace: 'pre-line',
@@ -196,8 +196,8 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, languageCode
                     )}
                 </Card>
                 <Card sx={{
-                    bgColor: 'primary',
                     display: 'flex',
+                    bgcolor: theme.palette.action.selected,
                     flexDirection: 'column',
                     alignItems: 'center',
                     marginBottom: 2,
@@ -205,7 +205,15 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, languageCode
                     width: '90%',
                     boxSizing: 'border-box',
                 }}>
-                    <AppBar position="static" sx={{ backgroundColor: grey[800], width: '100%', height: '23px', mb: 2 }}>
+                    <AppBar
+                        position="static"
+                        sx={{
+                            backgroundColor: theme.palette.grey[700],
+                            width: '100%',
+                            height: '23px',
+                            mb: 2
+                        }}
+                    >
                         <Toolbar sx={{
                             justifyContent: 'center',
                             alignItems: 'center',
@@ -222,9 +230,9 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, languageCode
                     ) : transcript && (
                         <Box sx={{ width: '100%', textAlign: 'left', padding: '0 16px' }}>
                             <Typography
-                                variant="body1"
                                 sx={{
                                     mb: 1,
+                                    color: theme.palette.primary.contrastText,
                                     fontFamily: 'Noto Sans, monospace',
                                     fontSize: '16px',
                                     whiteSpace: 'pre-line',
@@ -235,15 +243,30 @@ const AudioModal: React.FC<AudioModalProps> = ({ open, messageText, languageCode
                             </Typography>
                         </Box>
                     )}
-                    <Box sx={{ padding: 1, width: '95%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <AppBar position="static" sx={{ backgroundColor: getBorderColor(similarityScore), width: '40%', height: '30px' }}>
+                    <Box
+                        sx={{
+                            padding: 1,
+                            width: '95%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <AppBar
+                            position="static"
+                            sx={{
+                                backgroundColor: getBorderColor(similarityScore),
+                                width: '40%',
+                                height: '30px'
+                            }}
+                        >
                             <Toolbar sx={{
                                 justifyContent: 'center', // Center horizontally
                                 alignItems: 'center', // Center vertically
                                 height: '100%',
                                 minHeight: '30px',
                             }}>
-                                <Typography sx={{ fontSize: '16px', textAlign: 'center', }}>
+                                <Typography sx={{ fontSize: '16px', textAlign: 'center', color: theme.palette.primary.contrastText }}>
                                     Score: {similarityScore !== null ? similarityScore.toFixed(0) : '--'}
                                 </Typography>
                             </Toolbar>

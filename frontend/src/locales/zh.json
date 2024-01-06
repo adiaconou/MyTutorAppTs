@@ -1,0 +1,21 @@
+{
+    "SetupView.speakLanguage": "你目前说什么语言？",
+    "SetupView.learnLanguage": "你想学习什么语言？",
+    "SetupView.skillLevel": "你目前的{language}技能水平是什么？",
+    "SetupView.search": "搜索...",
+    "SetupView.beginner": "初学者",
+    "SetupView.intermediate": "中级",
+    "SetupView.advanced": "高级",
+    "language.english": "英语",
+    "language.german": "德语",
+    "language.french": "法语",
+    "language.spanish": "西班牙语",
+    "language.italian": "意大利语",
+    "language.russian": "俄语",
+    "language.chinese": "汉语",
+    "language.latvian": "拉脱维亚语",
+    "language.japanese": "日语",
+    "language.portuguese": "葡萄牙语",
+    "language.dutch": "荷兰语",
+    "language.greek": "希腊语"
+}

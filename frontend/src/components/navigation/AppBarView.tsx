@@ -34,7 +34,6 @@ const AppBarView: React.FC<AppBarViewProps> = ({ sx }) => {
           <IconButton
             size="large"
             edge="start"
-            color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
             onClick={handleMenuClick}
@@ -44,7 +43,7 @@ const AppBarView: React.FC<AppBarViewProps> = ({ sx }) => {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             My AI Tutor
           </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", height: "100%"}}>
+          <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
             <Avatar src={user?.picture}>
               <AccountCircleIcon />
             </Avatar>

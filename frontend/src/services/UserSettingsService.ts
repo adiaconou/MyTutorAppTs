@@ -9,27 +9,26 @@ export class UserSettingsService {
 
     // Get user's settings by user id
     async getUserSettings(userId: string, token: string): Promise<UserSettings | null> {
-        // Create HTTP headers
         const headers = this.createAuthHeaders(token);
         const response = await this.sendRequest(`${apiUrl}/userSettings/${userId}`, { method: "GET", headers });
+
+        if (response.status === 404){
+            return null;
+        }
         
         try {
-            // Send HTTP request
             return await response.json();
         } catch (error) {
-            console.error("Error fetching UserSettings", error);
             throw error;
         }
     }
 
     // Update user's settings
     async updateUserSettings(userSettings: UserSettings, token: string): Promise<void> {
-        // Create HTTP headers
         const headers = this.createAuthHeaders(token);
         headers.append("Content-Type", "application/json");
 
         try {
-            // Send HTTP request
             await this.sendRequest(`${apiUrl}/userSettings/${userSettings.userId}`, {
                 method: "PUT",
                 headers,
@@ -44,11 +43,7 @@ export class UserSettingsService {
     // Send the http request to the server
     private async sendRequest(url: string, options: RequestInit): Promise<Response> {
         console.log(`[Request] ${options.method} ${url}`);
-        const response = await fetch(url, options);
-        if (!response.ok) {
-            throw new Error(`HTTP error status ${response.status}`);
-        }
-        return response;
+        return await fetch(url, options);
     }
 
     // Create the HTTP headers with auth

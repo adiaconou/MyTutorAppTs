@@ -76,9 +76,9 @@ const Waveform: React.FC<WaveformProps> = ({ audioContext, analyser }) => {
     return (
         <Box sx={{
             width: '80%',
-            display: 'flex', // Use flex display
-            justifyContent: 'center', // Center the content
-            alignItems: 'center' // Vertically center the canvas if needed
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
         }}>
             <canvas ref={canvasRef} height="65px" />
         </Box>

@@ -1,0 +1,21 @@
+{
+    "SetupView.speakLanguage": "Kādu valodu jūs pašlaik runājat?",
+    "SetupView.learnLanguage": "Kādu valodu vēlaties mācīties?",
+    "SetupView.skillLevel": "Kāds ir jūsu pašreizējais {language} prasmju līmenis?",
+    "SetupView.search": "Meklēt...",
+    "SetupView.beginner": "Iesācējs",
+    "SetupView.intermediate": "Vidējs",
+    "SetupView.advanced": "Izvērstā",
+    "language.english": "Angļu",
+    "language.german": "Vācu",
+    "language.french": "Franču",
+    "language.spanish": "Spāņu",
+    "language.italian": "Itāļu",
+    "language.russian": "Krievu",
+    "language.chinese": "Ķīniešu",
+    "language.latvian": "Latviešu",
+    "language.japanese": "Japāņu",
+    "language.portuguese": "Portugāļu",
+    "language.dutch": "Holandiešu",
+    "language.greek": "Grieķu"
+}

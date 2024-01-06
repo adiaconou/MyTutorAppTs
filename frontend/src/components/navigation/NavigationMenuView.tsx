@@ -144,7 +144,7 @@ export default function NavigationMenuView({
         </Avatar>
         <Typography variant="h6">{userName}</Typography>
         {user?.email && (
-          <Typography variant="subtitle2" color="text.secondary">
+          <Typography variant="subtitle2">
             {user.email}
           </Typography>
         )}

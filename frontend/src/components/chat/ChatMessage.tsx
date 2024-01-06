@@ -144,8 +144,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, sx, waitingForMessag
             padding: "8px 12px",
             borderRadius: message.isUser ? "12px 12px 12px 12px" : "12px 12px 0px 12px",
             backgroundColor: message.isUser
-              ? (theme) => theme.palette.primary.main
-              : (theme) => theme.palette.grey[800],
+              ? (theme) => theme.palette.info.dark
+              : (theme) => theme.palette.grey[900],
           }}
         >
           {waitingForMessageFromAI && !message.isUser ? (

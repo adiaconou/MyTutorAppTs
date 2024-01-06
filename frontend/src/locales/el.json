@@ -1,0 +1,21 @@
+{
+    "SetupView.speakLanguage": "Ποια γλώσσα μιλάτε τώρα;",
+    "SetupView.learnLanguage": "Ποια γλώσσα θέλετε να μάθετε;",
+    "SetupView.skillLevel": "Ποιο είναι το τρέχον επίπεδο δεξιοτήτων σας στην {language};",
+    "SetupView.search": "Αναζήτηση...",
+    "SetupView.beginner": "Αρχάριος",
+    "SetupView.intermediate": "Μεσαίο Επίπεδο",
+    "SetupView.advanced": "Προχωρημένος",
+    "language.english": "Αγγλικά",
+    "language.german": "Γερμανικά",
+    "language.french": "Γαλλικά",
+    "language.spanish": "Ισπανικά",
+    "language.italian": "Ιταλικά",
+    "language.russian": "Ρωσικά",
+    "language.chinese": "Κινεζικά",
+    "language.latvian": "Λετονικά",
+    "language.japanese": "Ιαπωνικά",
+    "language.portuguese": "Πορτογαλικά",
+    "language.dutch": "Ολλανδικά",
+    "language.greek": "Ελληνικά"
+}

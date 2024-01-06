@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Paper, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { UserSettingsService } from "../services/UserSettingsService";
+import { Box, Typography, Paper, Button } from "@mui/material";
 import { UserSettings } from "../models/UserSettings";
+import { UserSettingsService } from "../services/UserSettingsService";
 import Loading from "../components/common/Loading";
 
 /*
@@ -11,9 +11,10 @@ import Loading from "../components/common/Loading";
   This will prompt the user for what they want to practice.
 */
 const NewSessionView: React.FC = () => {
-  const navigate = useNavigate();
   const[userSettings, setUserSettings] = useState<UserSettings>();
   const { isLoading, user, getAccessTokenSilently } = useAuth0();
+  const navigate = useNavigate();
+
   const userSettingsService = new UserSettingsService();
 
   // TODO: Move to view model
@@ -29,24 +30,12 @@ const NewSessionView: React.FC = () => {
         );
 
         // If is null, this is the first time the user has logged in
-        // and we set default values for the user's settings.
-        // Later on, new login should take them through a wizard
-        // to choose their settings.
         if (!userSettings)  {
-          const defaultUserSettings: UserSettings = {
-            userId: email,
-            settings: {
-              sourceLanguage: 'English',
-              languageChoice: 'French',
-              languageProficiency: 1,
-            }
-          };
+          navigate("/setup");
+          return;
+        } 
 
-          await userSettingsService.updateUserSettings(defaultUserSettings, token);
-          setUserSettings(defaultUserSettings);
-        } else {
-          setUserSettings(userSettings);
-        }
+        setUserSettings(userSettings);
       }
     };
 
@@ -57,7 +46,7 @@ const NewSessionView: React.FC = () => {
     navigate("/chat", { state: { value: 1, userSettings: userSettings } });
   };
 
-  if (isLoading) {
+  if (isLoading || !userSettings) {
     return <Loading />
   }
   
@@ -69,7 +58,6 @@ const NewSessionView: React.FC = () => {
         alignItems: "center",
         justifyContent: "center",
         height: "100vh",
-        color: "white",
         paddingTop: "16px",
         width: "100%",
       }}
@@ -78,7 +66,6 @@ const NewSessionView: React.FC = () => {
         elevation={3}
         sx={{
           padding: "16px",
-          boxShadow: "0px 0px 10px 0px blue",
           width: "70%",
           textAlign: "center",
           display: "flex",
@@ -90,9 +77,8 @@ const NewSessionView: React.FC = () => {
         <Box mt={2}>
           <Button
             variant="contained"
-            color="primary"
             onClick={redirectToChat}
-            sx={{ width: "200px", boxShadow: "0px 4px 7px rgba(0, 0, 0, 0.5)" }}
+            sx={{ width: "200px" }}
           >
             <Typography variant="button" style={{ textTransform: "none", fontSize: "14px" }}>
               Conversation
@@ -102,9 +88,8 @@ const NewSessionView: React.FC = () => {
         <Box mt={2}>
           <Button
             variant="contained"
-            color="primary"
             disabled
-            sx={{ width: "200px", boxShadow: "0px 4px 7px rgba(0, 0, 0, 0.5)" }}
+            sx={{ width: "200px" }}
           >
             <Typography variant="button" style={{ textTransform: "none", fontSize: "14px" }}>
               Vocabulary
@@ -114,9 +99,8 @@ const NewSessionView: React.FC = () => {
         <Box mt={2}>
           <Button
             variant="contained"
-            color="primary"
             disabled
-            sx={{ width: "200px", boxShadow: "0px 4px 7px rgba(0, 0, 0, 0.5)" }}
+            sx={{ width: "200px" }}
           >
             <Typography variant="button" style={{ textTransform: "none", fontSize: "14px" }}>
               Verb Conjugations
