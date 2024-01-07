@@ -119,6 +119,7 @@ export default function SettingsViewModel() {
     languageChoice,
     isLoading,
     userSettings,
+    setUserSettings,
     handleLanguageProficiencyChange,
     handleSourceLanguageChange,
     handleTargetLanguageChange,

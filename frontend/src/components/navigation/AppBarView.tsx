@@ -3,12 +3,13 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
 import NavigationMenuView from "./NavigationMenuView";
 import useViewModel from "./AppBarViewModel";
 import { useAuth0 } from "@auth0/auth0-react";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Avatar, Typography } from "@mui/material";
+import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsView from "../../views/SettingsView";
 
 interface AppBarViewProps {
   sx?: {
@@ -22,6 +23,11 @@ interface AppBarViewProps {
 const AppBarView: React.FC<AppBarViewProps> = ({ sx }) => {
   const { handleMenuClick, handleClose, getDrawerOpen } = useViewModel();
   const { isAuthenticated, user } = useAuth0();
+  const [isSettingsDrawerOpen, setIsSettingsDrawerOpen] = React.useState(false);
+
+  const handleClick = () => {
+    setIsSettingsDrawerOpen(!isSettingsDrawerOpen);
+  };
 
   if (!isAuthenticated) {
     return null;
@@ -38,21 +44,27 @@ const AppBarView: React.FC<AppBarViewProps> = ({ sx }) => {
             sx={{ mr: 2 }}
             onClick={handleMenuClick}
           >
-            <MenuIcon sx={{ fontSize: "2rem" }} />
+            <Avatar src={user?.picture}>
+              <AccountCircleIcon />
+            </Avatar>
           </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             My AI Tutor
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", height: "100%" }}>
-            <Avatar src={user?.picture}>
-              <AccountCircleIcon />
-            </Avatar>
+            <IconButton onClick={handleClick}>
+              <SettingsIcon />
+            </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
       <NavigationMenuView
         drawerOpen={getDrawerOpen()}
         handleClose={handleClose}
+      />
+      <SettingsView
+        drawerOpen={isSettingsDrawerOpen}
+        handleClose={() => setIsSettingsDrawerOpen(false)}
       />
     </Box>
   );

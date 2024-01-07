@@ -114,7 +114,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, sx, waitingForMessag
   return (
     <Box
       sx={{
-        maxWidth: "90%",
+        maxWidth: "85%",
         alignSelf: message.isUser ? "flex-start" : "flex-end",
         ...sx,
       }}
@@ -142,21 +142,22 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, sx, waitingForMessag
           elevation={3}
           sx={{
             padding: "8px 12px",
-            borderRadius: message.isUser ? "12px 12px 12px 12px" : "12px 12px 0px 12px",
+            borderRadius: message.isUser ? "18px 18px 18px 18px" : "18px 18px 0px 18px",
             backgroundColor: message.isUser
-              ? (theme) => theme.palette.info.dark
+              ? (theme) => theme.palette.primary.main
               : (theme) => theme.palette.grey[900],
+              mb: 2,
           }}
         >
           {waitingForMessageFromAI && !message.isUser ? (
-            <TypingIndicator /> // Render TypingIndicator when waitingForMessageFromAI is true and message is not from the user
+            <TypingIndicator /> 
           ) : (
             <Typography
               variant="body1"
-              style={{
+              sx={{
                 fontFamily: "Noto Sans, monospace",
                 fontSize: "13px",
-                color: textColor,
+                color: message.isUser ? (theme) => theme.palette.primary.contrastText : (theme) => theme.palette.grey[50],
                 whiteSpace: 'pre-line' // This will make CSS handle newlines as they are
               }}
             >
@@ -164,11 +165,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, sx, waitingForMessag
             </Typography>)}
           {!message.isUser && !waitingForMessageFromAI && ( // Only render for bot messages
             <>
-              <div style={{ height: '10px' }} />  {/* New line for spacing */}
+              <div style={{ height: '10px' }} />
               <Box
                 sx={{
                   display: 'flex',
-                  justifyContent: 'left', // Center the icons
+                  justifyContent: 'left',
                   alignItems: 'center'
                 }}
               >

@@ -26,22 +26,13 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ languageChoice, han
 
   return (
     <FormControl>
-      <InputLabel id="language-select-label">
-        <Box sx={{ display: 'flex', alignItems: 'center', mt: '3px' }}>
-          <LanguageIcon sx={{ mr: 1 }} />
-          <Typography variant="body1">
-            Language
-          </Typography>
-        </Box>
-      </InputLabel>
       <Select
         value={selectedLanguage || ''}
         labelId="language-select-label"
-        label="Languages \t\t"
         onChange={handleSelectionChange}
         sx={{
           marginTop: '4px',
-          width: '75vw',
+          width: '200px',
           height: '55px',
         }}
         MenuProps={{

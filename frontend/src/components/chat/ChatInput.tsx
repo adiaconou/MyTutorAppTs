@@ -92,6 +92,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                   fontFamily: "Noto Sans, monospace", // Set the font family
                   fontSize: "16px", // Set the font size
                   textAlign: "left",
+                  borderRadius: "25px",
                 },
 
                 endAdornment: (

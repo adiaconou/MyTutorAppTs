@@ -80,14 +80,6 @@ export default function NavigationMenuView({
       },
     },
     {
-      label: "Prompt Settings",
-      icon: <SettingsIcon />,
-      onClick: () => {
-        navigate("/settings");
-        handleClose();
-      },
-    },
-    {
       label: "Logout",
       icon: <LogoutIcon />, // replace this with your actual logout icon
       onClick: () =>
@@ -130,7 +122,6 @@ export default function NavigationMenuView({
         },
       }}
     >
-      {/* Header with profile icon and username */}
       <Box
         sx={{
           display: "flex",
