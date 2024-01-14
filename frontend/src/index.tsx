@@ -6,6 +6,9 @@ import { Auth0ProviderWithNavigate } from './auth/Auth0ProviderWithNavigate';
 import ErrorBoundary from './error/ErrorBoundary';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { register as registerServiceWorker } from './serviceWorkerRegistration';
+import { UserSettingsProvider } from './context/UserSettingsContext';
+
 
 const darkTheme = createTheme({
   palette: {
@@ -24,12 +27,16 @@ if (rootElement) {
         <Auth0ProviderWithNavigate>
           <ThemeProvider theme={darkTheme}>
             <CssBaseline />
-            <App />
+            <UserSettingsProvider>
+              <App />
+            </UserSettingsProvider>
           </ThemeProvider>
         </Auth0ProviderWithNavigate>
       </ErrorBoundary>
     </BrowserRouter>
   );
+
+  registerServiceWorker();
 
   reportWebVitals();
 } else {

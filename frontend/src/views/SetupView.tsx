@@ -184,10 +184,6 @@ const SetupView: React.FC = () => {
         }
     };
 
-    if (savingSettings) {
-        return <Loading />;
-    }
-
     return (
         <Box
             sx={{

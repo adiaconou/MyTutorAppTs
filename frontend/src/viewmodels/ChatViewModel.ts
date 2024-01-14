@@ -10,23 +10,25 @@ import { Message } from "../models/Message";
 import { OpenAIService } from "../services/OpenAIService";
 import { UserChatMessage } from "../models/UserChatMessage";
 import { Session } from "../models/Session";
-import { UserSettings } from "../models/UserSettings";
-import { UserSettingsService } from "../services/UserSettingsService";
+import { useUserSettings } from "../context/UserSettingsContext";
+
 
 export default function ChatViewModel() {
-  const { user, getAccessTokenSilently } = useAuth0();
+  const { user, isLoading, getAccessTokenSilently } = useAuth0();
   const { height: viewportHeight } = useWindowDimensions();
+  const { userSettings } = useUserSettings();
 
   // State objects
   const [waitingForMessageFromAI, setWaitingForMessageFromAI] = useState(false);
   const [userChatSession, setUserChatSession] = useState<Session>();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [authToken, setAuthToken] = useState<string>('');
 
   // Service objects
   const userChatMessagesService = new UserChatMessagesService();
   const userChatSessionsService = new UserChatSessionsService();
-  const userSettingsService = new UserSettingsService();
   const openAiService = new OpenAIService();
+
 
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
@@ -39,6 +41,14 @@ export default function ChatViewModel() {
     });
 
     useEffect(() => {
+      const fetchToken = async () => {
+        const token = await getAccessTokenSilently();
+        setAuthToken(token);
+        await loadChatSession();
+      };
+
+      fetchToken();
+
       function handleResize() {
         setWindowDimensions({
           height: window.innerHeight,
@@ -47,7 +57,7 @@ export default function ChatViewModel() {
 
       window.addEventListener("resize", handleResize);
       return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    }, [isLoading]);
 
     return windowDimensions;
   }
@@ -135,15 +145,13 @@ export default function ChatViewModel() {
   or in the browser, this is a totally new conversation.
 */
   const startNewChatSession = async (email: string): Promise<Session> => {
-    const token = await getAccessTokenSilently();
-    let localUserSettings = location.state?.userSettings as UserSettings;
-    if (!localUserSettings) {
-      localUserSettings = await userSettingsService.getUserSettings(email, token) as UserSettings;
+    if (!userSettings) {
+      throw new Error("User settings not found");
     }
 
     // Get the initial user prompt to start the AI chat
     // TODO: The retrieved prompt should be conditional on stateValue
-    const systemPrompt = Gpt4Prompt.getConversationPrompt(localUserSettings);
+    const systemPrompt = Gpt4Prompt.getConversationPrompt(userSettings);
 
     // Creating local array to store messages since setMessages
     // updates async and the new state won't be available here
@@ -158,8 +166,15 @@ export default function ChatViewModel() {
       isVisibleToUser: false
     });
 
-    // Send the prompt to the AI
-    const response = await openAiService.prompt(currentMessages, token);
+    let response;
+
+    if (authToken) {
+      response = await openAiService.prompt(currentMessages, authToken);
+    } else {
+      const token = await getAccessTokenSilently();
+      response = await openAiService.prompt(currentMessages, token);
+    }
+
     // TODO: Handle error/null
     if (response !== null) {
       const parsedJson = JSON.parse(response);
@@ -185,8 +200,8 @@ export default function ChatViewModel() {
     // if the user refreshes the page.
     const newSession = {
       id: uuidv4(),
-      sourceLanguage: localUserSettings.settings.sourceLanguage,
-      targetLanguage: localUserSettings.settings.languageChoice,
+      sourceLanguage: userSettings.settings.sourceLanguage,
+      targetLanguage: userSettings.settings.languageChoice,
       isSaved: false,
       messages: currentMessages
     };
@@ -199,7 +214,13 @@ export default function ChatViewModel() {
     If there is not a stored user chat session for the id, return undefined.
   */
   const getChatSessionFromServer = async (id: string): Promise<Session | undefined> => {
-    const token = await getAccessTokenSilently();
+    let token;
+    if (!authToken) {
+      token = await getAccessTokenSilently();
+    } else {
+      token = authToken;
+    }
+
     const userChatSession = await userChatSessionsService.getChatSessionById(id, token);
     if (userChatSession) {
       const messages = await getMessages(userChatSession.id, 500);
@@ -227,18 +248,14 @@ export default function ChatViewModel() {
       timestamp: new Date(message.timestamp),
     })) as Message[];
 
-    // TODO: Handle this better. Shouldn't be possible to not have user settings.
-    const token = await getAccessTokenSilently();
-    const localUserSettings = await userSettingsService.getUserSettings(email, token) as UserSettings;
-    if (!localUserSettings) {
-      // TODO: This should probably throw an exception since it's an invalid state
-      return undefined;
+    if (!userSettings) {
+      throw new Error("User settings not found");
     }
 
     const newSession = {
       id: id,
-      sourceLanguage: localUserSettings.settings.sourceLanguage,
-      targetLanguage: localUserSettings.settings.languageChoice,
+      sourceLanguage: userSettings.settings.sourceLanguage,
+      targetLanguage: userSettings.settings.languageChoice,
       isSaved: false,
       messages: storedMessages,
     };
@@ -248,7 +265,12 @@ export default function ChatViewModel() {
 
   /*** Get message history for the chat session ***/
   const getMessages = async (chatSessionId: string, limit: number): Promise<Message[]> => {
-    const token = await getAccessTokenSilently();
+    let token;
+    if (!authToken) {
+      token = await getAccessTokenSilently();
+    } else {
+      token = authToken;
+    }
     const messageList: UserChatMessage[] = await userChatMessagesService.getMessages(
       chatSessionId,
       limit,
@@ -291,8 +313,13 @@ export default function ChatViewModel() {
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     storedMessages.push(userMessage);
 
-    const token = await getAccessTokenSilently();
     const fetchResponse = async () => {
+      let token;
+      if (!authToken) {
+        token = await getAccessTokenSilently();
+      } else {
+        token = authToken;
+      }
       const response = await openAiService.prompt(messages, token);
 
       if (response !== null) {
@@ -334,7 +361,7 @@ export default function ChatViewModel() {
 
     if (!user || !user.email || !sessionId) {
       navigate("/login");
-      return;    
+      return;
     }
 
     // Create UserChatMessage object. A chat session is only
@@ -350,19 +377,22 @@ export default function ChatViewModel() {
       isVisibleToUser: message.isVisibleToUser,
     }));
 
-    // Get the auth token to authorize the API call
-    const token = await getAccessTokenSilently();
-    let localUserSettings = location.state?.userSettings as UserSettings;
-    if (!localUserSettings) {
-      localUserSettings = await userSettingsService.getUserSettings(user.email, token) as UserSettings;
+    if (!userSettings) {
+      throw new Error("User settings not found");
     }
 
-    // Send the request to the server
+    let token;
+    if (!authToken) {
+      token = await getAccessTokenSilently();
+    } else {
+      token = authToken;
+    }
+
     userChatSessionsService.saveChatSession(
       user.email,
       sessionId,
-      localUserSettings.settings.sourceLanguage,
-      localUserSettings.settings.languageChoice,
+      userSettings.settings.sourceLanguage,
+      userSettings.settings.languageChoice,
       userChatMessages,
       token
     );
@@ -377,7 +407,12 @@ export default function ChatViewModel() {
   }
 
   /*** Store the last message in the database ***/
-  async function putNewMessage(displayableText: string, rawText: string, sender: string, timestamp: Date, isVisibleToUser?: boolean) {
+  async function putNewMessage(
+    displayableText: string,
+    rawText: string,
+    sender: string,
+    timestamp: Date,
+    isVisibleToUser?: boolean) {
     // Get the chat session id from the browser session.
     // If it doesn't exist, we can't write the message.
     const chatSessionId = sessionStorage.getItem("chatSessionId");
@@ -385,11 +420,23 @@ export default function ChatViewModel() {
       return;
     }
 
-    // Get auth access token so the request can be authorized
-    const token = await getAccessTokenSilently();
+    let token;
+    if (!authToken) {
+      token = await getAccessTokenSilently();
+    } else {
+      token = authToken;
+    }
 
     // Send the message
-    userChatMessagesService.putNewMessage(displayableText, rawText, sender, chatSessionId, token, timestamp, isVisibleToUser);
+    userChatMessagesService.putNewMessage(
+      displayableText,
+      rawText,
+      sender,
+      chatSessionId,
+      token,
+      timestamp,
+      isVisibleToUser
+    );
   }
 
   return {
@@ -397,6 +444,7 @@ export default function ChatViewModel() {
     viewportHeight,
     waitingForMessageFromAI,
     userChatSession,
+    authToken,
     startNewChatSession,
     saveChatSession,
     loadChatSession,

@@ -1,16 +1,7 @@
-import { Box, CircularProgress } from "@mui/material";
+import Loading from "../components/common/Loading";
 
 export const PageLoader = () => {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-      }}
-    >
-      <CircularProgress />
-    </Box>
+   <Loading />
   );
 };

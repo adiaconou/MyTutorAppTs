@@ -1,39 +1,9 @@
 import TextField from "@mui/material/TextField";
 import { InputAdornment, Tooltip } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { blue } from "@mui/material/colors";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import { useTextFieldViewModel } from "./ChatInputViewModel";
-
-const theme = createTheme({
-  components: {
-    MuiInputLabel: {
-      styleOverrides: {
-        root: {
-          color: "white",
-        },
-      },
-    },
-    MuiOutlinedInput: {
-      styleOverrides: {
-        input: {
-          color: "white",
-        },
-        notchedOutline: {
-          "&:hover": {
-            borderColor: blue[500],
-          },
-          "&.Mui-focused": {
-            borderColor: blue[500],
-          },
-          borderColor: blue[500],
-        },
-      },
-    },
-  },
-});
 
 interface ChatInputProps {
   onSubmit: (inputValue: string) => void;
@@ -61,7 +31,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
     >
       <Container maxWidth="md">
         <form onSubmit={handleSubmit}>
-          <ThemeProvider theme={theme}>
             <TextField
               id="textField"
               variant="outlined"
@@ -72,29 +41,21 @@ const ChatInput: React.FC<ChatInputProps> = ({
               multiline
               maxRows={1}
               fullWidth
-              autoFocus={true}
               onBlur={handleBlur}
               disabled={disabled}
-              sx={{
-                "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline":
-                  {
-                    borderColor: blue[500],
-                  },
-              }}
               InputLabelProps={{
                 style: {
-                  fontFamily: "Noto Sans, monospace", // Set the font family
-                  fontSize: "16px", // Set the font size
+                  fontFamily: "Noto Sans, monospace",
+                  fontSize: "16px",
                 },
               }}
               InputProps={{
                 style: {
-                  fontFamily: "Noto Sans, monospace", // Set the font family
-                  fontSize: "16px", // Set the font size
+                  fontFamily: "Noto Sans, monospace",
+                  fontSize: "16px",
                   textAlign: "left",
                   borderRadius: "25px",
                 },
-
                 endAdornment: (
                   <InputAdornment position="end"  style={{
                      pointerEvents: inputValue.trim().length === 0 || disabled ? 'none' : 'auto',
@@ -103,7 +64,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
                     <Tooltip title="Send it!">
                       <SendIcon
                         sx={{
-                          color: blue[500],
                           cursor: "pointer",
                           "&:hover": {
                             cursor: "pointer",
@@ -116,7 +76,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 ),
               }}
             />
-          </ThemeProvider>
         </form>
       </Container>
     </Box>

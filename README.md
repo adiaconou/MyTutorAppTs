@@ -7,8 +7,6 @@ This is a fully responsive web application that is a simple chat interface built
 - Error handling is incomplete
 - Need to implement proper dependency injection
 - No unit tests
-- Doesn't actually do language translation yet since gpt3.5 can't return json formatted responses (gpt4 can, however I haven't been given API access to that model)
-- Frontend .env files need to be removed from repo
 
 # Architecture
 - Language: Typescript
@@ -38,6 +36,9 @@ These instructions will help set up the application from scratch.
 4. In the VS Code terminal, use the git clone command followed by the URL to clone the repository:
 
 `git clone https://github.com/adiaconou/MyTutorAppTs`
+
+## Caching
+The service worker will cache application assets in the browser. Either the cache version needs to be updated in serviceWorker.js, or the cache needs to be cleared from the browser console when new versions of the app are deployed in order to ensure new behavior takes effect.
 
 # Setting Up Environment Variables
 

@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Box, Slider, Typography, Divider, Button, SelectChangeEvent, CircularProgress, Drawer } from "@mui/material";
+import { Box, Slider, Typography, Divider, SelectChangeEvent, Drawer } from "@mui/material";
 import LanguageSelector from "../components/common/LanguageSelector";
-import useViewModel from "../viewmodels/SettingsViewModel";
-import Loading from "../components/common/Loading";
 import { UserSettingsService } from "../services/UserSettingsService";
 import { UserSettings } from "../models/UserSettings";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useUserSettings } from "../context/UserSettingsContext";
+import { useLocation } from 'react-router-dom';
 
 interface SettingsViewProps {
   drawerOpen: boolean;
@@ -17,59 +18,43 @@ export default function SettingsView({
   handleClose,
 }: SettingsViewProps): JSX.Element {
   const [isSaving, setIsSaving] = useState(false);
+  const [settingsChanged, setSettingsChanged] = useState(false);
   const [sourceLanguage, setSourceLanguage] = React.useState<string | undefined>(undefined);
   const [targetLanguage, setTargetLanguage] = React.useState<string | undefined>(undefined);
   const [languageProficiency, setLanguageProficiency] = React.useState<number | undefined>(undefined);
-  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+  
+  const location = useLocation();
+  const { user, getAccessTokenSilently } = useAuth0();
+  const { userSettings } = useUserSettings();
 
   const userSettingsService = new UserSettingsService();
-
-  const {
-    isLoading,
-    userSettings,
-    setUserSettings,
-    getUserSettings,
-  } = useViewModel();
-
-  useEffect(() => {
-    const fetchSettings = async () => {
-      if (user?.email && isAuthenticated) {
-        try {
-          const token = await getAccessTokenSilently();
-          getUserSettings(user.email, token);
-        } catch (error) {
-          console.error("Error fetching access token:", error);
-        }
-      } else {
-        console.error("User email is not available");
-      }
-    };
-
-    fetchSettings();
-  }, [languageProficiency, getAccessTokenSilently]);
-
-  if (isLoading) {
-    return (
-      <Loading />
-    );
-  }
 
   function handleSourceLanguageChange(event: SelectChangeEvent<string>): void {
     const newSourceLanguage = event.target.value;
     setSourceLanguage(newSourceLanguage);
+    setSettingsChanged(true);
     handleSaveSettings(newSourceLanguage, targetLanguage, languageProficiency);
   }
-  
+
   function handleTargetLanguageChange(event: SelectChangeEvent<string>): void {
     const newTargetLanguage = event.target.value;
     setTargetLanguage(newTargetLanguage);
+    setSettingsChanged(true);
     handleSaveSettings(sourceLanguage, newTargetLanguage, languageProficiency);
   }
-  
+
   function handleLanguageProficiencyChange(event: Event, value: number | number[]): void {
     const newLanguageProficiency = value as number;
     setLanguageProficiency(newLanguageProficiency);
+    setSettingsChanged(true);
     handleSaveSettings(sourceLanguage, targetLanguage, newLanguageProficiency);
+  }
+
+  function handleDrawerClose(): void {
+    handleClose();
+    if (settingsChanged){
+      window.location.href = location.pathname;
+    }
   }
 
   async function handleSaveSettings(
@@ -108,10 +93,10 @@ export default function SettingsView({
     <Drawer
       anchor="right"
       open={drawerOpen}
-      onClose={handleClose}
+      onClose={handleDrawerClose}
       PaperProps={{
         style: {
-          width: '80%',
+          width: '100%',
         },
       }}
     >
@@ -126,20 +111,27 @@ export default function SettingsView({
         }}
       >
         <Box
-          className="setting_pageTitle"
           sx={{
             mb: 2,
             mt: 2,
-            width: "75%",
+            width: "90%",
             display: "flex",
-            flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
           }}
         >
-          <Typography sx={{ fontWeight: "bold", fontSize: "24px" }}>
+          <ArrowBackIcon onClick={handleDrawerClose} />
+          <Typography
+            sx={{
+              fontWeight: "bold",
+              fontSize: "24px",
+              position: "absolute",
+              left: "50%",
+              transform: 'translateX(-50%)',
+            }}
+          >
             Settings
           </Typography>
+          <div></div>
         </Box>
         <Box
           className="setting_languageChoice"

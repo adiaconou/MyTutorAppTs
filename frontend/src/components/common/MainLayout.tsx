@@ -1,7 +1,5 @@
-
 import React from "react";
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import AppBarView from "../navigation/AppBarView";
 
 type MainLayoutProps = {
@@ -10,31 +8,29 @@ type MainLayoutProps = {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => (
     <Box
+        className="MainLayout_parent"
         sx={{
-            display: "flex",
-            flexDirection: "column",
+            maxWidth: "800px",
+            margin: 'auto',
         }}
     >
         <Box
             className="AppBarView_parent"
-            sx={{ position: "fixed", top: 0, zIndex: 10, width: "100%" }}
+            sx={{
+                position: "fixed",
+                top: 0,
+                zIndex: 10,
+            }}
         >
             <AppBarView />
         </Box>
         <Box
+            className="MainLayout_children"
             sx={{
-                display: "flex",
-                flexDirection: "column",
-                flexGrow: 1,
-                alignItems: "center",
+                width: "100%",
             }}
         >
-            <Container
-                maxWidth="md"
-                sx={{ flexGrow: 1, paddingLeft: "0px", paddingRight: "0px" }}
-            >
-                {children}
-            </Container>
+            {children}
         </Box>
     </Box>
 );

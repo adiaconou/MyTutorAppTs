@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2017",
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
+      "webworker"
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -22,5 +23,5 @@
   },
   "include": [
     "src"
-, "server/interfaces", "server/src/dataAccess", "server/models", "server/interfaces", "server/src/models/settingsModel.ts", "server/src/interfaces/settingsDataAccess.ts"  ]
+, "server/interfaces", "server/src/dataAccess", "server/models", "server/interfaces", "server/src/models/settingsModel.ts", "server/src/interfaces/settingsDataAccess.ts", "public/serviceWorker.js"  ]
 }

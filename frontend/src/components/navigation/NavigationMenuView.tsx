@@ -6,7 +6,6 @@ import ListItemText from "@mui/material/ListItemText";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useNavigate } from "react-router-dom";
 import ChatBubbleIcon from "@mui/icons-material/ChatBubble";
@@ -15,7 +14,6 @@ import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { useLayoutEffect, useState } from "react";
-import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import useViewModel from "./NavigationMenuViewModel";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -39,7 +37,7 @@ export default function NavigationMenuView({
   drawerOpen,
   handleClose,
 }: NavigationMenuViewProps): JSX.Element {
-  const { logout, user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
+  const { logout, user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(
     null
   );
@@ -55,7 +53,6 @@ export default function NavigationMenuView({
 
   const userChatSessionsService = new UserChatSessionsService();
 
-  // Get access to the useHistory hook from react-router-dom
   const navigate = useNavigate();
 
   useLayoutEffect(() => {
@@ -68,7 +65,6 @@ export default function NavigationMenuView({
     fetchSettings();
   }, [user, isAuthenticated, getAccessTokenSilently]);
 
-  // Items for the navigation menu
   const menuItems: MenuItem[] = [
     {
       label: "New Chat",
@@ -81,7 +77,7 @@ export default function NavigationMenuView({
     },
     {
       label: "Logout",
-      icon: <LogoutIcon />, // replace this with your actual logout icon
+      icon: <LogoutIcon />,
       onClick: () =>
         logout({
           logoutParams: {
@@ -90,22 +86,6 @@ export default function NavigationMenuView({
         }),
     },
   ];
-
-  if (isLoading) {
-    // Render a loading spinner or message while data is being fetched
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
 
   return (
     <Drawer

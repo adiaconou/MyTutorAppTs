@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import Loading from "../components/common/Loading";
 import { Box } from "@mui/material";
@@ -16,22 +16,10 @@ const ChatView: React.FC = () => {
     viewportHeight,
     waitingForMessageFromAI,
     userChatSession,
+    authToken,
     saveChatSession,
-    loadChatSession,
     submitMessage,
   } = useViewModel();
-
-  // Check auth and load chat session on component mount
-  useEffect(() => {
-    console.log("ChatView useEffect");
-
-    const fetchToken = async () => {
-      await loadChatSession();
-    };
-
-    fetchToken();
-
-  }, []);
 
   const handleTextSubmit = async (text: string) => {
     await submitMessage(text);
@@ -43,14 +31,13 @@ const ChatView: React.FC = () => {
     }
   };
 
-  // TODO: Hanlde userChatSession better.
-  if (isLoading || !userChatSession) {
-    return <Loading />
+  // TODO: Handle userChatSession better.
+  if (isLoading || !userChatSession || !authToken) {
+    return <Loading />;
   }
 
   return (
     <Box
-      className="ChatFormView_parent"
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -60,7 +47,6 @@ const ChatView: React.FC = () => {
       }}
     >
       <Box
-        className="ChatMessageListView_parent"
         sx={{
           flexGrow: 1,
           overflowY: "auto",
@@ -83,12 +69,15 @@ const ChatView: React.FC = () => {
           },
         }}
       >
-        <ChatMessageList messages={messages} chatSession={userChatSession} waitingForMessageFromAI={waitingForMessageFromAI} />
+        <ChatMessageList
+          messages={messages}
+          chatSession={userChatSession}
+          waitingForMessageFromAI={waitingForMessageFromAI}
+        />
       </Box>
       <Box
-        className="TextFieldView_parent"
         sx={{
-          position: "relative", // Set position as relative
+          position: "relative",
           paddingBottom: "15px",
           paddingTop: "15px",
           width: "100%",
@@ -96,23 +85,19 @@ const ChatView: React.FC = () => {
           margin: "0 auto",
           display: 'flex',
           alignItems: 'center',
-          // ... other existing styles ...
         }}
       >
         {userChatSession.isSaved ? (
-          // Render the StarIcon with a disabled look
           <StarIcon sx={{
             position: "absolute",
             bottom: "100%",
             left: "8%",
             transform: "translateX(-50%)",
-            color: "gold", // Change color to gray or any other to indicate disabled state
-            cursor: "not-allowed", // Change cursor to indicate non-clickable
+            color: "gold",
+            cursor: "not-allowed",
             opacity: 0.5, // Reduce opacity to indicate it's disabled
-            // ... other styling as required ...
           }} />
         ) : (
-          // Render the StarBorderIcon for the non-selected state
           <StarBorderIcon sx={{
             position: "absolute",
             bottom: "100%",
@@ -120,7 +105,6 @@ const ChatView: React.FC = () => {
             transform: "translateX(-50%)",
             color: "gray",
             cursor: "pointer",
-            // ... other styling as required ...
           }} onClick={handleStarClick} />
         )}
         <ChatInput onSubmit={handleTextSubmit} disabled={waitingForMessageFromAI} />
