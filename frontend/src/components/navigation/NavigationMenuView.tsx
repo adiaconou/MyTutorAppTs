@@ -81,7 +81,7 @@ export default function NavigationMenuView({
       onClick: () =>
         logout({
           logoutParams: {
-            returnTo: window.location.origin + "/login",
+            returnTo: window.location.origin + "/",
           },
         }),
     },
@@ -93,13 +93,10 @@ export default function NavigationMenuView({
       anchor="left"
       open={drawerOpen}
       onClose={handleClose}
-      sx={{
-        width: "240px",
-        flexShrink: 0,
-        "& .MuiDrawer-paper": {
-          width: "240px",
-          boxSizing: "border-box",
-        },
+      PaperProps={{
+        sx: {
+          minWidth: '250px'
+        }
       }}
     >
       <Box

@@ -19,6 +19,7 @@ const NewSessionView: React.FC = () => {
   const { userSettings, isSettingsLoading } = useUserSettings();
 
   useEffect(() => {
+    console.log("useEffect NewSessionView", { userSettings, isLoading });
     setViewportWidth(window.outerWidth * .6);
   }, []);
 
@@ -74,7 +75,7 @@ const NewSessionView: React.FC = () => {
           }}
           onClick={redirectToChat}
         >
-          <Typography variant="h6" sx={{fontWeight: "bold"}}>Conversation</Typography>
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>Conversation</Typography>
         </Card>
       </Box>
       <Box
@@ -103,7 +104,7 @@ const NewSessionView: React.FC = () => {
             cursor: 'pointer'
           }}
         >
-          <Typography variant="h6" sx={{fontWeight: "bold"}}>Vocabulary</Typography>
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>Vocabulary</Typography>
         </Card>
       </Box>
       <Box
@@ -116,7 +117,7 @@ const NewSessionView: React.FC = () => {
           margin: "0 auto",
         }}
       >
-        <ChatInput onSubmit={handleTextSubmit} disabled={true}  />
+        <ChatInput onSubmit={handleTextSubmit} disabled={true} />
       </Box>
     </Box>
   );

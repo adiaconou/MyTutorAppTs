@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth0 } from '@auth0/auth0-react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useAuth0 } from "@auth0/auth0-react";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import { Box, Stepper, Step, StepLabel, Typography, Button } from "@mui/material";
-import { UserSettingsService } from "../services/UserSettingsService";
 import { UserSettings } from "../models/UserSettings";
 import { useLocale } from "../context/LocaleContext";
 import LanguageList from "../components/common/LanguageList";
-import Loading from "../components/common/Loading";
 import "../components/common/step-transition.css";
 import config from "../config";
+import { UserSettingsService } from "../services/UserSettingsService";
 
 const SetupView: React.FC = () => {
     const [activeStep, setActiveStep] = useState(0);
@@ -20,13 +19,12 @@ const SetupView: React.FC = () => {
     const [languageProficiency, setLanguageProficiency] = useState<string | null>("BEGINNER");
     const [transitionDirection, setTransitionDirection] = useState('forward');
 
-    const { user, getAccessTokenSilently } = useAuth0();
+    const { user, getAccessTokenSilently, loginWithRedirect } = useAuth0();
     const navigate = useNavigate();
     const intl = useIntl();
     const { setLocale } = useLocale();
 
-    const userSettingsService = new UserSettingsService();
-
+    const userSettingsService: UserSettingsService = new UserSettingsService();
 
     function handleSkillLevelSelection(value: string): void {
         setLanguageProficiency(value.toUpperCase());
@@ -49,11 +47,6 @@ const SetupView: React.FC = () => {
     async function submitSettings() {
         setSavingSettings(true);
 
-        if (!user || !user.email) {
-            navigate('/login');
-            return;
-        }
-
         if (!sourceLanguage || !targetLanguage || !languageProficiency) {
             navigate('/setup');
             return;
@@ -68,18 +61,43 @@ const SetupView: React.FC = () => {
             skillLevel = 3;
         }
 
-        const settings: UserSettings = {
-            userId: user.email,
-            settings: {
-                sourceLanguage: sourceLanguage,
-                languageChoice: targetLanguage,
-                languageProficiency: skillLevel
-            }
-        };
+        if (!user || !user.email) { // New user (not logged in) executed setup flow
+            const userSettings: UserSettings = {
+                userId: '', // user doesn't exist yet, will be set after redirect on login
+                settings: {
+                    sourceLanguage: sourceLanguage,
+                    languageChoice: targetLanguage,
+                    languageProficiency: skillLevel
+                }
+            };
 
-        const token = await getAccessTokenSilently();
-        await userSettingsService.updateUserSettings(settings, token);
-        navigate('/');
+            // Convert userSettings to JSON to be put in the URL params
+            const appStateJSON = encodeURIComponent(JSON.stringify(userSettings));
+
+            await loginWithRedirect({
+                authorizationParams: {
+                    screen_hint: "signup",
+                },
+                appState: {
+                    appStateJSON,
+                    returnTo: "/new",
+                },
+            });
+        } else { // User running setup flow while already logged in
+            const userSettings: UserSettings = {
+                userId: user.email,
+                settings: {
+                    sourceLanguage: sourceLanguage,
+                    languageChoice: targetLanguage,
+                    languageProficiency: skillLevel
+                }
+            };
+
+            const token = await getAccessTokenSilently();
+            userSettingsService.updateUserSettings(userSettings, token);
+            window.location.href = "/new";
+        }
+        
         setSavingSettings(false);
     }
 

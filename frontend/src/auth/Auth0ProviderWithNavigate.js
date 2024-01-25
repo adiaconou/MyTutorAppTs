@@ -6,9 +6,16 @@ export const Auth0ProviderWithNavigate = ({ children }) => {
 
   const domain = "dev-qprsmox8bpmaln3b.us.auth0.com";
   const clientId = "dlijXHwUF79ccHBqB9cRv0nMZux9irbj";
-  const redirectUri = window.location.origin; // + "/callback";
+  const redirectUri = window.location.origin;
 
   const onRedirectCallback = (appState) => {
+    if (appState && appState.appStateJSON) {
+      // Store appState in the URL params to pass to redirect target
+      const appStateJSON = appState.appStateJSON;
+      const queryString = `appStateJSON=${appStateJSON}`;
+      window.location.search = queryString;
+    }
+
     navigate(appState?.returnTo || window.location.pathname);
   };
 

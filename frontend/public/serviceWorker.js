@@ -3,7 +3,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Basic cache name
-const CACHE_NAME = 'v1.1';
+const CACHE_NAME = 'v1.3';
 
 const urlsToCache = [
   "/",
@@ -38,8 +38,9 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event
 self.addEventListener('fetch', (event) => {
+  if (!(event.request.url.indexOf('http') === 0)) return; // skip the request. if request is not made with http protocol
+
   // Bypass the cache for the service worker file
   if (event.request.url.includes('serviceWorker.js')) {
     event.respondWith(fetch(event.request));
